@@ -1,0 +1,45 @@
+
+[Version]
+Signature="$Windows NT$"
+Provider=%Destiny%
+ClassGUID={4D36E979-E325-11CE-BFC1-08002BE10318}
+Class=Printer
+DriverVer=12/24/2009, 1.35.1224.0
+CatalogFile=SP701xl.cat
+
+
+[DriverInfo]
+DriverName=KONICA MINOLTA PagePro 1350E
+DriverCode=0009
+
+[Uninstall]
+DelReg=Environment_Reg
+DelFiles=@SP701.DAT,PSCRIPT_NT
+
+[Environment_Reg]
+HKLM,"System\CurrentControlSet\Control\Print\Printers","StartOnBoot"
+HKCU,"SoftWare\KONICA MINOLTA\KONICA MINOLTA PagePro 1350E"
+
+[PSCRIPT_NT]
+SP7012kXL.DLL
+SP7012kXUI.DLL
+1350DRV.CHM
+L7012k.PRN
+S7012k.PRN
+L7012k12.PRN
+S7012k12.PRN
+mon7012k.dll
+OEMSETUP.UNF
+
+
+[DestinationDirs]
+DefaultDestDir=66000
+
+
+[Strings]
+Destiny="KONICA MINOLTA"
+PrinterClassName="Printer"
+Floppy="KONICA MINOLTA PagePro 1350E"
+OEM_MONITOR="KONICA MINOLTA PagePro 1350E PJL Language Monitor,MON7012k.DLL"
+
+
