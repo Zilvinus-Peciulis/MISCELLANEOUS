@@ -1,0 +1,79 @@
+
+[Version]
+Signature="$Windows NT$"
+Provider=%Destiny%
+ClassGUID={4D36E979-E325-11CE-BFC1-08002BE10318}
+CatalogFile=SP701xl.cat
+DriverVer=12/24/2009, 1.34.1224.0
+Class=Printer
+
+
+[ClassInstall32.NT]
+AddReg=printer_class_addreg
+
+[printer_class_addreg]
+HKR,,,,%PrinterClassName%
+HKR,,Icon,,"-4"
+HKR,,Installer32,,"ntprint.dll,ClassInstall32"
+HKR,,NoDisplayClass,,1
+
+
+[Manufacturer]
+"KONICA MINOLTA"
+
+
+[KONICA MINOLTA]
+"KONICA MINOLTA PagePro 1350E"=SP701.DAT,LPTENUM\KONICA_MINOLTA_PagePD893
+"KONICA MINOLTA PagePro 1350E"=SP701.DAT,USBPRINT\KONICA_MINOLTA_PagePD893
+
+
+[SP701.DAT.NT]
+CopyFiles=@SP701.DAT,PSCRIPT_NT
+DataFile=SP701.DAT
+DataSection=PSCRIPT_DATA_NT
+
+
+[PSCRIPT_NT]
+SP7012kXL.DLL
+SP7012kXUI.DLL
+1350DRV.CHM
+L7012k.PRN
+S7012k.PRN
+L7012k12.PRN
+S7012k12.PRN
+mon7012k.dll
+OEMSETUP.UNF
+
+
+[PSCRIPT_DATA_NT]
+DriverFile=SP7012kXL.DLL
+ConfigFile=SP7012kXUI.DLL
+HelpFile=1350DRV.CHM
+LanguageMonitor="KONICA MINOLTA PagePro 1350E PJL Language Monitor,MON7012k.DLL"
+
+
+[DestinationDirs]
+DefaultDestDir=66000
+
+[SourceDisksNames]
+4 = %Floppy%,,,""
+
+[SourceDisksFiles]
+SP701.DAT = 4,,,,,,,11,3
+SP7012kXL.DLL = 4,,,,,,,11,3
+SP7012kXUI.DLL = 4,,,,,,,11,3
+1350DRV.CHM = 4,,,,,,,11,3
+L7012k.PRN = 4,,,,,,,11,3
+S7012k.PRN = 4,,,,,,,11,3
+L7012k12.PRN = 4,,,,,,,11,3
+S7012k12.PRN = 4,,,,,,,11,3
+mon7012k.dll= 4,,,,,,,11,3
+OEMSETUP.UNF= 4,,,,,,,11,3
+
+
+[Strings]
+Destiny="KONICA MINOLTA"
+PrinterClassName="Printer"
+Floppy="KONICA MINOLTA PagePro 1350E"
+
+

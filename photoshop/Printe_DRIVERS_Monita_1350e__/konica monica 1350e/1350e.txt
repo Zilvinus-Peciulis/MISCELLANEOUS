@@ -1,0 +1,11 @@
+win7
+How to install
+
+1.Control Panel
+2.Go Printer and Other Devises
+3.Add printer
+4.2x Next
+5.Serach For Advanced [Manula way to install drtiver]
+6.Do it until ask path and select --> PP1350EPCL6Winx86_13412240EN
+7.Auto Complete and promt about successfull install
+8.All Done , can check in printers printing job progress

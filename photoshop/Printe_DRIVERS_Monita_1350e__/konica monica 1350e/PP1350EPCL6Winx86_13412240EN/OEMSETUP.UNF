@@ -1,0 +1,53 @@
+
+[Version]
+Signature="$Windows NT$"
+Provider=%Destiny%
+ClassGUID={4D36E979-E325-11CE-BFC1-08002BE10318}
+CatalogFile=SP701xl.cat
+DriverVer=12/24/2009, 1.34.1224.0
+Class=Printer
+
+
+[ClassInstall32.NT]
+AddReg=printer_class_addreg
+
+[printer_class_addreg]
+HKR,,,,%PrinterClassName%
+HKR,,Icon,,"-4"
+HKR,,Installer32,,"ntprint.dll,ClassInstall32"
+HKR,,NoDisplayClass,,1
+
+
+[DriverInfo]
+DriverName=KONICA MINOLTA PagePro 1350E
+DriverCode=0009
+
+[Uninstall]
+DelReg=Environment_Reg
+DelFiles=@SP701.DAT,PSCRIPT_NT
+
+[Environment_Reg]
+HKLM,"System\CurrentControlSet\Control\Print\Printers","StartOnBoot"
+HKCU,"SoftWare\KONICA MINOLTA\KONICA MINOLTA PagePro 1350E"
+
+[PSCRIPT_NT]
+SP7012kXL.DLL
+SP7012kXUI.DLL
+1350DRV.CHM
+L7012k.PRN
+S7012k.PRN
+L7012k12.PRN
+S7012k12.PRN
+mon7012k.dll
+OEMSETUP.UNF
+
+
+[DestinationDirs]
+DefaultDestDir=66000
+
+[Strings]
+Destiny="KONICA MINOLTA"
+PrinterClassName="Printer"
+Floppy="KONICA MINOLTA PagePro 1350E"
+
+
