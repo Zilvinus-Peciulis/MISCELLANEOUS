@@ -58,3 +58,23 @@ GP7k + DRINK CUP (Yellow)
      (3)=
      (4)=
      
+ =========================================================================================================================================    
+Keywords------
+GP-5 Black
+Tags 
+          Gas mask,Gasmask,Scary Gas mask,Halloween pary,Steampunk,Creepy mask,Military mask,Party accesory,Vitage gasmask,Birthday gift,black gas mask,halloween mask,halloween
+Material
+          Gum,glass,metal
+          
+GP-5 Black
+Tags 
+          Gas mask,Scary gas mask,Creepy mask,Military mask,Party accessory,Vintage gas mask,Halloween mask,Birthday gift,Pary mask,gas masks,Steampunk,Halloween,Gasmask,
+Material
+          Gum,glass,metal,
+                    
+GP-5 White
+Tags 
+          Steampunk,Gas mask,Party accesory,Military,Soviet,Birthday,Soviet gas mask,mask,gasmask,Halloween,Halloween mask,Vintage,gp 5
+Material
+          Gum,glass,metal,
+                                        
