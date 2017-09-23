@@ -77,4 +77,19 @@ Tags
           Steampunk,Gas mask,Party accesory,Military,Soviet,Birthday,Soviet gas mask,mask,gasmask,Halloween,Halloween mask,Vintage,gp 5
 Material
           metal,fabric,gum,rubber,glass
+          
+ 
+ GP-7 k no filters
+Tags 
+          gas mask,Soviet,Original canvas bag,Steampunk,rare,Military,Collection,halloween,black gas mask,gasmask,Military mask,Vintage,gasmask,gas masks,halloween,
+Material
+          metal,gum,rubber,glass
                                         
+                                        
+        
+ PBF white
+Tags 
+          goth,Halloween,RARE Soviet Gas Mask,vintage,Pbf-EO19,made in Ussr,Scary gas mask,Gorila mask,Steam-punk,gas mask,White gas mask,soviet gas mask,Party Accesory,
+Material
+          metal,gum,rubber,glass
+                                                                                
