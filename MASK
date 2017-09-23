@@ -76,5 +76,5 @@ GP-5 White
 Tags 
           Steampunk,Gas mask,Party accesory,Military,Soviet,Birthday,Soviet gas mask,mask,gasmask,Halloween,Halloween mask,Vintage,gp 5
 Material
-          Gum,glass,metal,
+          metal,fabric,gum,rubber,glass
                                         
