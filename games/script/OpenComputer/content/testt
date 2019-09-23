@@ -1,0 +1,240 @@
+local self__ = require ("self")
+self__.Hello();
+
+
+
+--------filemanager save condition----
+--index: "left"
+--------------------------------------
+
+local rb = require("robot")
+local comp = require("component")
+local computer = require("computer")
+local file = require ("file");
+local inventory = require("inventory");
+local craft = require ("craft")
+local sides = require("sides")
+local fuel = comp.generator;
+local exp = comp.experience;
+
+
+--rb.durability()
+
+-- for i,v in pairs(rb) do
+--    print ("I: ",i,", V:",v,"\n");
+--    io.read ();
+-- end
+
+print ("Durability:"..tostring (inventory:durability()) );
+print ("Expirence:"..exp.level());
+
+
+local function equipAndCraftPickaxe  ()
+  local pickaxe = "minecraft:stone_pickaxe";
+
+      if   inventory:durability() == -1 then  -- if only if dont have  try to  equip pickaxe
+           inventory:equipTool(pickaxe);
+      end
+
+     if   inventory:durability() == -1 then -- if robot not have pickaxe then craft and equip
+          print ("No pickaxe in tool slot");
+          inventory:dropItem("minecraft:cobblestone",32,sides.bottom); -- Drop unwanted cobble and leave 32.
+          craft:craft("stone-pickaxe",3);
+          inventory:equipTool(pickaxe); -- and equip
+     end
+
+end
+
+
+
+--print  (rb.swing(1,true) );
+
+--print (item.equip().. ",TYPE:"..type(item.equip()))
+
+--inventory:dropItem("minecraft:cobblestone",32);-- leave 32
+--inventory:dropItem("minecraft:stone");
+--if true then  return end
+
+local function robotSide(setget) -- give config option in program file!
+local  path = "/home/tunnel";
+local  line = 2;
+setget= setget or false;
+   local side =  file.getLineValue(path,line);
+   if setget then
+           if  side =="left" then ;
+               file.ConfigLineAuto( path , line ,"--index", "right","=" );
+            else
+               file.ConfigLineAuto( path , line ,"--index", "left","=" );
+           end
+              print("Go "..tostring(side));
+         return side;
+    end
+        return side;
+end
+
+
+
+
+local LENGHT = 80;
+local boolSide = "left" --or  "right"
+
+--ITEM DATA
+local function itemName (slot)
+local item;
+slot = slot or 16;
+
+ if rb.count (slot) > 0 then -- chesk or give error bellow line
+    item = comp.inventory_controller.getStackInInternalSlot(slot );
+
+   -- print (item.name.."WTF error" .. c);
+    return tostring(item.name);
+ end
+   return false;
+end
+--print (itemName(1))
+--print (itemName(1) .. " equal ?" ..tostring (itemName(1) == "minecraft:coal" ) );
+
+
+local function  itemSlot (name)
+    for i=1,16 do
+        if itemName (i) == name then return i end;
+    end
+    return 404;
+end
+
+--print("slot torhc "..rb.select(itemSlot ("minecraft:torch")))
+
+
+--FUEL
+local function refuel(value)
+local function listFuel (slot)
+ local m ="minecraft:";
+list = {
+      m.."coal",m.."wood",m.."planks",m.."log"
+       }
+  for xlist = 1 , #list do -- keep looking fuel type
+--      print ("fuel item: "..tostring(itemName(slot)) .. " =="..tostring(itemName(slot) == list[xlist]).."== "..list[xlist]);
+--     print("type itemName:"..  type(itemName(slot))..",list[xlist]:"..type(list[xlist]) )
+
+if itemName(slot) == list[xlist] then
+ -- print ("FOUND")
+return true ; -- found fuel
+end
+   end
+end
+ print (rb.inventorySize())
+  for slot = 1 , rb.inventorySize()  do
+    if listFuel(slot) then
+        rb.select(slot);
+          fuelfound = itemName(slot);
+          fuel.insert(value or 10);
+         print ("Fuel is: " ..fuel.count() .. ", My energy:" .. math.floor( computer.energy() / computer.maxEnergy() *100 ) .. "%"..","..fuelfound  )
+
+return;
+      end
+   end
+end
+
+
+local function dig()
+  local succ , n= rb.detect();
+  if succ and rb.swing() or n=="air" then
+   if rb.detectUp() then rb.swingUp(); end
+          return;
+     else
+    -- if fail to swing then change pickaxe to iron
+    if n == "solid" then
+        inventory:equipTool("minecraft:iron_pickaxe"); -- swith pickaxe
+    end
+ end;
+       while rb.detect() do
+       rb.swing();
+      end
+       rb.swingUp();
+       inventory:equipTool("minecraft:stone_pickaxe");
+end
+
+local function  howRefuel ()
+  -- less then 80%
+  if   computer.energy() / computer.maxEnergy() < .80 then
+     refuel()
+  end
+end
+
+local function inventoryFull  ()
+    for slot= inventory:size(),1 ,1 do
+        if rb.count(slot)== 0 then return false; end --
+    end
+    return true;
+end
+
+
+--dig();
+
+--if true then return end
+
+refuel();
+--------------- PROGRAM---------------
+for x =0 , LENGHT  do
+  os.sleep(.10)
+equipAndCraftPickaxe  (); -- check   if needed pickaxe
+dig();
+if inventoryFull  () then
+
+end
+
+ if x%8 == 0 then
+  rb.select(itemSlot ("minecraft:torch"));
+  rb.placeUp();
+  rb.select(1);
+ end
+print ("Torch:" .. x%8);
+
+ howRefuel();
+ rb.forward();
+
+os.sleep(.100);
+end
+
+
+
+if robotSide() == "right" then
+rb.turnRight();
+dig();
+rb.forward();
+dig();
+rb.forward();
+dig();
+rb.forward();
+rb.swingUp();
+rb.turnRight();
+dig();
+rb.forward();
+rb.swingUp();
+      else
+
+        rb.turnLeft();
+        dig();
+        rb.forward();
+        dig();
+        rb.forward();
+        dig();
+        rb.forward();
+        rb.swingUp();
+        rb.turnLeft();
+        dig();
+        rb.forward();
+        rb.swingUp();
+
+
+end
+
+
+
+inventory:dropItem("minecraft:cobblestone",32);-- leave 32
+inventory:dropItem("minecraft:stone");
+inventory:dropItem("minecraft:dirt");
+
+
+os.sleep(.400);
+robotSide(true); -- memorize size

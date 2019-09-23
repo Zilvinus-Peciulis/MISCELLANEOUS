@@ -1,0 +1,141 @@
+--SOURCE https://github.com/MightyPirates/OpenComputers/wiki/API-Component
+-- local comp=require("component");
+-- local rs = comp.redstone;
+--
+-- for i,v in pairs (comp) do
+--
+--
+-- print (i,v)
+-- --io.read()
+-- end
+------------------------------------------------------------
+
+--local rs_squizer = component.proxy(component.get(address));
+--local rs_squizer = component.proxy(component.get(address));
+
+
+local component = require("component")
+local sides = require("sides")
+local term = require("term")
+term.clear();
+
+print ("-->Initiating redstone address.")
+for address, name in component.list("red") do
+  print (address,name);
+end
+print ("-->Initiating ie 'ImersiveEngineering' address.")
+
+for address, name in component.list("ie") do
+  print (address,name);
+end
+
+
+control = {
+     ["Squeezer"] =
+    {
+       rs = component.proxy(component.get("e06")); --redstone object
+       adatpter= component.proxy(component.get("1ee")); -- Squeezer Structure
+       GardenClocheAmount = 6;
+       side = sides.south;
+    };
+
+     ["Fermenter"] =
+    {
+       rs = component.proxy(component.get("1dc")); --redstone object
+       adatpter= component.proxy(component.get("de1"));  -- Fermenter Structure
+       GardenClocheAmount = 9;
+       side = sides.south;
+    };
+}
+
+print ("Complete.\n")
+
+ local function rs_ProcentControl (control_name,procent)
+    local item; -- select control item
+    local NAME;
+      for kName,address in pairs(control) do -- find oject name
+          -- print (kName,address);
+           if (tostring(control_name) == kName) then --if find then give object name to then item
+              item=address
+              NAME=kName;
+              -- print ("--"..kName.."--");
+              break;
+           end
+      end
+        if item == nil then error ("1# Expected argument control table name get "..type(item)) end;
+      --  local redstoneRequareProc= math.floor( (255/100)*procent );
+        redstoneRequare = math.ceil (item.GardenClocheAmount / 100 * procent);
+      local name;
+
+           print (NAME.." "..math.ceil(procent).."% is redstone "..redstoneRequare..' strenght.');
+
+      if type(item) == "table" then
+
+        item.rs.setOutput(sides.top,redstoneRequare);
+        item.rs.setOutput(item.side,redstoneRequare);
+      else
+          error("#1 Expected argument redstone table get "..type(item)..".\n");
+      end
+ end
+
+
+local function getFluidProcent (control_name)
+  local item; -- select control item
+  local NAME;
+  for kName,address in pairs(control) do -- find oject name
+      -- print (kName,address);
+       if (tostring(control_name) == kName) then --if find then give object name to then item
+          item=address
+          NAME=kName;
+          -- print ("--"..kName.."--");
+          break;
+       end
+  end
+  if item == nil then error ("1# Expected argument control table name get "..type(item)) end;
+     -- if find cotrol name lole Squeezer return object
+        local amount = item.adatpter.getFluid().amount;
+        local maxCapacity = item.adatpter.getFluid().capacity;
+      -- print (".getFluid()",NAME)
+        if type(amount) == "number" and type(maxCapacity) == "number" then
+          return (amount/maxCapacity*100);
+        else
+          return 0;
+       end
+
+end
+
+
+
+while true do
+  term.clear();
+-- Auto ajast Analog sternght of redstone Cloche Growing Amount
+for name,_ in pairs (control) do
+  local amount=getFluidProcent (name);
+  rs_ProcentControl (name,amount);
+  control[name].adatpter.setEnabled(true);
+end
+os.sleep(5)
+end
+
+ -- rs_ProcentControl ("Fermenter",100);
+-- print ("Rezult::",getFluidProcent ("Fermenter")..'%');
+
+ --rs_ProcentControl ("Squeezer",100);
+ -- --
+--
+-- --------------Test
+--  for i,v in pairs(control["Fermenter"].adatpter.getFluid()) do
+--
+--     print ('index::',i,v);
+--
+--  end
+
+
+ -- print (control["Squeezer"].adatpter.getFluid())
+
+ -- control["Fermenter"].adatpter.getFilledCanisters
+ --rs_ProcentControl (rs_FermenterCloche,1,9);
+--
+-- for k,v in pairs(component) do
+--   print (k,v);
+-- end

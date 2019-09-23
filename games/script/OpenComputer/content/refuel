@@ -1,0 +1,64 @@
+local rb = require("robot")
+local comp = require("component")
+local computer = require("computer")
+local fuel = comp.generator;
+
+local lib = {};
+
+--ITEM DATA
+ lib.itemName = function (slot)
+local item;
+slot = slot or 16;
+
+ if rb.count (slot) > 0 then -- chesk or give error bellow line
+    item = comp.inventory_controller.getStackInInternalSlot(slot );
+
+   -- print (item.name.."WTF error" .. c);
+    return tostring(item.name);
+ end
+   return false;
+end
+--print (itemName(1))
+--print (itemName(1) .. " equal ?" ..tostring (itemName(1) == "minecraft:coal" ) );
+
+
+
+--FUEL
+lib.refuel = function(value)
+local function listFuel (slot) --local function
+ local m ="minecraft:";
+list = {
+      m.."coal",m.."wood",m.."planks",m.."log"
+       }
+  for xlist = 1 , #list do -- keep looking fuel type
+--      print ("fuel item: "..tostring(itemName(slot)) .. " =="..tostring(itemName(slot) == list[xlist]).."== "..list[xlist]);
+--     print("type itemName:"..  type(itemName(slot))..",list[xlist]:"..type(list[xlist]) )
+
+if lib.itemName(slot) == list[xlist] then
+ -- print ("FOUND")
+return true ; -- found fuel
+end
+   end
+end
+ print (rb.inventorySize())
+  for slot = 1 , rb.inventorySize()  do
+    if listFuel(slot) then
+        rb.select(slot);
+          fuelfound = lib.itemName(slot);
+          fuel.insert(value or 10);
+         print ("Fuel is: " ..fuel.count() .. ", My energy:" .. math.floor( computer.energy() / computer.maxEnergy() *100 ) .. "%"..","..fuelfound  )
+
+return;
+      end
+   end
+end
+
+lib.howRefuel = function (percentage)
+  -- less then 80%
+   percentage = percentage/100 or .80;
+  if   computer.energy() / computer.maxEnergy() < (percentage or.80) then
+     lib.refuel()
+  end
+end
+lib.refuel (64);
+return lib;
