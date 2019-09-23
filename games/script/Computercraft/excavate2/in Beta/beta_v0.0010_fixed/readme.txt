@@ -1,0 +1,1 @@
+Fixed start mining in random corners after few layers

@@ -1,0 +1,21 @@
+function merge(t1,t2)
+  local tb = {}
+if type (t1) == "table"  then  
+   -- print "1>"
+   -- print (type(t1))
+   for k,v in pairs(t1) do
+   		tb[k] = v
+     --    print(k,v)
+   end
+  end 
+
+ if type(t2) == "table"   then 
+      -- print "2>".
+       -- print (type(t2))
+      for k,v in pairs(t2) do
+      	 tb[k] = v
+       --   print (k,v)
+      end
+  end  
+    return tb 
+end

@@ -1,0 +1,41 @@
+local isSide  = peripheral.getNames()
+
+local function name (o)
+return (o.getInventoryName and o.getInventoryName()) or "Peripheral"
+end
+
+
+ if #isSide > 0  then  
+  term.clear() term.setCursorPos(1,1)     
+     if #isSide > 1 then 
+       local sides = {}
+         term.write "Chose peripheral side "
+       for i , v in pairs (isSide) do
+         term.write ( v..", ")
+         sides [i] = v
+       end print ("?")
+         
+         local input = tostring(read (nil,sides))
+        local m =  peripheral.wrap(input)
+        if input == isSide[1] or input == isSide[2] or input == isSide[3] or input == isSide[4] then 
+             print (name(m).." found in "..input)
+             for p_i , p_v in pairs (m) do
+             print (p_i," : ",p_v)
+             read() sleep(0)
+             end
+             print ("Complete") sleep(1)
+           else print "wrong side" 
+       end  
+         return 
+     end
+   local m = peripheral.wrap(isSide[1])  
+   print (name(m).." found in "..isSide[1])
+    for i ,v in pairs (m) do 
+     print (i," : ",v)
+     read() sleep(0)
+   end
+   print "Complete" sleep(1)
+    else print "Periheral not found"
+ end
+
+

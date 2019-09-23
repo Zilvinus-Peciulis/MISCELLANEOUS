@@ -1,0 +1,10 @@
+print "Startup from Disk TurtleStartup"
+
+-- MAGIC NINZA TRICK WORK LIKE A BOSS
+
+
+
+-- DONT PLACE BEFORE BOOTING, STARTUP TO SON OR LATER?
+
+shell.run ("text")
+shell.run("/moreFile/projectT/index")

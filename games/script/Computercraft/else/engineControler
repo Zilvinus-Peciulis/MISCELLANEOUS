@@ -1,0 +1,30 @@
+local m = peripheral.wrap('bottom');
+
+
+function isStillWorking()
+ local n = m.getAllStacks() 
+  
+  for i ,v in pairs (n) do
+     if (i~=nil) then 
+       return true
+     end
+   end  
+  
+end
+
+
+while true do
+sleep(1)
+ if not isStillWorking() then 
+   print "Available"
+   rs.setOutput("back",true)
+   else 
+   print "Unavailable"
+   rs.setOutput("back",false)
+ end
+
+end
+
+
+
+

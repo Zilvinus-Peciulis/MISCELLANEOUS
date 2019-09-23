@@ -1,0 +1,41 @@
+-- use to calculate total fuel value in inentory and check
+turtlefuel = {
+		[1] = {name = "minecraft:coal" , value = 80 };
+		[2] = {name = "minecraft:charcoal" , value = 80 } ;
+		[3] = {name = "minecraft:planks" , value = 15 };
+		[4] = {name = "minecraft:log" , value = 15 };
+		[5] = {name = "minecraft:coal_block" , value = 800 };
+}
+-- do nothing right now
+fuel = {
+		[1] = {name = "minecraft:coal" , value = 80 };
+		[2] = {name = "minecraft:charcoal" , value = 80 } ;
+		[3] = {name = "minecraft:planks" , value = 15 };
+		[4] = {name = "minecraft:log" , value = 15 };
+		[5] = {name = "minecraft:coal_block" , value = 800 };
+}
+
+--- look when digging
+junk = {
+		[1] = {name = "minecraft:gravel"};
+		[2] = {name = "minecraft:stone"};
+		[3] = {name = "minecraft:dirt"};
+		[4] = {name = "minecraft:grass"};
+		[5] = {name = "minecraft:sand"};
+}
+-- look then serching in inventory as junk
+junkInventory = {
+		[1] = {name = "minecraft:gravel"};
+		[2] = {name = "minecraft:stone"};
+		[3] = {name = "minecraft:dirt"};
+		[4] = {name = "minecraft:grass"};
+		[5] = {name = "minecraft:cobblestone"};
+		[6] = {name = "minecraft:sand"};
+
+}
+
+--No use in of this yny code!
+turtleName = { [1] = {name = "ComputerCraft:CC-Turtle"} ,
+			   [2] = {name = "ComputerCraft:CC-TurtleAdvanced"},
+			   [3] = {name = "ComputerCraft:CC-TurtleExpanded"},
+			 } 

@@ -1,0 +1,91 @@
+perfectCLearLine = function (getY)
+local x,y=term.getSize()
+  term.setCursorPos(1, getY or term.getCursorPos())
+  print (string.rep(" " , x-1 , x) ) -- in this way folow clearing with empty string 
+-- print(x)
+end
+--perfectCLearLine()
+
+text = function (x,y ,txt,color)  
+   if term.isColor() and color ~= nil  then 
+--Set text color!
+       term.setTextColor(color)   
+    end 
+   term.setCursorPos(x,y)
+   print(txt) 
+ end
+
+effect1 = function (x,y ,txt ,color,blinkNewColorVal)
+    --jei turtle nera spalvotas tai '=>'
+    if not term.isColor() then txt='=>'..txt end
+     
+      local blinkNewColorVal = tonumber(blinkNewColorVal)
+         perfectCLearLine(y)
+        --blink text for fun ^_^
+        --if statment for not beaing crahed
+        if color >= (blinkNewColorVal)and term.isColor() then 
+        text(x , y , txt, color-blinkNewColorVal)  
+           else 
+           text(x, y , txt , color+blinkNewColorVal)
+           end
+            
+            sleep(0.2)
+            text ( x , y , txt , color)
+            sleep(0.2) 
+                
+      end
+
+--print 'mammbo'
+--for x = 1 , 10 do
+--effect1 (8 , 9 ,"Helo", colors.blue , 554) 
+
+--end
+
+getDataName = function (slot)
+local data = "errorData"
+if  turtle.getItemCount(slot) > 0 then 
+  t = turtle.getItemDetail() 
+   data = t.name
+   end
+  return data
+end
+
+
+--print(getDataName() )
+
+loopItem = function (value, slot,y, txt ,minecraftData,color,blink,flag) 
+       local a = txt    
+           turtle.select(slot) 
+     local cnt = turtle.getItemCount(slot)
+      --create log registry for looking 
+        effect1(1 , y, txt , color , blink)
+      while cnt < value  or getDataName() ~= minecraftData  do 
+cnt = turtle.getItemCount(slot)	      
+--chesk if not correct item then say ???
+		
+	--Bad positioning couse failing clearLine functionality	
+	--Flag are use when no specific item needed
+	if getDataName() ~= minecraftData and flag==true and cnt>0 then txt = a.." ???" end
+	if cnt==0 then txt = a end --wipe little bit then nothing in slot
+	-- Then get correct item return correct text leyout	
+	if getDataName() == minecraftData then txt = a  end       
+-- exit from loop if when get correct value and is  not specific item
+	if cnt >= value and flag==false then break end   
+      effect1(1 , y, txt , color , blink)          
+
+end   
+ end
+
+
+footer = function(txt,color,height , len)
+local leyout = txt 
+local len = len or 38 
+local height = height or 13
+
+if term.isColor() then term.setBackgroundColor(23) end
+effect1((len-#leyout)/2,height-1 ,leyout,color or 128,500)
+ if term.isColor() then term.setBackgroundColor(128) end	
+end
+
+--exsample: loopItem (1 , 9 ,9, "9. 1-torh" ,'minecraft:torth',colors.brown ,10000,true)
+

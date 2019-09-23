@@ -1,0 +1,21 @@
+ 1) isDisk Drive : true
+ 2) My Coord xpos: -181
+ 3) My Coord ypos: 73
+ 4) My Coord zpos: 243
+ 5) My Coord fpos: 1
+ 6) SuperComputer ID: 1
+ 7) GiveFuelLevel: 1
+ 8) Floppy label: "NewWorld"
+ 9) Ask turtle Type: false
+10) Ask user Coords: false
+11) Turtles Name: "Kekse"
+12) TurtlesHomeRow: 4
+13) MaxTurtlesHome: 100
+14) TurtlesGapsSize: 2
+15) xStartJob: -189
+16) zStartJob: 237
+17) xEndJob: -221
+18) zEndJob: 268
+19) yJob: 71
+20) GenerateJob: "GenerateQuarry"
+

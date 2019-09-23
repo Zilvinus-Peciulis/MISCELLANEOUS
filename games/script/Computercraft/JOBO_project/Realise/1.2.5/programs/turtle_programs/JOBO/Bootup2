@@ -1,0 +1,42 @@
+print "Boot all program from Disk Drive2"
+Boot = "/JOBO/" --"/JOBO/"
+local tArg = {...}
+local sDir =  "disk2"..Boot or shell.dir()..Boot
+
+
+
+function newFile( file  )
+ if fs.exists(file) then fs.delete(file) end -- Void FILE EXIST nononono FILE DELETEED BITH
+	fs.copy(sDir..file, file) 
+end
+
+local IGNORE = {"rom"}
+ function IGNORE:inList( iT )
+    for i = 1 , #self do  
+        if self[i] == iT then return false end -- whem detect void item return bad thing :?
+    end
+    return true 
+end 
+
+
+local tAll = fs.list(sDir)
+-- Transfer all files and folders to computer/turtle
+
+for index  , sItem in pairs (tAll) do 
+  if string.sub(sItem , 1,1)  ~="," then 
+                         local sPATH = fs.combine(sDir , sItem);
+         if fs.isDir(sPATH) and  IGNORE:inList( sItem )  then 
+                         -- print ("This "..sItem.. " is folder ")
+              	          newFile( sItem  )
+         elseif IGNORE:inList( sItem ) then 
+            	          --print ("Tis '"..sItem .."' is text file")
+  				          newFile( sItem  )
+         end   
+  end 
+end 
+
+
+print ".....Complete booting Disk Drive2......"
+
+
+-- sleep (20)

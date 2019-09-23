@@ -1,0 +1,219 @@
+os.loadAPI ("OS")
+local FileName = "quarry"
+OS.loadAPI("/moreFile/GPS/gps")
+OS.loadAPI("/moreFile/programs/config/source/defaultProgramT",FileName)
+OS.loadAPI("/moreFile/programs/config/configProgramT",FileName)
+OS.loadAPI("/moreFile/programs/say",FileName)
+OS.loadAPI("/moreFile/GPS/source/gps_Program",FileName)
+OS.loadAPI("/moreFile/programs/requestAPI",FileName) --
+
+-- os.loadAPI("/moreFile2/mining/tool/item") --
+-- os.loadAPI("/moreFile/programs/calculate") -- Loaded
+
+local LINE
+local LINES
+local bedrock = 5
+local yProgressEnd = defaultProgramT.GET.yProgressEnd()
+
+-- Global/ use some programs us parametres
+local square = 9
+
+function getSquare(  )
+	return square
+end
+
+local Varline = 1
+local Varlines = 1
+local function DungeonChest(  )
+	-- if requestAPI.inspectThis("front", {"minecraft:chest", "minecraft:trapped_chest"} ) then 
+	--  say.success "I found dungeon chest front !"
+	--  item.LeaveTrash(  )
+	--  while turtle.suck () do end 
+	-- end 
+	
+	-- if requestAPI.inspectThis("bottom", {"minecraft:chest", "minecraft:trapped_chest"} ) then 
+	--  say.success "I found dungeon chest bottom!"
+	--  item.LeaveTrash(  )
+	--  while turtle.suckDown () do end 
+	-- end 	
+end 
+
+
+local function forward( )
+	calculate.locateInQuarry(  )
+	 if turtle.getItemCount (16) > 0 then item.LeaveTrash(  )  item.SortLastItem(  )  end 
+		     DungeonChest(  )
+		     if turtle.getItemCount (16) > 0 then 
+
+		     	 configProgramT.SET["xProgress"](gps_Program.GET["xLocation"]())
+			   	 configProgramT.SET["yProgress"](gps_Program.GET["yLocation"]())
+			     configProgramT.SET["zProgress"](gps_Program.GET["zLocation"]())
+			     configProgramT.SET["fProgress"]( orientation.toNameOrientation(gps_Program.GET["fLocation"]())  )
+			     configProgramT.SET.line(Varline)
+	 			 configProgramT.SET.lines(Varlines)
+				 say.warning "Inventory is full!" return false 
+		     end 
+	 -- thit shoud be below getItemCound else fail line value
+	 turtle.digDown() 
+	 turtle.attackDown()
+	while turtle.detect() or not gps.forward() do 
+		if not turtle.dig( ) and  turtle.detect() then  configProgramT.SET.JobComplete( true )  say.danger ("I got bedrock in front") return false end  
+	 	turtle.attack()
+	 	turtle.attackUp()
+	 	turtle.attackDown()
+	 end 
+
+	 if not  calculate.fuelEnauthBack(  ) then say.warning ("Fuel Not enout to back home "..calculate.RequareFuelComeBackHome(  ).." have "..calculate.FuelTotal(  ).." = "..calculate.FuelTotal(  )-calculate.RequareFuelComeBackHome(  ))  return false end 
+	 return true 
+	 
+end 
+
+local function forwardSimple(  )
+	 calculate.locateInQuarry(  )
+	 if turtle.getItemCount (16) > 0 then item.LeaveTrash(  )  item.SortLastItem(  )  end
+		 	 DungeonChest(  ) 
+			 turtle.digDown() 
+			 turtle.dig() 
+		 	 turtle.attackDown()
+	 	
+	while turtle.detect() or not gps.forward() do 
+		if not turtle.dig( ) and  turtle.detect() then  configProgramT.SET.JobComplete( true )  say.danger ("I got bedrock in front") return false end  
+	 	turtle.attack()
+	 	turtle.attackUp()
+	 	turtle.attackDown()
+	 end 
+end
+
+function Update(  )
+	configProgramT.SET["xProgress"](gps_Program.GET["xLocation"]())
+			   	 configProgramT.SET["yProgress"](gps_Program.GET["yLocation"]())
+			     configProgramT.SET["zProgress"](gps_Program.GET["zLocation"]())
+			     configProgramT.SET["fProgress"]( orientation.toNameOrientation(gps_Program.GET["fLocation"]())  )
+			     configProgramT.SET.line(Varline)
+	 			 configProgramT.SET.lines(Varlines)
+end
+
+
+function down(  )
+ turtle.digDown()
+ turtle.attackDown()
+ local  currentHeight = gps_Program.GET["yLocation"]()
+if currentHeight > bedrock then 
+ 		 	-- say.success (" This height "..currentHeight.." is good ")
+		
+		 while  not gps.down() do 
+				if not turtle.digDown( ) and  turtle.detect() then  configProgramT.SET.JobComplete( true )  say.danger ("I got bedrock in down") return false end  
+				if requestAPI.inspectThis("bottom", {"minecraft:bedrock"} ) then  configProgramT.SET.JobComplete( true )  say.danger ("I got bedrock in down OMG!") return false end  
+			 	
+			 	turtle.attackDown()
+			 	turtle.attack()
+		 		turtle.digDown()
+			 end 
+  	 else 
+ 		say.warning ("Near "..bedrock.." is bedrock,I "..currentHeight.." better go home next time !")
+  	 	-- configProgramT.SET.JobComplete( true )
+    return false 
+  end 
+  return true 
+end
+
+local function line(  )
+	for i=LINE,square-1  do -- was : -1 / overfloaw !
+	-- if turtle.detect() then print (" I saw somthing bad D:") end 
+	 Varline = i 
+	if not forward( ) then return false end 
+	end
+	 -- configProgramT.SET["line"](1)
+	 LINE = 1 
+	return true 
+end
+
+
+
+
+function lines(  )
+	
+	for rows=LINES ,square do
+		Varlines = rows --Before break shoud be here 
+  if not line(  ) then return false end 
+		item.voidDig(  )
+		turtle.select(1)
+		if rows%2 ==0 then 
+		 -- print "Right"
+		 gps.right()
+		 forwardSimple(  )
+
+		item.voidDig(  )
+		 gps.right ()
+		 elseif rows%2 ==1 and rows ~= square  then   
+		 	-- print ("Left"..tostring(rows%2 ) )
+		 	gps.left()
+		 	forwardSimple(  )
+
+		item.voidDig(  )
+		 	gps.left()
+		end 
+	 LINES = 1 
+
+     -- configProgramT.SET.lines(1)
+
+	end
+	 return true 
+end
+
+function quarryFull( ... )
+ 	  LINE = configProgramT.GET["line"]()
+	  LINES = configProgramT.GET["lines"]()
+ 	  local continue = true 
+ 	 local yTrack = configProgramT.GET["yProgress"]() + 1
+ 	  gps.getCoord ()-- Load coords in gps API
+ 	  
+ while  yTrack > yProgressEnd  do 
+     turtle.select ( 1 )
+     
+     say.alert ("yTrack: "..yTrack-1)
+ 	 -- say.super ( "Block to mine and fuel to "..calculate.quarryAndTravelTotal(  )..", have "..calculate.FuelTotal(  ) )
+ 	 if not lines(  ) then break end -- bedrock detection 
+     yTrack = yTrack  - 2 
+ 	 local height = yTrack <= yProgressEnd
+ 	 say.warning (yTrack.." .<= "..yProgressEnd.." == "..tostring(height))
+	-- for last block
+	-- if not  calculate.fuelEnauthBack(  ) then say.warning "Fuel Not enout to back home if i continue!"  break end 
+	 -- gps_Program.GET["yLocation"]()
+	if turtle.detectDown() then turtle.digDown() end 
+ 	if  height  then say.success( "I reached bedrock" ) 
+ 		 configProgramT.SET.JobComplete( true )
+ 		 	item.LeaveTrash(  )
+ 		 break
+ 		 else 
+ 	 	 gps.right()
+ 	 	 gps.right()
+ 	 	 -- local currentHeight = gps_Program.GET["yLocation"]()
+ 		 if not continue then configProgramT.SET.JobComplete( true ) say.success ("Done mining here! " )
+ 		 		item.LeaveTrash(  )
+ 		 end 
+ 		 
+ 		continue = down(  )  
+ 		continue = down(  )  
+ 		 
+ 		 -- if currentHeight<=
+    end 
+
+    local xJob = gps_Program.GET["xLocation"]()
+    local yJob = gps_Program.GET["yLocation"]()
+    local zJob = gps_Program.GET["zLocation"]()
+    local fJob = orientation.toNameOrientation (gps_Program.GET["fLocation"]() )
+    local lineStart = configProgramT.GET.line()
+    local linesStart = configProgramT.GET.lines()
+
+     configProgramT.SET["xProgress"]( xJob )
+     configProgramT.SET["yProgress"]( yJob )
+     configProgramT.SET["zProgress"]( zJob )
+     configProgramT.SET["fProgress"]( fJob )
+     
+     configProgramT.SET.line(1)
+	 configProgramT.SET.lines(1)
+
+
+ end 
+end

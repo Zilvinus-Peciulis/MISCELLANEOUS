@@ -1,0 +1,27 @@
+-- -Simply look empty spaces in inventory
+function getInvSpace( slot )
+   for i=1,16 do
+      if turtle.getItemCount(i) <= 0 then 
+        return i 
+      end 
+   end
+return false 
+end
+
+-- Ignore selected slot while looking free space in inventory
+-- Leave seleted slot for be empry while looking enather arternatyve
+function getSpace( slot )
+ assert (type (slot)== "number", "Requare slot value.")
+   for i=1,slot-1 do
+      if turtle.getItemCount(i) <= 0 then 
+        return i 
+     end 
+   end
+   for i=slot+1,16 do
+     if turtle.getItemCount(i) <= 0 then 
+        return i
+     end
+   end
+
+return false 
+end

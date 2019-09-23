@@ -1,0 +1,154 @@
+os.loadAPI("/moreFile/programs/config/HomeCoord/HomeCoordProgram")
+os.loadAPI("/moreFile/programs/calculate")
+os.loadAPI("/moreFile/programs/refuel")
+os.loadAPI("/moreFile/programs/orientation")
+os.loadAPI("/moreFile/programs/say")
+os.loadAPI("/moreFile/GPS/gps")
+
+
+local xHome = HomeCoordProgram.GET.xHome()
+local yHome = HomeCoordProgram.GET.yHome()
+local zHome = HomeCoordProgram.GET.zHome()
+local fHome = HomeCoordProgram.GET.fHome() 
+
+
+local travleVal	 = 0; 
+
+
+function Home(  )
+				 
+local xFix , zFix = calculate.crossTravelTo(fHome, xHome , zHome   ) -- from job location
+-- for forcing chane coordinate little bit in side
+local xLeft , zLeft = orientation.Left(fHome,1  )				 
+local xRight , zRight = orientation.Right(fHome,1  )
+
+						    gps.Global:setCondition(true) 
+ 				travleVal = gps.Global:goto (xFix,yHome+2,zFix) + travleVal--- when come back home always in thne top/ dont kiss method
+			 	travleVal =  gps.Global:goto (xHome,yHome,zHome) + travleVal
+			 	 gps.look(fHome)
+print ("Total travel Home//: "..tostring(travleVal))
+travleVal = 0
+
+end
+
+
+
+function xJob( x , y , z  )
+	assert (type(x)=="number", "Requare x number.")
+	assert (type(y)=="number", "Requare y number.")
+	assert (type(z)=="number", "Requare z number.")
+	-- print ("Job in x:",x," y:",y," z:",z," .")
+local xFix , zFix = calculate.crossTravelFrom(fHome, x, z   ) --frome home location
+						     gps.Global:setCondition(true) 
+ 				travleVal =  gps.Global:goto (xFix,yHome+1,zFix) + travleVal
+				travleVal =  gps.Global:goto (x,yHome+1,z) + travleVal
+			 	travleVal =  gps.Global:goto (x,y,z) + travleVal
+			 	 gps.look(fHome)
+
+print ("Total travel job//: "..tostring(travleVal))
+
+end
+
+
+function thenBooted( x , y , z , f )
+-- assert (type(x)=="number", "Requare x number.")
+	-- assert (type(y)=="number", "Requare y number.")
+	-- assert (type(z)=="number", "Requare z number.")
+	print ("Home in x:",x," y:",y," z:",z," .")
+local xFix , zFix = calculate.crossTravelFrom(f, x, z   ) --frome home location
+				 gps.Global:setCondition(true)
+ 				 gps.Global:goto (xFix,y+1,zFix)
+				 gps.Global:goto (x,y+1,z)
+			 	 gps.Global:goto (x,y,z)
+			 	 gps.look(f)
+end
+
+function xDissassemble( x , y , z  )
+	assert (type(x)=="number", "Requare x number.")
+	assert (type(y)=="number", "Requare y number.")
+	assert (type(z)=="number", "Requare z number.")
+	print ("Job in x:",x," y:",y," z:",z," .")
+local xFix , zFix = calculate.crossTravelTo(fHome, x , z   ) -- from job location
+				 gps.Global:setCondition(true)
+ 				 gps.Global:goto (xFix,yHome,zFix)
+				 gps.Global:goto (x,yHome,z)
+			 	 gps.Global:goto (x,y,z)
+end
+
+
+
+
+
+-- Supporting 
+function supTurtle( x , y , z, f, fobject  )
+	assert (type(x)=="number", "Requare x number.")
+	assert (type(y)=="number", "Requare y number.")
+	assert (type(z)=="number", "Requare z number.")
+	assert (type(f)=="string", "Requare f number.")
+	-- print ("Job in x:",x," y:",y," z:",z," .")
+local xFix , zFix = calculate.crossTravelTo(f, x, z   ) --frome home location
+local xBack , zBack =  orientation.Back(fHome,1  )			  
+				  gps.Global:setCondition(true) 
+ 				  gps.Global:goto (xFix+xBack,y,zFix+zBack) 
+			 	  gps.Global:goto (x,y,z)
+			 	  gps.look(fobject) -- return orientation  Name
+
+print ("Total travel xTurtle//: ")
+
+end
+
+-- Supporting 
+function supHome(   )
+local xBack , zBack =  orientation.Back(fHome,1  )			  
+
+local xFixBack , zFixBack = calculate.crossTravelFrom(fHome, xHome, zHome   ) --frome home location
+
+
+
+				 gps.Global:setCondition(true) 
+				 -- When go bakc 
+				 local xFixBack,zFixBack = xFixBack + zBack ,zFixBack + zBack , 
+ 				 gps.Global:goto (xFixBack+xBack,yHome,zFixBack+zBack) --- when come back home always in thne top/ dont kiss method
+				 -- When go Left Right  
+				local xFixLeftRight , zFixLeftRight = calculate.crossTravelTo(fHome, xHome, zHome   ) -- from job location
+
+ 				 gps.Global:goto (xFixLeftRight,yHome,zFixLeftRight) --- when come back home always in thne top/ dont kiss method
+			 	 
+ 				 gps.Global:goto(xHome,yHome,zHome)
+			 	 gps.look(fHome) -- return orientation  Name
+			 	 print "GO HOME"
+
+-- print ("xFixBack: "..xFixBack)
+-- print ("zFixBack: "..zFixBack)			 	 
+-- print("xFixLeftRight: "..xFixLeftRight)
+-- print("zFixLeftRight: "..zFixLeftRight)
+
+			 	 -- gps.Global:goto (xHome,yHome,zHome)
+			 	 -- gps.look(fHome)
+print ("Total travel Home//:")
+end
+
+
+
+function checkFuelxTarget( xTarget,yTarget,zTarget )
+	local sub = calculate.TravelTotal( xTarget,yTarget,zTarget ) < (turtle.getFuelLevel() + refuel.fuelTotal(  ))
+    	say.special("xTarget more "..tostring(sub).." fuel, "..calculate.TravelTotal( xTarget,yTarget,zTarget ).." < "..turtle.getFuelLevel() + refuel.fuelTotal(  ))
+    return sub
+end
+
+-- refuel and return missing fuel to manager 
+function checkFuelQuarry(  )
+	  local quarrySQ = calculate.quarryTotal(  )
+	  local anw = (calculate.TravelTotalBlocks(  ) + quarrySQ) - calculate.FuelTotal(  ) 
+	  local trav =  calculate.quarryAndTravelTotal(  )
+	        refuel.valueSuck(anw ,"Front" )
+	  local anw = (calculate.TravelTotalBlocks(  ) + quarrySQ) - calculate.FuelTotal(  ) 
+	   say.alert ( "FuelLevelTotal: "..calculate.FuelTotal(  ) )
+	   say.alert("travel: "..calculate.TravelTotalBlocks(  ))
+	   say.alert ( "quarry: "..quarrySQ)
+	   say.alert("quarry+travel = "..calculate.TravelTotalBlocks(  )+quarrySQ )
+	   say.alert ("Answer: "..anw)
+	   return trav > calculate.FuelTotal(  ) , (anw)  
+end
+
+os.unloadAPI("/moreFile/programs/say")

@@ -1,0 +1,401 @@
+local t = {...}
+turtle.select(1)
+
+if t[1]~= nil then
+craft = tostring( string.lower( t[1] ) )
+quantity = tostring (t[2]) 
+ 
+    if quantity=='auto' then 
+    	print ( 'quantity=auto' )
+        elseif quantity~='auto' then quantity =tonumber (t[2]); --print ( 'invert' ) 
+       if type (quantity)~='number' then quantity=1;  end 
+    end
+ else
+  craft = nil;
+ if turtle.craft(0) then
+ --turtle.craft()
+    else print ('usage:<craft><quantity/auto>')
+   end
+end
+
+
+
+
+  function findItem ( ... )	
+  local arg = {...};
+  local start = start or 1;
+  local ends = ends or 16
+  local tb = {};
+  local objSet =1; 
+  local num = 1 ;
+  local count = 0 ;     
+     
+      for x = 1 , 16 do --try find first of item to lock priority 
+         if turtle.getItemCount(x) > 0 then 
+          local data =turtle.getItemDetail(x) ;
+            for i = 1, #arg do 
+            	
+               if data.name == arg[i] then 
+                   objSet = i --save founded value from inventory objects
+                  -- print ( (" object: "..arg[objSet]) )
+                 break
+               end              
+            end
+         end
+      end
+
+      for x = start, ends do -- find item and store slot position in table 
+       if turtle.getItemCount(x) > 0 then
+        local data =turtle.getItemDetail(x) 
+                  
+        
+            if data.name == tostring (arg[objSet]) then          
+           
+           
+              tb[num] = x;
+               num = num + 1 
+            
+               count = count + data.count -- count all value and store in table
+               tb.count = count; 
+
+               --   print (arg[objSet]..' in '..x..' count:'..count) 
+                    
+           end
+       end 
+      end
+    
+    return tb --return table 
+   end 
+   
+    
+  
+
+
+
+
+function selectObject (tb) -- take data fom slot table where are sored exsistig items slot and total count 
+if tb ~= nil then  
+ for x = 1 , #tb do
+   if turtle.getItemCount(tb[x]) ~= 0 then
+     turtle.select(tb[ x ])
+      return true
+   end
+ end
+ return false
+end
+end
+
+ 
+
+
+
+
+
+
+
+
+
+
+-- selectObject (slot['_planks_']) 
+
+
+exs = {	
+          [''] ={  
+                false ,false , false ,false ;
+                false ,false , false ,false ;
+                false ,false , false ,false ; 
+                false ,false , false ,false ;
+                };
+
+
+}
+
+
+recipe = {
+--_planks_ = 'minecraft:_planks_' ; 
+
+['chest'] = {   false ,false , false ,false ;
+                false ,'_planks_' , '_planks_' ,'_planks_' ;
+                false ,'_planks_' , false ,'_planks_' ; 
+                false ,'_planks_' , '_planks_' ,'_planks_' ;
+            };
+
+
+['furnacle']={ 
+                false ,false , false ,false ;
+                false ,'_cobble_' , '_cobble_' ,'_cobble_' ;
+                false ,'_cobble_' ,   false    ,'_cobble_' ; 
+                false ,'_cobble_' , '_cobble_' ,'_cobble_' ;
+            };
+
+
+['sword'] = {   false ,false , false ,false ;
+                false ,false , false ,'_sword_material_' ;
+                false ,false , false ,'_sword_material_' ; 
+                false ,false , false ,'_stick_' ;
+              };
+
+['planks'] = { 
+                false ,false , false ,false ;
+                false ,false , false ,false ;
+                false ,false , false ,false ; 
+                false ,false , false ,'_log_' ;
+              };
+
+['stick'] = { 
+                false ,false , false ,false ;
+                false ,false , false ,false ;
+                false ,false , false ,'_planks_' ; 
+                false ,false , false ,'_planks_' ;
+            };
+
+ ['ladder']= {  false ,false , false ,false ;
+                false ,'_stick_' , false     ,'_stick_' ;
+                false ,'_stick_' , '_stick_' ,'_stick_' ; 
+                false ,'_stick_' , false     ,'_stick_' ;
+            };
+
+ ['wheat']= {   false ,false , false ,false ;
+                false ,false , false ,false ;
+                false ,false , false ,false ; 
+                false ,'_wheat_' , '_wheat_' ,'_wheat_' ;
+            };           
+
+['door']= {     false ,false , false ,false ;
+                false ,false , '_door_material_' ,'_door_material_' ;
+                false ,false , '_door_material_' ,'_door_material_' ; 
+                false ,false , '_door_material_' ,'_door_material_' ;
+            }; 
+
+['pickaxe']= {  false ,false , false ,false ;
+                false ,'_pickaxe_material_' , '_pickaxe_material_' ,'_pickaxe_material_' ;
+                false ,false , '_stick_' ,false ; 
+                false ,false , '_stick_' ,false ;
+            };                       
+
+['hoe'] ={  
+                false ,false , false ,false ;
+                false ,false , '_pickaxe_material_' ,'_pickaxe_material_' ;
+                false ,false , '_stick_' ,false ; 
+                false ,false , '_stick_' ,false ;
+                };
+
+
+  ['axe'] ={  
+                false ,false , false ,false ;
+                false ,false , '_pickaxe_material_' ,'_pickaxe_material_' ;
+                false ,false , '_stick_' ,'_pickaxe_material_' ; 
+                false ,false , '_stick_' ,false ;
+                }; 
+
+
+['bed']= {      false ,false , false ,false ;
+                false ,false , false ,false ;
+                false ,'_wool_' , '_wool_' ,'_wool_' ; 
+                false ,'_planks_' , '_planks_' ,'_planks_' ;
+            };                       
+
+['torch']= {    false ,false , false ,false ;
+                false ,false , false ,false ;
+                false ,false , false ,'_coal_' ; 
+                false ,false , false ,'_stick_' ;
+            };                       
+
+['ctable']= {   false ,false , false ,false ;
+                false ,false , false ,false ;
+                false ,false , '_planks_' ,'_planks_' ; 
+                false ,false , '_planks_' ,'_planks_' ;
+            };                    
+
+ ['body']= {
+                false ,false , false ,false ;
+                false ,'_armor_material_' ,         false      ,'_armor_material_' ;
+                false ,'_armor_material_' , '_armor_material_' ,'_armor_material_' ; 
+                false ,'_armor_material_' , '_armor_material_' ,'_armor_material_' ;
+            };
+
+ ['legs'] ={  
+                false ,false , false ,false ;
+                false ,'_armor_material_' , '_armor_material_' ,'_armor_material_' ;
+                false ,'_armor_material_' , false ,'_armor_material_' ; 
+                false ,'_armor_material_' , false ,'_armor_material_' ;
+                };
+
+
+ ['shoes'] ={  
+                false ,false , false ,false ;
+                false ,false , false ,false ;
+                false ,'_armor_material_' , false ,'_armor_material_' ; 
+                false ,'_armor_material_' , false ,'_armor_material_' ;
+                };
+ 
+ ['hat'] ={  
+                false ,false , false ,false ;
+                false ,false , false ,false ;
+                false ,'_armor_material_' , '_armor_material_' ,'_armor_material_' ; 
+                false ,'_armor_material_' , false ,'_armor_material_' ;
+                };
+
+ ['gpane'] ={  
+                false ,false , false ,false ;
+                false ,false , false ,false ;
+                false ,'_glass_' , '_glass_' ,'_glass_' ; 
+                false ,'_glass_' , '_glass_' ,'_glass_' ;
+                };
+
+  ['computer'] ={  
+                false ,false , false ,false ;
+                false ,'_computer_material_' , '_computer_material_' ,'_computer_material_' ;
+                false ,'_computer_material_' , '_redstone_' ,'_computer_material_' ; 
+                false ,'_computer_material_' , '_glasspane_' ,'_computer_material_' ;
+                };
+
+  ['turtle'] ={  
+                false ,false , false ,false ;
+                false ,'_turtle_material_' , '_turtle_material_' ,'_turtle_material_' ;
+                false ,'_turtle_material_' ,   '_computer_'    ,'_turtle_material_' ; 
+                false ,'_turtle_material_' ,  '_chest_'    , '_turtle_material_' ;
+                };
+
+
+   ['block'] ={  
+                false ,false , false ,false ;
+                false ,'_fullBlock_material' , '_fullBlock_material' ,'_fullBlock_material' ;
+                false ,'_fullBlock_material' , '_fullBlock_material' ,'_fullBlock_material' ; 
+                false ,'_fullBlock_material' , '_fullBlock_material' ,'_fullBlock_material' ;
+                };
+
+ ['hopper'] ={  
+                false ,false , false ,false ;
+                false ,'_iron_ingot_' , false ,'_iron_ingot_' ;
+                false ,'_iron_ingot_' , '_chest_' ,'_iron_ingot_' ; 
+                false ,false , '_iron_ingot_' ,false ;
+                };
+
+['sign'] ={  
+                false ,false , false ,false ;
+                false ,'_planks_' , '_planks_' ,'_planks_' ;
+                false ,'_planks_' , '_planks_' ,'_planks_' ; 
+                false ,false , '_stick_' ,false ;
+                };
+
+['tnt'] ={  
+                false ,false , false ,false ;
+                false ,'_gunpowder_' , '_sand_' ,'_gunpowder_' ;
+                false ,'_sand_' , '_gunpowder_' ,'_sand_' ; 
+                false ,'_gunpowder_' , '_sand_' ,'_gunpowder_' ;
+                };
+
+}
+--library of compare items and maping  and saved where was items in senter place when program is started else need  reload  memory again
+slot = {['_log_'] = findItem("minecraft:log");
+        ['_wheat_'] = findItem("minecraft:wheat");
+        ['_planks_'] = findItem("minecraft:planks");
+        ['_cobble_'] = findItem("minecraft:cobblestone");
+        ['_stick_'] = findItem("minecraft:stick");
+        ['_wool_'] = findItem("minecraft:wool");
+        ['_coal_'] = findItem("minecraft:coal");
+        ['_glasspane_'] = findItem("minecraft:glass_pane");
+        ['_glass_'] = findItem("minecraft:glass");
+        ['_stone_'] = findItem("minecraft:stone");
+        ['_redstone_'] = findItem("minecraft:redstone");
+        ['_iron_ingot_'] = findItem("minecraft:iron_ingot");
+        ['_gold_ingot_'] = findItem("minecraft:gold_ingot");
+        ['_diamond_'] = findItem("minecraft:diamond_ingot");
+        ['_chest_'] = findItem("minecraft:chest");
+        ['_sand_'] = findItem("minecraft:sand");
+        ['_gunpowder_'] = findItem("minecraft:gunpowder");
+
+        ['_computer_'] = findItem("ComputerCraft:CC-Computer");
+        
+        ['_turtle_material_'] = findItem('minecraft:gold_ingot' , 'minecraft:iron_ingot'); 
+        ['_fullBlock_material'] = findItem("minecraft:redstone","minecraft:coal" , "minecraft:gold" , "minecraft:iron" , "minecraft:diamond");
+        ['_computer_material_'] = findItem("minecraft:stone","minecraft:gold_ingot"); 
+        ['_armor_material_'] = findItem("minecraft:iron_ingot"); 
+        ['_pickaxe_material_'] = findItem("minecraft:planks","minecraft:cobblestone","minecraft:diamond" ,"minecraft:iron_ingot","minecraft:gold_ingot"   );  
+        ['_door_material_'] = findItem("minecraft:planks"  ); 
+        ['_sword_material_'] = findItem('minecraft:iron_ingot','minecraft:cobblestone' , "minecraft:planks"  ); --select by priority what are in inventory first
+         }
+      
+
+function invObjectCount() 
+local num = 0
+  for x = 1, 16 do
+    if  turtle.getItemCount(x) > 0 then 
+       num = num + turtle.getItemCount(x)
+      
+    end
+  end
+ return num
+end
+
+
+--print ( slot['_log_'].count )
+
+--print ( invObjectCount()  )
+
+
+
+function main( ... )
+if quantity == 'auto' then quantity = invObjectCount()  end
+
+
+ if recipe[craft] ~= nil then 
+for doAl = 1 , quantity do 
+--turtle.drop()
+  for x = 1, 16 do 
+   if recipe[craft][x] ~= false  then	
+      invItem = selectObject (slot[ recipe[craft][x] ] )  --INPORTANT TO USE select from recipes map then take item slot where are by ty[pe]
+         -- print ( invItem )
+  
+        if invItem == false then break
+       else 
+       	turtle.transferTo(x , 1)
+    end
+  end
+ end
+end
+-- remove/drop what not needed to craft 
+  for doAl = 1 , quantity+1 do 
+     for x = 1, 16 do
+          if turtle.getItemCount(x) ~= 0 and recipe[craft][x] == false then 
+                turtle.select(x)
+            turtle.drop()
+        end
+	 end
+
+
+  
+      turtle.select(1)
+        sleep(0.5)
+         print ( 'craft: '..tostring (turtle.craft(0)) )
+          if turtle.craft(0)  then 
+              turtle.craft()
+              -- print ( 'crafed <%' )      
+	            else
+	            	
+					
+					break
+	            end
+            end -- recipe[craft] nest END
+        
+		print ( 'inv: '..tostring (invItem) )
+        
+ end
+
+-- spit from table sum information to user
+
+  if recipe[craft] == nil and craft ~= nil then        
+        local sSet={};
+        local jnum = 1; 
+          for  i , v in pairs (recipe) do         
+              sSet[jnum] =i;         
+               jnum = jnum + 1
+            end
+             table.sort( sSet )
+          print ('Try use: '..table.concat(sSet, ", ")..'//')    
+     end  
+end   
+
+
+main()

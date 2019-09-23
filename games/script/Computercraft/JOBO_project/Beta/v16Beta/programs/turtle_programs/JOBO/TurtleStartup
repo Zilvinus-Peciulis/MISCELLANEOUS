@@ -1,0 +1,25 @@
+print "Startup from Disk TurtleStartup"
+-- Update from Source API
+local function copy (fromPath, toPath)
+ if fs.exists(fromPath) then  	
+	-- if fs.exists(toPath) then 
+		--print ("From ["..fromPath.."]\nTo ["..toPath.."]")
+		fs.delete (toPath) --delete
+		fs.copy (fromPath,toPath)--create
+	-- else print ("To file ['"..toPath.."'] not exists.")  return true 
+	-- end 
+ else print ("From file ['"..fromPath.."'] not exists.") 
+ end 
+ return false 
+end 	
+
+-- copyy from right disk 
+turtle.turnRight()
+copy ("disk2/JOBO/moreFile2", "moreFile2")
+turtle.turnLeft()
+-- sleep(10)
+
+-- DONT PLACE BEFORE BOOTING, STARTUP TO SON OR LATER?
+
+shell.run ("text")
+shell.run("/moreFile/index")

@@ -1,0 +1,108 @@
+os.loadAPI("config".."/source/FileLibrary/fLib")
+os.loadAPI("config".."/source/ConfigProgram")
+
+
+
+local orientations = {'SOUTH' , 'WEST' , 'NORTH' , 'EAST' };
+local orientation = ConfigProgram.GET.fPos() + 1;
+	--print(orientations[orientation]) sleep(8)
+
+function turnleft(  )
+	orientation = (orientation -1)>=1 and (orientation -1) or 4 
+	return orientation
+end
+
+
+
+function turnright(  )
+	orientation = (orientation +1)<=4 and (orientation +1) or 1 
+	return orientation
+end
+
+
+
+local xPos = ConfigProgram.GET.xPos()
+local yPos = ConfigProgram.GET.yPos()
+local zPos = ConfigProgram.GET.zPos()
+local fPos = ConfigProgram.GET.fPos()
+
+
+--ConfigProgram.SET.MaxTurtlesHome(1009)
+
+----Set Defoults------------------------------------------------------------------------------------------------------
+local getHomeRows = ConfigProgram.GET.TurtlesHomeRows() or ConfigProgram.SET.TurtlesHomeRows(4) or 4 --set Defolts 
+local getMaxTurtles = ConfigProgram.GET.MaxTurtlesHome() or ConfigProgram.SET.MaxTurtlesHome(100) or 100 --set Defolts 
+local getGapsSize = ConfigProgram.GET.TurtlesGapsSize() or ConfigProgram.SET.TurtlesGapsSize(2) or 2
+
+if getHomeRows < 2 or getHomeRows > 25 then 
+      getHomeRows = 4;
+      ConfigProgram.SET.TurtlesHomeRows(getHomeRows)
+end	
+
+if getMaxTurtles < 5 or getMaxTurtles > 100 then 
+      getMaxTurtles = 100;
+      ConfigProgram.SET.MaxTurtlesHome(getMaxTurtles)
+end	
+
+if getGapsSize < 2 or getGapsSize > 10 then 
+      getGapsSize = 2;
+      ConfigProgram.SET.TurtlesGapsSize(getGapsSize)
+end	
+
+---end------------------------------------------------------------------------------------------------------------------------
+
+
+
+local MaxRow = getHomeRows -- 4
+local MaxColumns = getMaxTurtles ; -- 100
+local gapSize = getGapsSize;-- 2
+
+local xTo = {0 , -gapSize , 0 , gapSize};
+local zTo = {gapSize , 0 , -gapSize , 0} ;
+
+
+
+
+--fLib.AppendLoongLine( "config/DATA/GenerateHomeCoord/HomeCoordDATA" , {x=-55, y=yPos ,z=zPos ,f=fPos ,turtleID = 112, STATUS = false} )	
+
+-- Delete Content was before 
+    fLib.DeleteContent( "config/DATA/GenerateHomeCoord/HomeCoordDATA" )
+
+for Lenght = 1 , (MaxColumns/MaxRow) do --- Generator _-__-__---__--__-__-__--__-___---
+	xPos = xPos + xTo[orientation]
+	zPos = zPos + zTo[orientation]
+
+	turnleft(  )
+	for Widht = 1 , MaxRow do 
+	 -- Add line	
+     fLib.AppendLoongLine( "config/DATA/GenerateHomeCoord/HomeCoordDATA" , {x=xPos, y=yPos ,z=zPos ,f=fPos ,ID = "...", STATUS = false} )		
+	 xPos = xPos + xTo[orientation]
+	 zPos = zPos + zTo[orientation]
+	
+	end
+	 -- reset values in correct order/ Carry line
+	if orientation == 1 or orientation == 3 then 
+		--print"I look NORTH or SOUTH"
+		zPos = ConfigProgram.GET.zPos()
+	end 	
+
+	if orientation == 2 or orientation == 4 then 
+		--print"I look WEST or EAST"
+		xPos = ConfigProgram.GET.xPos()
+	end
+	--print(orientations[orientation]) sleep(3)
+ turnright(  )	
+	--print(orientations[orientation]) sleep(3)
+
+	
+end 
+
+
+--for x = 1,MaxColumns do 
+ --fLib.AppendLoongLine( "config/DATA/GenerateHomeCoord/HomeCoordDATA" , {x=math.random(1,1000),y=math.random(1,1000),z=math.random(1,1000),f=math.random(1,4),turtleID = math.random(1,1000), used = false} )	
+--end
+
+
+
+os.unloadAPI("config".."/source/FileLibrary/fLib")
+os.unloadAPI("config".."/ConfigProgram")

@@ -1,0 +1,127 @@
+local button = {}
+xGET , yGET  = term.getSize()
+term.setCursorPos(1,1)
+term.clear()
+term.setBackgroundColor(colors.black)
+
+function setTable(name , func , xmin ,xmax , ymin , ymax , color_bg , color_active , color_text )
+button[name] = {}
+button[name]["func"] = func
+button[name]["xmin"] = xmin
+button[name]["xmax"] = xmax
+button[name]["ymin"] = ymin
+button[name]["ymax"] = ymax
+button[name]["active"] = false
+button[name]["color_bg"] = color_bg or colors.red
+button[name]["color_active"] = color_active or  colors.green
+button[name]["color_text"] = color_text or colors.yellow
+end
+
+
+
+fillTable = function ()
+   --+setTable ("Test1" , test1 , 2 , 10 ,2 , 5 )
+   --+setTable ("Test2" , test2 , 12, 24 ,2 , 5 )
+end
+
+--fillTable()
+--print (button.Test1["xmin"])
+
+
+
+fillBlock = function (text, color,color_text,bData)
+local x =0
+local y = 0  
+ local ypos = math.floor((bData["ymin"] + bData["ymax"])/2)
+ local xpos = math.floor ((bData["xmax"] - bData["xmin"]) /2)
+ term.setTextColor(color_text)     
+
+ for y = bData["ymin"] , bData["ymax"]-1 do 
+       
+       for x = bData["xmin"] , bData["xmax"]-1 do 
+	term.setCursorPos(x,y)
+        term.setBackgroundColor(color)       
+	
+	term.setCursorPos(x,y)
+        term.write(" ")
+	       
+	end
+        
+ end
+term.setCursorPos( ((xpos+bData["xmin"])-(string.len(text) /2)) ,ypos)  
+term.write(text )
+term.setCursorPos(bData["xmax"]+1,yGET-(bData['ymax']/2))
+
+end
+
+
+
+  
+function screen()
+   local currColor
+   for name,data in pairs(button) do
+      local on = data["active"]
+      local color_bg = data["color_bg"]
+      local color_bar = data["color_active"]
+      local color_text = data["color_text"]
+      if on == true then currColor = color_bar else currColor = color_bg end
+ fillBlock(name, currColor ,color_text, data)
+   end
+end
+
+
+function checkxy(x, y)
+   for name, data in pairs(button) do
+      if y>=data["ymin"] and  y <= data["ymax"] then
+         if x>=data["xmin"] and x<= data["xmax"] then
+            data["func"]()
+            return true
+            --data["active"] = not data["active"]
+            --print(name)
+         end
+      end
+   end
+   return false
+end
+
+
+
+function toggleButton(name)
+   button[name]["active"] = not button[name]["active"]
+   screen()
+   return button[name]["active"]
+end     
+
+function flash(name)
+   toggleButton(name)
+   screen()
+   sleep(0.15)
+   toggleButton(name)
+   screen()
+end
+
+
+function heading(text,color_bg,color_bar,color_text)
+   w, h = term.getSize()   
+   term.setCursorPos(1,1)
+   term.setBackgroundColor(color_bar or colors.green)
+   term.setCursorPos((w-string.len(text))/2+1, 1)
+   term.clearLine()
+   term.setTextColor(color_text or colors.blue)
+   term.setBackgroundColor(color_bg  or colors.black)
+   term.write(text)
+
+   
+end
+
+function label(w, h, text)
+   mon.setCursorPos(w, h)
+   mon.write(text)
+end
+
+
+clear = function ()
+term.setBackgroundColor(colors.black)
+term.clear()
+term.setCursorPos(1,1)
+end

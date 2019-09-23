@@ -1,0 +1,3 @@
+-- Everithing sart up from disk in disk drive
+shell.run ("text")
+shell.run("/moreFile/index")

@@ -1,0 +1,14 @@
+1){|1]="EnderIO:itemPowderIngot",|2]="blacklist",}
+2){|1]="minecraft:cobblestone",|2]="blacklist",}
+3){|1]="minecraft:dirt",|2]="blacklist",}
+4){|1]="minecraft:wheat",|2]="blacklist",}
+5){|1]="minecraft:flint",|2]="whitelist",}
+6){|1]="minecraft:iron_bars",|2]="blacklist",}
+7){|1]="minecraft:planks",|2]="blacklist",}
+8){|1]="minecraft:iron_ingot",|2]="blacklist",}
+9){|1]="EnderIO:itemMaterial",|2]="blacklist",}
+10){|1]="minecraft:sand",|2]="whitelist",}
+11){|1]="minecraft:gravel",|2]="blacklist",}
+12){|1]="minecraft:glass",|2]="blacklist",}
+13){|1]="Thaumcraft:blockCustomOre",|2]="blacklist",}
+14){|1]="minecraft:gold_ingot",|2]="whitelist",}

@@ -1,0 +1,58 @@
+function fwrite( path , text )
+	local file =  assert(io.open(path ,'w')) do --loop
+	   file:write(text)
+	   file:close()
+	 end
+	-- exs: fwrite( 'text' , 'text' )
+end
+
+function writeFromTable (path ,t)
+	local text = '';
+	 for _ , index in pairs(t) do
+        text=text..index..'\n'
+	 end
+	fwrite( path , text )
+
+--exs:ass = {'mabo','jambo'};writeFromTable ('text' ,ass)
+end
+
+
+
+ function getTable( path ) --read everything from file/path and return table
+ if fs.exists(path) then 
+ 	 local file =   io.open(path ,'r');
+ 	 local lines = {};
+ 	 local i = 1;
+ 	 local line = file:read('*l');
+ 	   while  line~=nil  do --loop
+ 	    lines[i]=line;
+ 	    line = file:read('*l');
+ 	    i=i+1;
+ 	  end
+ 	  file:close()
+ 	   return lines
+    end
+	return {}
+
+--exs: mama = rgetTable( 'text' );print ( mama[1] )
+end 
+
+function replaceLine( path , n ,text )
+	local  lines = getTable(path); --read file to table
+	lines[n]=text                  --return text
+	writeFromTable(path ,lines)    --write back
+  return lines                     --return what are made
+--exs: ptb=replaceLine( 'text' , 1 ,"hello World" )
+end
+
+
+
+
+function append( path , addtext )--prideda teksta
+local file =   assert(  io.open(path ,'a')) 
+file:write(addtext..'\n')
+file:close()
+	-- body
+end
+
+--append( 'text' , "Mother of good" )

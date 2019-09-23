@@ -1,0 +1,13 @@
+os.loadAPI("cnt/doc")
+  local app = doc.getLibrary(  ) -- get current library 
+  app.setCondition (true)
+
+  if app.get_x(  ) ~= 0 or app.get_y(  ) ~= 0 or app.get_z(  ) ~= 0  then 
+    	-- back home
+      	app.success("I just travel home")
+       app.goto (0,0,0)
+       app.look("SOUTH")
+  end
+
+--app.goto (1,0,1)
+

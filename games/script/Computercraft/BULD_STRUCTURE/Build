@@ -1,0 +1,77 @@
+local Library = 'BUILDAPI/Library'
+os.loadAPI (Library..'/event')
+os.loadAPI (Library..'/say')
+os.loadAPI (Library..'/uttility')
+os.loadAPI (Library..'/requestAPI')
+os.loadAPI (Library..'/material')
+os.loadAPI (Library..'/refuel')
+--## Key break sub program 
+local breakKey = {'t'}
+-- The Programs
+local pHouse = 'BUILDAPI/Structure/House'
+	--House
+		os.loadAPI(pHouse..'/TimberHouse')
+		os.loadAPI(pHouse..'/TownHouse')
+	--MobTrap
+local pMobTrap = 'BUILDAPI/Structure/MobTrap'	
+	  os.loadAPI (pMobTrap.."/MobFarm")
+	--Pad
+local pMobTrap = 'BUILDAPI/Structure/Pad'
+	  os.loadAPI (pMobTrap.."/Floor")
+
+-- local ts = material.solidBlock
+-- _,uneque = TownHouse.Listed_Item( "silence" )
+
+-- for k,v in pairs(uneque) do
+--       for k,v in pairs(v) do
+--         print(k,'  ',v)
+--       end
+-- end
+
+-- requestAPI.checkAll_ReturnLastSlot( uneque )
+-- print (ts.value)
+
+-- say.danger (requestAPI.checkAll( {ts,uneque } ))
+
+-- uttility.Items_Complete (TownHouse)
+
+-- say.danger (requestAPI.getDataName  (1))
+-- slot = {64,64,64,64,64,64,64,}
+-- requestAPI.selectLessSlot( slot )
+local Builds = {'TimberHouse','TownHouse','MobFarm','Floor','exit'}
+while true  do
+
+uttility.clear(  ) 
+uttility.spitText( Builds )
+uttility.pointScreenDown(  )
+local c  = uttility.getSInput(  "command",Builds )
+--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          if   uttility.Command( c ) ~= "go" then uttility.clear(  ) end 
+ if c == 'TimberHouse' then
+ 	        if uttility.Items_Complete (TimberHouse) then event.waitMehtod( breakKey,function () TimberHouse.run() end) end 
+         uttility. WaitEnter(  ) 
+  elseif c =='TownHouse' then 
+          if uttility.Items_Complete (TownHouse) then event.waitMehtod( breakKey, function () TownHouse.run() end ) end 
+        	uttility. WaitEnter(  ) 
+  elseif c =='MobFarm' then
+ 	        if uttility.Items_Complete (MobFarm) then MobFarm.run() end  
+          uttility. WaitEnter(  ) 
+  elseif c =='Floor' then
+      	say.special ("Floor program")
+      	local elp = uttility.NumberElipse( 32, 2  )
+      	local WIDTH = uttility.getNInput( 'WIDTH',elp )
+      	local LENGHT = uttility.getNInput( 'LENGHT',elp )
+      	local ACTION = uttility.getSInput(  'ACTION',{'remove','add'} )
+      	Floor.getOrder( WIDTH, LENGHT, ACTION )
+     	  event.waitMehtod( breakKey,Floor.run )  
+     	  uttility. WaitEnter ()	
+ elseif c == 'exit' then uttility.clear(  ) break
+      	-- try use ComputerCraft api
+ 	else  
+         		if not shell.run (c) then uttility.clear() say.danger ("No such ComputerCraft program") uttility.WaitEnter ()	
+              elseif uttility.Command( c ) == "refuel" then  uttility.WaitEnter ()  
+            end
+ 
+ end
+ uttility.clear(  )
+end 

@@ -1,0 +1,3 @@
+os.loadAPI("cnt/doc")
+  local app = doc.getLibrary(  ) -- get current library 
+app.setCondition (true) --enable gps 

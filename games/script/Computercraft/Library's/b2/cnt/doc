@@ -1,0 +1,51 @@
+local lib = "cnt/library/"
+os.loadAPI(lib.."OS")
+OS.loadAPI(lib.."GPS/gps")
+OS.loadAPI(lib.."requestAPI")
+OS.loadAPI(lib.."fLib")
+--Child
+OS.loadAPI(lib.."inventory")
+OS.loadAPI(lib.."material")
+OS.loadAPI(lib.."orientation")
+OS.loadAPI(lib.."perip")
+OS.loadAPI(lib.."refuel")
+OS.loadAPI(lib.."say")
+OS.loadAPI(lib.."turtleLib")
+OS.loadAPI(lib.."tbLib")
+
+-- merge library in one 
+local call = {}
+call = tbLib.merge(call,tbLib)
+call = tbLib.merge(call,turtleLib)
+call = tbLib.merge(call,gps)
+call = tbLib.merge(call,requestAPI)
+call = tbLib.merge(call,fLib)
+call = tbLib.merge(call,inventory)
+call = tbLib.merge(call,material)
+call = tbLib.merge(call,perip)
+call = tbLib.merge(call,refuel)
+call = tbLib.merge(call,say)
+call = tbLib.merge(call,turtleLib)
+call = tbLib.merge(call,tbLib)
+call = tbLib.merge(call,OS)
+
+
+--unload for beter performance
+os.unloadAPI(lib.."OS")
+OS.unloadAPI(lib.."GPS/gps")
+OS.unloadAPI(lib.."requestAPI")
+OS.unloadAPI(lib.."fLib")
+--Child
+OS.unloadAPI(lib.."inventory")
+OS.unloadAPI(lib.."material")
+OS.unloadAPI(lib.."orientation")
+OS.unloadAPI(lib.."perip")
+OS.unloadAPI(lib.."refuel")
+OS.unloadAPI(lib.."say")
+OS.unloadAPI(lib.."turtleLib")
+OS.unloadAPI(lib.."tbLib")
+
+
+function getLibrary(  )
+	return call
+end

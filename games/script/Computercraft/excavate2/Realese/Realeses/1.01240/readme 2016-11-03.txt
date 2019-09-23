@@ -1,0 +1,1 @@
+Aded Option to make shure reset progress z x pos was no just miss click

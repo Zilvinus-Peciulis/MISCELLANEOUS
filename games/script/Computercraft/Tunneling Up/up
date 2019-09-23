@@ -1,0 +1,51 @@
+local targ = {...};
+
+if targ[1] == nil then print "No value in prg[arg1]";
+return
+end
+
+local function place(side)
+ for slt = 1 ,16 do 
+     if turtle.getItemCount(slt) > 0 then
+       turtle.select(slt);
+       turtle[side]();
+     end
+ end
+end
+
+local function  move(side)
+  if side == "forward" then
+    while not turtle["forward"]() do turtle.dig() end;
+  elseif side == "back" then 
+    while not turtle["back"]() do turtle.turnLeft(); turtle.turnLeft();while turtle.dig() do sleep(.3) end; turtle.turnLeft();turle.turnLeft(); end;    
+  elseif side == "up" then 
+    while not turtle.up() do turtle.digUp() end;
+  elseif side == "down" then 
+    while not turtle.down() do turtle.digDown() end;
+ end
+end
+
+--Go Up
+
+for x =1 , targ[1] do 
+
+  for x = 1 , 4 do 
+    move("forward");
+    place("place");
+    turtle.turnLeft()
+    place("place");
+    turtle.turnRight();
+    turtle.turnRight()
+    place("place");
+    turtle.turnLeft();
+    move("back");
+    turtle.turnLeft()
+  end  
+   move("up");
+end
+--Go Down
+for x = 1 ,targ[1] do 
+  move("down");
+end
+place("placeDown");
+print "Complete";

@@ -1,0 +1,288 @@
+os.loadAPI("cnt/doc")
+  local app = doc.getLibrary(  ) -- get current library 
+  app.setCondition (true)
+
+local tree_inLen = 10;
+local tree_inWid = 10;
+local tree_inGap = 3;
+
+local sleep_time = 600 --seconds
+
+local sapl = {
+  "minecraft:sapling",
+  "IC2:blockRubSapling"
+  };
+
+local chest = {
+"minecraft:chest",
+"minecraft:trapped_chest"
+};
+
+local dirt = {"minecraft:dirt"}
+
+local log ={"minecraft:log"}
+
+local function up ()
+while not  app.up()  do turtle.digUp() end 
+end
+local function down()
+while not  app.down() do turtle.digDown() sleep(.3) end 
+end
+local function forward()
+  for tree_Gap=1,tree_inGap do
+    while not app.forward() do turtle.dig()  sleep (0) end 
+  end
+  turtle.suckDown()
+end
+local function left(  )
+  app.left()
+end
+function right(  )
+  app.right()
+end
+
+
+
+--Checkers 
+local function home(  )
+  if  app.get_x(  ) == 0 and  app.get_y(  ) == 0 and  app.get_z(  ) == 0 then 
+     return true
+  end  
+end
+
+local function proceed_home(  )
+   if  ( app.get_x(  ) + app.get_z(  ) ) > (app.fuelTotal(  ) + turtle.getFuelLevel()) then 
+      app.danger "To going back requare more fuel ..."
+         return false
+   end 
+   return true
+end
+
+
+local function proceed_treefarm (more)
+  local asn = (tree_inLen*tree_inWid)*tree_inGap + (more or 0)
+  local tt = app.fuelTotal(  ) + turtle.getFuelLevel()
+    if asn > tt then 
+        say.danger ("Missinng "..(asn - tt ).." fuel to continue ...") return false
+    end  
+   return true
+end
+
+local function size_treefarm(  )
+   app.alert ("Tree farm Wid: "..(tree_inWid*tree_inGap).. ", Len: "..(tree_inLen*tree_inGap)  )
+end
+----
+local function reset(  )
+  app.set_x (0)
+  app.set_y (0)
+  app.set_z (0)
+  app.set_f (1)
+  app.success "Reset applied "
+end
+
+local function inportChest ()
+
+local isChest =  app.inspectThis ("bottom",chest);
+  
+  if not isChest then 
+      app.warning "No inport chest in bottom !"
+      app.alert "Cheking ... " sleep(0.4)
+      local where_chest = app.selectThis(chest)
+        
+        if where_chest then 
+           app.success ("Chest found ..")sleep(0.4)
+           app.alert "Prepare place inport chest" sleep(0.5)           
+           turtle.digDown() 
+           turtle.select(where_chest)
+             if turtle.placeDown() then 
+               app.success " Complete ! "
+               else say.danger "Unaible to place chest "; return false  end
+             
+         else app.danger "No chest in invetory" return false  end   
+    end
+  turtle.select(1)
+  while turtle.suckDown() do end -- suck all items from inport chest
+  return true
+end
+
+
+local function sapling ()
+  
+  local where_sapling = app.selectThis(sapl)
+  local isSapling = app.inspectThis("bottom",sapl)
+
+  if not isSapling and
+   not where_sapling then 
+    app.warning "Checking saplings ..."  turtle.suckUp() ; turtle.suck();turtle.suckDown()
+     where_sapling = app.selectThis (sapl)
+      
+      if where_sapling then
+        app.success "Sapling found!"
+      else
+               app.danger "Unaible to find eny sapling !"  return false;
+      end
+   end
+ 
+   if where_sapling then 
+      
+      turtle.select( where_sapling)
+      
+      -- if try place sapling and failed try place dirt
+      if  not isSapling  and  
+      not turtle.placeDown() then 
+        
+        app.warning "Failed place sapling .." 
+        app.warning "Checking dirt .."
+        local dirt = {"minecraft:dirt"}
+        local where_dirt = app.selectThis(dirt)           
+          if where_dirt then 
+            app.success "Dirt found .."
+            down ()
+             turtle.digDown()
+             turtle.select(where_dirt)
+               
+               if turtle.placeDown() then
+                 app.success "Placed dirt"
+                 else app.danger "Unable to place dirt bottom !" ; up() return false
+               end
+            up()
+            say.alert "Place sapling"
+            turtle.select(where_sapling)
+            turtle.placeDown()
+            else app.danger "Unable to find dirt"  return false;
+          end
+        
+        
+      end
+   end   
+
+return true
+end
+
+local function tree ()
+  local wasTreeTall = 0
+  local tree_tall = 8
+  if app.inspectThis ("top",log) then 
+      while app.inspectThis ("top",log) do turtle.digUp() up() wasTreeTall = wasTreeTall + 1 sleep(0) end
+      
+      if tree_tall == wasTreeTall then turtle.select (app.selectThis(dirt)) turtle.placeUp() end
+
+      for _ = 1, wasTreeTall do down() end 
+       turtle.digDown() -- when need place to sapling
+       return true
+  end
+  return false
+end
+
+
+
+local function dropItems(  )
+  local available_sapling = (tree_inLen*tree_inWid)
+  local available_dirt = available_sapling
+   local available_fuel = (tree_inLen*tree_inWid)*tree_inGap
+   
+   local x = 0 
+   app.warning "Droping sapling overflow"
+   
+   for slt =1,16 do
+       if app.isListedRequestSlot(slt , sapl ) then 
+        x = x + turtle.getItemCount(slt)
+         if x > available_sapling and turtle.getItemCount(slt)>0 then turtle.select (slt) turtle.drop((x-available_sapling) <= 64 
+            and x-available_sapling or 64 ) end
+       end 
+   end
+   app.success "Successfuly droped saplings ..." sleep (.5)
+    local x = 0 
+   app.warning "Droping dirt overflow"
+    for slt =1,16 do
+       if app.isListedRequestSlot(slt , dirt ) then 
+        x = x + turtle.getItemCount(slt)
+         if x > available_dirt and turtle.getItemCount(slt)>0 then turtle.select (slt) turtle.drop((x-available_dirt) <= 64 
+            and x-available_dirt or 64 ) end
+       end 
+   end
+   app.success "Successfuly droped dirt"; sleep (.56)
+
+         if app.fuelTotal(  ) > available_fuel then  
+           app.warning "Droping fuel/wood overflow"
+          app.valueDropLess((app.fuelTotal(  )-available_fuel) ,"Front" ) 
+          app.success "Successfuly droped fuel/wood .."
+         end
+     app.alert "Droping last items"    
+        for slt = 1,16 do 
+            local isSapling = app.isListedRequestSlot(slt , sapl )
+            local isLog = app.isListedRequestSlot(slt , log )
+            local isDirt = app.isListedRequestSlot(slt , dirt )
+            -- print ("slot: ",slt," == ",not (isSapling or isLog)) sleep(2)
+            if turtle.getItemCount (slt) > 0 and not (isSapling or isLog or isDirt) then turtle.select (slt); turtle.drop() end
+
+        end 
+     app.success "Complete droping odd items .."  
+     sleep (2)
+     turtle.select (1) 
+end
+
+  local err = "-----------------------"
+
+app.clear()
+print "Starting program.. \nand waiting redstone input "
+
+while true do 
+     
+         assert (proceed_home(  ),err)
+          if  not home(  ) then 
+             app.success("I just travel home")
+             app.goto (app.get_x(  ) +1 ,0,math.floor(app.get_z(  )) )
+             app.goto (app.get_x(  ),0,math.floor(app.get_z(  )-1))
+             -- app.goto (1,0,-1)
+             app.goto (0,0,0)
+             app.look("SOUTH")
+          end  
+
+
+-- Balance selection
+ while not (rs.getInput("right") or rs.getInput("left")) do sleep (.4) end
+ app.warning "Waiting 10s , please select order .."
+ sleep (10)
+   
+    if rs.getInput("right") and not rs.getInput("left") then
+      reset(  )
+    end  
+    
+    if rs.getInput("right") and rs.getInput("left") then 
+      app.warning "Sleep timer running ..."
+      sleep( sleep_time )
+    end  
+
+   if rs.getInput("left") then       
+       assert ( proceed_treefarm () ,err )
+       assert (inportChest (),err)
+    
+     left () left ()
+     dropItems(  )
+     left () left ()
+    -- proceed_home(  )
+
+   turtle.select (1)
+   while turtle.suckDown() do end 
+   -- Go as default from base
+   forward()
+    for tree_Wid=1,tree_inWid do
+        tree () 
+       sapling () 
+       for tree_Len=1,tree_inLen -1 do
+           -- forward while by gaps
+           forward()
+           assert (proceed_home(  ),err) -- if not enouch
+           tree ()  
+           -- if not tree then sapling or tree then sapling 
+           sapling ()  
+       end
+       if tree_Wid % 2 == 0 then 
+          left(  ) forward() left()
+       else
+         right(  ) forward () right()
+       end 
+    end
+ end 
+end

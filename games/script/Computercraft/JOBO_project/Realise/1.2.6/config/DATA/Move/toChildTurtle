@@ -1,0 +1,20 @@
+
+fLib.replaceLineValue( "/programs/turtle_programs/JOBO/moreFile/programs/config/HomeCoord/HomeCoord" , 8 , false  , ":" ) -- save in turtle config file  id  
+
+local configT = "/programs/turtle_programs/JOBO/moreFile/programs/config/configT"
+fLib.replaceLineValue( configT , 13 ,ConfigProgram.GET.GenerateJob() ) -- Set job in as default
+
+
+-- to default
+local default = "/programs/turtle_programs/JOBO/moreFile/programs/config/default"
+fLib.replaceLineValue( default , 1 ,(ConfigProgram.GET.TurtlesName() and ConfigProgram.GET.TurtlesName() ) or ConfigProgram.SET.TurtlesName("JOBO") or "JOBO"  ) -- set turtleStatus in config file false . enather way that woud be sematic error
+fLib.replaceLineValue( default , 2 ,os.getComputerID() ) -- save in turtle default file  id  
+fLib.replaceLineValue( default , 3 ,ConfigProgram.GET.yJobEnd() ) -- save in turtle default file  id  
+fLib.replaceLineValue( default , 4 ,ConfigProgram.GET.DropJunkItem() ) -- save in turtle config file  id / drop cobblestobe 
+--write  manager location
+fLib.replaceLineValue( default , 6 ,ConfigProgram.GET.xPos() ) -- save in turtle config file  id / drop cobblestobe 
+fLib.replaceLineValue( default , 7 ,ConfigProgram.GET.yPos() ) -- save in turtle config file  id / drop cobblestobe 
+fLib.replaceLineValue( default , 8 ,ConfigProgram.GET.zPos() ) -- save in turtle config file  id / drop cobblestobe 
+fLib.replaceLineValue( default , 9 ,orientation.toNameOrientation(  ConfigProgram.GET.fPos()+1 ) ) -- save in turtle config file  id / drop cobblestobe 
+fLib.replaceLineValue( default , 10 ,ConfigProgram.GET.DungeonChest() ) -- save in turtle config file  id / drop cobblestobe 
+

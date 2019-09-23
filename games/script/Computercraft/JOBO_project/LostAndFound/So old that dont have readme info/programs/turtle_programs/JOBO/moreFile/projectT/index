@@ -1,0 +1,133 @@
+-- Turtle index
+print "INDEX FILE IS LOADING..."
+-- Core Statup Data---------------------------------------------------
+os.loadAPI("/moreFile/programs/BOOT/BOOT_HOMECOORD") -- Booting first time 
+---end-----------------------------------------------------------------
+
+os.loadAPI("/moreFile/programs/perip")
+os.loadAPI("/moreFile/programs/requestAPI") --
+os.loadAPI("/moreFile/programs/config/HomeCoord/HomeCoordProgram")
+os.loadAPI("/moreFile/GPS/gps")
+os.loadAPI("/moreFile/programs/config/configProgramT")
+os.loadAPI("/moreFile/programs/turtleLib")
+
+local xHome = HomeCoordProgram.GET.xHome()
+local yHome = HomeCoordProgram.GET.yHome()
+local zHome = HomeCoordProgram.GET.zHome()
+local fHome = HomeCoordProgram.GET.fHome() 
+local Manager = configProgramT.GET.ManagerID()
+
+
+print (BOOT_HOMECOORD.status and "I was sececcfuly booted" or "I cannot boot for some reason." )
+print "INDEX COMPLETE..."
+
+local function ProtocolGoHome( instruction ) -- Broadcast protocols about Go home 
+		if type (instruction)== "table" then  -- bug , random send whithout statement
+		  if  instruction.GoHome == true and Manager == instruction.Manager	 then 
+			     print (">>ProtocolGoHome<<")
+			     turtleLib.Broadcast( {GoHome=true, Manager = Manager} ) -- send information to shutdown
+		         return true 
+		  end
+	    end 	   	  
+  return false  
+end
+
+
+local  function DisassembleProtocol( instruction ) -- Going to disasablling  
+	   if type (instruction)== "table" then  -- bug , random send whithout statement
+		  if  instruction.Disassemble == true and Manager == instruction.Manager then 
+			     print (">>DisassembleProtocol<<")
+		         return true 
+		  end
+	    end 	   	  
+  return false  
+end
+
+shell.run("clear")
+
+
+
+-- TURTLES
+	gps.Global:setCondition(true)
+
+while true do 
+	 print ("Waiting status from "..Manager.." manager.")
+	 --turtleLib.Send(135,{Status="getJob"})
+	 
+	 local sender ,  instruction = turtleLib.Receive( )
+	 if instruction ~= nil then 
+	 	if instruction.JobAvailable == true and instruction.STATUS == true and Manager == instruction.Manager then 
+	 		gps.Global:setCondition(true)
+	 		local yJobBug = yHome + 1-- bug with instruction.yJ, some reason not add and then go turtle in same eight
+	 		print ("Job isAvailable at X:"..instruction.xJ.." Z:"..instruction.zJ.." F:"..instruction.fJ)
+	 		print ("Ho Up bug>"..yJobBug)
+	 		gps.Global:goto(instruction.xJ,yJobBug,instruction.zJ)
+	 		gps.Global:goto(instruction.xJ,instruction.yJ,instruction.zJ)
+	 		print('WOrKS >>'..tostring(instruction.fJ))
+	 		gps.look(instruction.fJ)
+	 		--sleep(20)
+	 		--turtle.digDown()
+	 		print"NEXT-->>>>"
+	 	elseif ProtocolGoHome( instruction ) then  -- if Receive from manager and if Go Home  
+	 		print "Going Home "
+	 		ProtocolGoHome(  )
+	 		gps.Global:goto(xHome,yHome+2,zHome)
+	 		gps.Global:goto(xHome,yHome,zHome)
+		  	gps.look(fHome)
+	 		print "No More Job"
+	 	elseif DisassembleProtocol( instruction ) then 
+	 			 gps.Global:setCondition(true)
+		         gps.Global:goto(instruction.x,instruction.y+1,instruction.z)
+		         gps.Global:goto(instruction.x,instruction.y,instruction.z)	
+	 		--break
+	 	elseif Manager ~= instruction.Manager  then 
+	 		print ("This "..tostring(sender).. " unkown received,expected:"..tostring (instruction.Manager)..".")
+	 	end  
+	 else 
+	 	print "Message equal nil ??"
+	 end 
+end 
+
+
+--[[ -- interupt test Working 
+instruction = nil
+
+function msg( ... )
+	while true do 
+			
+	 print "Waiting status "
+	 local msg = turtleLib.Receive( )
+	 if msg ~= nil then 
+	 	instruction = msg
+	 	gps.Global:setCondition(false) -- Interupt working 
+	 end 
+	 end 	
+end
+
+
+function run( ... )
+	-- body
+
+while true do 
+	 if instruction~=nil then 
+		
+	  if instruction.Status =="getJob" then 
+			gps.Global:setCondition (true)
+			gps.Global:goto (instruction.x , instruction.y , instruction.z)
+			if type(instruction.f)=="number" then  gps.look(orientations[instruction.f+1]) end 
+		end  
+
+		  if instruction.Status=="GoHome" then 
+		  	gps.Global:setCondition(true)
+		  	gps.Global:goto(xHome,yHome,zHome)
+		  	gps.look(orientations[fHome+1])
+		  end 	
+			instruction = nil
+	   end 
+  	sleep(1)
+ end 
+end
+
+parallel.waitForAny (msg,run)
+
+]]

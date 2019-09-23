@@ -1,0 +1,9 @@
+Turtle name: "Jobla"
+ManagerID: 1
+yProgressEnd: 10
+DropJunkItem: true
+ROLE:
+xManager: -562
+yManager: 70
+zManager: 283
+fManager: "SOUTH"

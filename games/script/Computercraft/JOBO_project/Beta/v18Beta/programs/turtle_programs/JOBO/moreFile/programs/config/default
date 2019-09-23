@@ -1,0 +1,10 @@
+Turtle name: "Steave"
+ManagerID: 8
+yProgressEnd: 5
+DropJunkItem: true
+ROLE:
+xManager: -562
+yManager: 70
+zManager: 283
+fManager: "SOUTH"
+DungeonChest: true

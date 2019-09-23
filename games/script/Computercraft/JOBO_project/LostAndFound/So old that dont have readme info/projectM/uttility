@@ -1,0 +1,28 @@
+os.loadAPI("config/source/StatisticsProgram")
+
+
+local function getNInput(  txt )
+  	      print ("Requare:"..txt..".")
+   local  n = tonumber(read())
+        while n == nil do
+                n = tonumber(read())
+  		end
+               return n
+  end
+
+function clear(  )
+	term.setCursorPos(1,1) ; term.clear()
+end
+
+
+function changeCoord (  )  
+	clear(  )
+	print ("Changing Coord ...")
+	StatisticsProgram.changeCoord(  getNInput(  "xPos" ), getNInput(  "yPos" ),getNInput(  "zPos" ),getNInput(  "fPos" ) )
+end
+
+function changeJobLocation(  )
+clear(  )
+	print ("Changing Job Location...")
+	StatisticsProgram.changeJobLocation(getNInput(  "xStartJob" ) ,getNInput(  "zStartJob" ),getNInput(  "xEndJob" ),getNInput(  "zEndJob" ),getNInput(  "yJob" ) )
+end

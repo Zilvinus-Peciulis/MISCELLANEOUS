@@ -1,0 +1,2 @@
+Fixed Then reseting option are available , doesnt clear progress from query , leaving bad mining later. Except yPosProgress is not Deleted to leave same heightit was.
+Fixed Then hit in beadrock try to stop mining by even was reached bad rock , no more ignore badrock state

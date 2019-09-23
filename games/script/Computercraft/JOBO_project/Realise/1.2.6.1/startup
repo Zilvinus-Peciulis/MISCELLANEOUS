@@ -1,0 +1,2 @@
+-- Everithing sart up from disk in disk drive
+shell.run("JOBO")

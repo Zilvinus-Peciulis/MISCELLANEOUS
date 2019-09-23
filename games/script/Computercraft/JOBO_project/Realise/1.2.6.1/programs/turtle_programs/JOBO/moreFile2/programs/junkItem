@@ -1,0 +1,158 @@
+os.loadAPI("OS")
+local FileName = "junkItem"
+OS.loadAPI("/moreFile/GPS/gps",FileName)
+OS.loadAPI("/moreFile/programs/requestAPI",FileName) 
+OS.loadAPI("/moreFile2/programs/material",FileName)
+OS.loadAPI("/moreFile2/programs/refuel",FileName)
+OS.loadAPI("/moreFile2/programs/travel",FileName)
+
+
+
+
+--  check if left in inventory something more if does then return true 
+function suckJunks(  )
+	turtle.select(1)
+	local x = 0
+	for items=1,16 do
+		if turtle.getItemCount(items) > 0 then 
+		x=x+1
+		end 
+	end
+
+	for slot=1,15-x  do
+		turtle.suck()	
+	end
+
+	return turtle.suck ()
+end
+
+function voidJunkCount(  )
+	local  c = 0
+	for item=1,#material.junkInventory do
+		if  material.junkInventory[item].name == requestAPI. getDataName  (item) then 
+			c= c + turtle.getItemCount(item)
+		end 
+	end
+	return c 
+end
+
+ -- junk calculate
+ function junkCount(  )
+ local c = 0	
+ 	for slot=1,16 do
+	if not refuel.checkIsFuelSlot( slot ) then c = c + turtle.getItemCount(slot) end 
+end
+return c
+ end
+
+ function isJunk(  )
+ 	if junkCount(  ) > 0 then return true else return false end 
+ end
+
+function dropVoidJunk( side )
+	assert (side=="Up"or side=="Down"or side == "Front"," dropJunk expected Up, Down, Fron got "..tostring (side))
+	if side == "Front" then side ="" end 
+  	
+  for slot = 16,1,-1 do 	
+		for item=1,#material.junkInventory do
+			if not refuel.checkIsFuelSlot( slot ) and not turtleLib.TurtleIn( slot ) and  material.junkInventory[item].name == requestAPI.getDataName  (slot) then 
+				turtle.select(slot)
+				turtle["drop"..side] ()
+			elseif turtleLib.TurtleIn( slot ) then say.warning ("I shoud not have turtle  "..slot.." at all !")
+			end 
+		end
+   end 	
+end
+
+function dropJunk( side )
+	assert (side=="Up"or side=="Down"or side == "Front"," dropJunk expected Up, Down, Fron got "..tostring (side))
+	if side == "Front" then side ="" end 
+	for slot=16,1,-1 do
+		if not refuel.checkIsFuelSlot( slot ) and  turtle.getItemCount(slot) > 0 then 
+			turtle.select(slot)
+			turtle["drop"..side]()
+		 elseif turtleLib.TurtleIn( slot ) then say.warning ("I drop turtle !")
+		end 	
+	end
+				turtle.select(1)
+end
+
+function dropAll( side )
+	assert (side=="Up"or side=="Down"or side == "Front"," dropJunk expected Up, Down, Fron got "..tostring (side))
+	if side == "Front" then side ="" end 
+	for slot=16,1,-1 do
+	if turtle.getItemCount(slot) > 0 then 	
+		turtle.select(slot)
+		turtle["drop"..side] ()
+	end 	
+	end
+				turtle.select(1)
+end
+
+function dropFuelChest(  )
+	  refuel.valuesDrop( 99999999999999  , "Front") -- ALL :D 
+end
+
+function dropJunkAndFuelSlave( refuelvalue )
+	dropJunk( "Down" )
+	refuel.valueDropLess( refuelvalue  , "Down")
+	
+end
+
+function dropJunkAndMaterialsSupport(  )
+	-- drop value 
+	  dropFuelChest(  ) 
+	  if isJunk(  ) then 
+		  dropJunk( "Down" )
+	 end 
+end
+--leave where they are 
+function takeAllJunkFromSlave( instruction,command )
+turtle.select(1)
+	refuel.organizeFuel(  )
+	say.warning ("Moving to slave!")
+	 while true do  
+		local junkLeft = false
+		if not travel.checkFuelxTarget( instruction.x,instruction.y+2,instruction.z ) then turtle.select(1) turtle.suck() end  
+	 	local xOneLeft , zOneLeft =  orientation.Left(instruction.f,1  )
+
+			  -- not move like crazy somethere 
+			  travel.supJunkSlave( instruction.x,instruction.y,instruction.z,instruction.f, command )
+			 junkLeft = suckJunks(  ) 
+			 command = "" -- forget about default option 
+			 
+		-- if not drop all junk, continue 
+		 if not junkLeft then break
+			 else 
+				travel.supHome(   )
+				dropJunk( "Down" )
+				turtle.select(1)
+
+		  end 
+	 end
+
+end
+--leave where they are 
+function takeAllJunkFromSlaveChest(instruction ,command)
+	turtle.select(1)
+	refuel.organizeFuel(  )
+	say.warning ("Moving to slave junk chest!")
+	 while true do  
+		local junkLeft = false
+		--- if not enouth fuel to travel take sum
+		if not travel.checkFuelxTarget( instruction.x,instruction.y+2,instruction.z ) then turtle.select(1) turtle.suck() end  
+			  -- not move like crazy somethere 
+		  		travel.supJunkChest( instruction.x,instruction.y,instruction.z,instruction.f ,command)
+			 junkLeft = suckJunks(  ) 
+			 command = "" -- forget about default option 
+		
+		-- if not drop all junk, continue 
+		 if not junkLeft then break
+			 else 
+				travel.supHome(   )
+				dropJunk( "Down" )
+				turtle.select(1)
+
+		  end 
+	 end
+end

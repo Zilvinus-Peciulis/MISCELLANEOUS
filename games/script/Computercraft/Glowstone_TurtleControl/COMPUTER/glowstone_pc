@@ -1,0 +1,81 @@
+--COMPUTER PROGRAM ONLY
+rednet.open("back")
+-- Turtle i#id that can understand and execute commands
+local sendDataId = 0
+--terminal size
+local xSize ,zSize = term.getSize()
+local arg = {...}
+term.clear()
+term.setCursorPos(1,1)
+-- return in single string
+function unzip (tb)
+  local text =""
+  for i ,v in pairs (tb) do 
+      text =  text.." "..v 
+
+  end
+ return string.sub(text,2, #text)  
+end
+
+-- sprite on the sreen message
+ function outputScreen( message )
+        local array = textutils.unserialize(message)
+        print ("Distance "..array["a"])
+        local checkSpelling, errorMessage = array["b"];
+          if  checkSpelling ~= true then 
+              print ("Failed: "..tostring(array["b"])) 
+             else
+              print ("Fuel: "..array['c'])
+              print ("Success: "..tostring(array["b"]))
+          end
+        print(string.rep("-",xSize))
+ end
+
+-- if using argument then execute this code
+ if #unzip(arg) > 0 then
+  rednet.send (sendDataId , unzip(arg) )
+  local id, message, dis = rednet.receive(.4) 
+    local array = textutils.unserialize(message)
+    if message ~=nil then 
+      print(":"..unzip(arg))
+       outputScreen( message )
+      else
+        print ("Signal not reached #"..sendDataId.." id the point")
+    end
+  return "Was used arguments"
+  end   
+  
+  print "No Argument used,run CLI\n"
+
+  local stringAppend = 1
+   local history ={}
+   print ("Write command to #"..sendDataId)
+   while true do
+         history[stringAppend] = read(nil , history)
+     -- check if user want to exit
+         if history[stringAppend] == "exit" then break end
+     --send command data to turtle
+        rednet.send(sendDataId,history[stringAppend])
+     --reciving data about distance
+     local id , message , distance = rednet.receive(.4)
+     -- check if message was received
+     if message ~= nil then 
+ 
+ -- clear screen if in bottom
+   local xtm , ztm = term.getCursorPos()
+  -- latch condition about command was succsessfully executed
+  if ztm >= zSize then 
+       term.clear()
+        term.setCursorPos(1,1)
+        outputScreen(message)
+    else
+        outputScreen(message)
+   end
+       local array = textutils.unserialize(message)
+        -- increment when is correctly comunicated
+        if array['b'] ==true then stringAppend = stringAppend + 1 end
+       else
+        print ("Signal was unreached to #"..sendDataId.." id.")
+     end
+      
+  end

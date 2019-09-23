@@ -1,0 +1,128 @@
+
+local xSize,zSize = term.getSize()
+
+function resetScreen(  )
+  local xPos,zPos = term.getCursorPos()
+  if  zPos>=zSize then term.clear(); term.setCursorPos(1,1) end 
+end
+
+ function getNInput(  txt,history,command )
+  	      resetScreen(  )
+          say.writeAlert (""..txt.." # ")
+           local tb -- select table is not created 
+          local xPos,zPos = term.getCursorPos()
+           if type(history)~="table" then  tb = {history} else tb = history end 
+              local  n = tonumber(read(nil,tb))
+                while n == nil do
+                     term.setCursorPos (1,zPos)
+                     term.clearLine()
+                     say.writeAlert (""..txt.." # ")
+                n = tonumber(read(nil,tb))
+
+  		end
+                  if command == "clearInput" then 
+                          term.setCursorPos (1,zPos)
+                          term.clearLine()
+                          say.alert (""..txt.." # ")
+                    end     
+               return n,xPos,zPos
+  end
+
+   function getSInput(  txt,history,command )
+          resetScreen(  )
+          say.writeAlert (""..txt.." % ")
+           local tb -- select table is not created 
+          local xPos,zPos = term.getCursorPos()
+           if type(history)~="table" then  tb = {history} else tb = history end 
+              local  n = tostring(read(nil,tb))
+                while #n==0 do
+                    term.setCursorPos (1,zPos)
+                     term.clearLine()
+                    say.writeAlert (""..txt.." % ")
+                    n = tostring(read(nil,tb))
+
+      end               if command == "clearInput" then 
+                          term.setCursorPos (1,zPos)
+                          term.clearLine()
+                          say.alert (""..txt.." % ")
+                        end  
+               return n,xPos,zPos
+  end
+
+function clear(  )
+	term.setCursorPos(1,1) ; term.clear()
+end
+
+function NumberElipse( start, ends  )
+  assert (type(start)=="number" and type(ends)=="number","NumberElipse expected number")
+  local cnt = 1
+  local tb = {}
+  if ends >= start then 
+      for i=start,ends do
+        tb[cnt]=tostring(i)
+        cnt=cnt+1
+      end
+  else 
+    for i=start,ends,-1 do
+        tb[cnt]=tostring(i)
+        cnt=cnt+1
+      end
+  end 
+  return tb 
+end
+
+
+--Events
+function WaitEnter ()
+term.write "Press enter to continue."
+local _ = read()
+  end
+function WaitEnterClear(  )
+ clear(  ) WaitEnter ()
+end
+
+ function spitText( tHistory )
+  assert (type(tHistory)=='table','spitText expected table with text got '..type(tHistory))
+   local text = "" 
+    for k,v in pairs(tHistory) do
+       if k == 1 then  text = text.." "..v else  text = text.." "..v end 
+    end
+say.success (text)
+end
+
+function pointScreenDown(  )
+  term.setCursorPos (1,zSize-1)
+end
+
+function OnAssert( condition,text )
+  if condition then return true else say.warning (text) end 
+end
+
+function Command( text )
+  assert (type (text)=="string", "Requare Word string")
+   local  void = string.find(text," ")
+  if void then return  string.sub(text,1,void -1 ) else return text end 
+end
+
+
+
+
+--- Orders
+
+function Items_Complete (object)
+  assert (type (object)=="table","Items_Complete requare api name got "..type(object) )
+  local sBlock = material.solidBlock 
+        sBlock.value,tItems,slotVal = object.Listed_Item( "silence" )
+     if uttility.OnAssert( object.FuelRequare() < turtle.getFuelLevel(),"Requare "..object.FuelRequare()..' fuel to proceed!!!' ) then   
+         
+         local UNEQUE = requestAPI.checkAll( tItems )
+         local SBLOCK = requestAPI.checkAll( {sBlock} )
+         local isVslot = requestAPI.selectLessSlot( slotVal )
+         if UNEQUE and SBLOCK and not isVslot then 
+           return true  
+            elseif not SBLOCK then say.danger ("Solid items is missing!!") WaitEnter()  object.Listed_Item(  )
+            elseif not UNEQUE then say.danger ("Uneque items is missing!!") WaitEnter()  object.Listed_Item(  ) 
+            else say.danger ("Items still missing!!") WaitEnter() object.Listed_Item(  )
+         end      
+    end 
+end 

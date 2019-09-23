@@ -1,0 +1,8 @@
+1){|"JobType"]="GenerateQuarry",|"z"]=-257,|"ID"]=3,|"JobAvailable"]=true,|"Connected"]=false,|"JobComplete"]=false,|"Disassemble"]=true,|"fTime"]=false,|"MissingItems"]="DontKnow",|"f"]="WEST",|"y"]=75,|"x"]=-81,}
+2){|"JobType"]="GenerateQuarry",|"z"]=-247,|"ID"]=4,|"JobAvailable"]=true,|"Connected"]=false,|"JobComplete"]=false,|"Disassemble"]=true,|"x"]=-81,|"MissingItems"]="DontKnow",|"f"]="WEST",|"y"]=75,|"fTime"]=false,}
+3){|"JobType"]="GenerateQuarry",|"z"]=-237,|"ID"]=5,|"JobAvailable"]=true,|"Connected"]=false,|"JobComplete"]=false,|"Disassemble"]=true,|"x"]=-81,|"MissingItems"]="DontKnow",|"f"]="WEST",|"y"]=75,|"fTime"]=false,}
+4){|"JobType"]="GenerateQuarry",|"z"]=-227,|"ID"]=6,|"JobAvailable"]=true,|"Connected"]=false,|"JobComplete"]=false,|"Disassemble"]=true,|"fTime"]=false,|"MissingItems"]="DontKnow",|"f"]="WEST",|"y"]=75,|"x"]=-81,}
+5){|"JobType"]="GenerateQuarry",|"z"]=-217,|"ID"]=7,|"JobAvailable"]=true,|"Connected"]=false,|"JobComplete"]=false,|"Disassemble"]=true,|"x"]=-81,|"MissingItems"]="DontKnow",|"f"]="WEST",|"y"]=75,|"fTime"]=false,}
+6){|"JobType"]="GenerateQuarry",|"z"]=-207,|"ID"]=8,|"JobAvailable"]=true,|"Connected"]=false,|"JobComplete"]=false,|"Disassemble"]=true,|"x"]=-81,|"MissingItems"]="DontKnow",|"f"]="WEST",|"y"]=75,|"fTime"]=false,}
+7){|"JobType"]="GenerateQuarry",|"z"]=-197,|"ID"]=9,|"JobAvailable"]=true,|"Connected"]=false,|"JobComplete"]=false,|"Disassemble"]=true,|"x"]=-81,|"MissingItems"]="DontKnow",|"f"]="WEST",|"y"]=75,|"fTime"]=false,}
+8){|"JobType"]="GenerateQuarry",|"z"]=-257,|"ID"]=10,|"JobAvailable"]=true,|"Connected"]=false,|"JobComplete"]=false,|"Disassemble"]=true,|"fTime"]=false,|"MissingItems"]="DontKnow",|"f"]="WEST",|"y"]=75,|"x"]=-91,}

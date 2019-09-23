@@ -1,0 +1,230 @@
+--Boot Turtle
+
+os.loadAPI("OS")
+local FileName = "BOOT_HOMECOORD"
+OS.loadAPI("/moreFile/programs/perip",FileName) --
+OS.loadAPI("/moreFile/programs/config/source/defaultProgramT",FileName)
+OS.loadAPI("/moreFile/programs/config/HomeCoord/HomeCoordProgram",FileName)
+OS.loadAPI("/moreFile/programs/requestAPI",FileName) --
+OS.loadAPI("/moreFile/GPS/gps",FileName)
+OS.loadAPI("/moreFile/GPS/refuelLib",FileName)
+OS.loadAPI("/moreFile/programs/config/source/defaultProgramT",FileName)
+OS.loadAPI("/moreFile/programs/say",FileName)
+OS.loadAPI("text")
+say.super ("Booting Home Coords")
+status = true -- cach status from error
+local function copy (fromPath, toPath)
+ if fs.exists(fromPath) then  	
+	-- if fs.exists(toPath) then 
+		--print ("From ["..fromPath.."]\nTo ["..toPath.."]")
+		fs.delete (toPath) --delete
+		fs.copy (fromPath,toPath)--create
+	-- else print ("To file ['"..toPath.."'] not exists.")  return true 
+	-- end 
+ else say.danger ("From file ['"..fromPath.."'] not exists.") 
+ end 
+ return false 
+end 	
+
+
+
+local managerID = defaultProgramT.GET.ManagerID()
+local function isModem(  )
+	return   perip.inspectThisObject("modem") 
+end
+
+
+
+local function wasHomeCoordData(  )
+  return 	HomeCoordProgram.GET.HomeCoordData()
+end
+
+local function setHomeCoord( x , y, z , f , C, chest, arrive,ROLE )
+	HomeCoordProgram.SET["xHome"] (x)
+	HomeCoordProgram.SET["yHome"] (y)
+	HomeCoordProgram.SET["zHome"] (z)
+	HomeCoordProgram.SET["fHome"] (f)
+	HomeCoordProgram.SET["CoordComplete"] (C)
+	HomeCoordProgram.SET["PlacedChests"] (chest)
+	HomeCoordProgram.SET["orArrive"](arrive)
+	defaultProgramT.SET["ROLE"](ROLE)
+
+end
+
+local function Accepted(  )
+            HomeCoordProgram.SET.HomeCoordData(true) -- set true if is id equal to this computer 
+    		--take data from disk2
+    		turtle.turnRight()
+				sleep(.5)
+			copy ("disk2/JOBO/moreFile2", "moreFile2")
+			turtle.turnLeft()
+			if not  fs.exists ("moreFile2/programs/travel") then 
+					say.danger "I not copy disk2, try again!"
+					turtle.turnRight()
+						sleep(.5)
+						copy ("disk2/JOBO/moreFile2", "moreFile2")
+					turtle.turnLeft()
+			end 	
+end
+
+
+local function Denied(  )
+      HomeCoordProgram.SET.HomeCoordData(false)
+end
+
+
+
+-- Receiving Data and unserialize or error
+--Do while not was first time in Home Coord else Ignore
+
+------Stage-1---Receving-Data------------------------------------------------------------------
+
+say.success ( (not  wasHomeCoordData(  )) and ">>Boot first time<< " or ">This is second time then I em there< ")
+if not  wasHomeCoordData(  )  then 
+		if isModem(  ) then 
+		  	     Accepted(  )
+		  	        say.special("Sending first attempt to "..managerID.." Manager.")
+		  	   -- Sending signal thart say : Okey, I send one message about me.
+		  	        
+		  	    say.alert ("manager ID "..tostring(managerID) )
+			     while true do -- force to talk, maybe void freeing someting /Looks Promising :D
+		            rednet.send(managerID,'#'..os.getComputerID().." Start Working!")
+		         --[Reseive home cordination and save in configFile]
+		            print("Waiting Home Coord Data")
+		            _,message,_ = rednet.receive(0.8)
+		            	  isContent = message and textutils.unserialize(message) 
+		        		 if isContent ~= nil then break end 
+		         end    
+		          
+			     local isContent = message and textutils.unserialize(message)    -- if content 
+--sleep(20)
+			     if isContent ~= nil then
+			        say.success "Receive Home cord."
+			        --print(message)
+			        -- Unserialize cords fron string 
+			        say.alert ("Translating message in values.")
+			        local Home = textutils.unserialize(message)
+			        say.success ("Compelte")
+			        --Set Coord in HomeCord config file
+			        -- print ("Save Coord in: /moreFile/programs/config/HomeCoord/HomeCoordProgram.")
+			        setHomeCoord( Home.x ,Home.y, Home.z , Home.f , Home.CoordComplete , Home.PlacedChests, Home.orArrive,Home.ROLE)--set home coord
+			       	--
+			       	say.alert("Home.x "..Home.x..".")
+			        say.alert("Home.y "..Home.y..".")
+			        say.alert("Home.z "..Home.z..".")
+			        say.alert("Home.f "..Home.f..".")
+			        say.alert("Coord Complete "..tostring (Home.CoordComplete)..".")
+			        say.alert("Placed Chests "..tostring(Home.PlacedChests)..".")
+			        say.alert ("Is arrived "..tostring(Home.orArrive)) -- firrst time in nest
+			        say.success("-------------------------------------")
+			     
+			     else 
+			     	--print"Camon Manager I need Home coordination..."
+        			 status = false 
+        			 say.danger("Reason: "..tostring(message))
+        end 
+		     else 
+		  	status =false 
+		  	say.danger "No modem found, terminated."  
+		  end 
+  else
+  --Denied(  )
+end
+
+
+
+-- Stage 2---Go-Home--------------------------------------------------------
+
+
+local chestArray =  {"minecraft:chest", "minecraft:trapped_chest"}
+
+local function isHome(  )
+	return HomeCoordProgram.GET.CoordComplete()
+end
+
+if isModem()  then 
+	if  isHome(  )  then 
+		if not HomeCoordProgram.GET.orArrive() then -- if not arrive in home first time do
+			say.alert ("Prepare Moving in Home.")
+			--receive data in BOOT file
+			--- Get data from config file 
+			say.alert ("Geting Home Data from file.")
+		    local xHome = HomeCoordProgram.GET.xHome()
+			local yHome = HomeCoordProgram.GET.yHome()
+			local zHome = HomeCoordProgram.GET.zHome()
+			local fHome = HomeCoordProgram.GET.fHome()
+			local completeHome = HomeCoordProgram.GET.CoordComplete() -- complete to traveled home first time condition
+			local chestHome = HomeCoordProgram.GET.PlacedChests()
+			local orArriveFirstTimeHome = HomeCoordProgram.GET.orArrive()
+		    say.success ("Complete!")
+		    say.alert ("Faceing:"..tostring(fHome))
+			if turtle.getFuelLevel() == 0 then refuelLib.RefuelByValue( 999 ) say.success "Fyel:Yes it was." else  say.warning "Fuel: no fuel needed."  end
+			say.success ("Complete!")	
+				if not orArriveFirstTimeHome then 
+					say.alert "Moving Home First Time."
+					-- sleep(.5)
+					text.changeLabel(  )
+					OS.loadAPI("moreFile2/programs/travel",FileName)
+					travel.thenBooted( xHome , yHome , zHome , fHome )
+					-- sleep(.5)
+					say.success ("Home was Reached.")
+					HomeCoordProgram.SET.orArrive(true)-- Was moved in Home first time
+					say.special "Save status about Home was reached."
+					say.success "Complete"
+					if not chestHome  then 
+					   say.alert "Placing chests."	
+							 if defaultProgramT.GET["ROLE"] () == "SLAVE" then 
+			          				say.special "ROLE:SLAVE"
+							 local a = false;
+							 local b = false;
+							 if not requestAPI.inspectThis("front", chestArray ) then turtle.dig() a=true; end 
+							 if not requestAPI.inspectThis("bottom", chestArray ) then turtle.digDown() b=true end 
+									requestAPI.selectThis(chestArray)
+									say.alert (turtle.placeDown() and "Place Bottom" or "Chest Bottom :D.")
+									requestAPI.selectThis(chestArray)
+									say.alert (turtle.place() and "Place Front." or "Chest Front :D.")
+									--else drop chest to exsisting one
+									say.alert ((not a or not b) and ("Droping Chest"..( a and b and "'s" or "")) or "No Chest To Drop.") 
+									requestAPI.giveItemsFrom("bottom",2, chestArray  )
+									requestAPI.selectThis (chestArray)
+								    HomeCoordProgram.SET.PlacedChests(true) -- Okey bucky you done your job now you can go rest.
+								    say.alert((a or b ) and ("Chest"..( a and b and "'s" or "").." was placed first time.") or "Chest Was placed before me :(." )
+								    say.success ("Complete")
+			          		elseif defaultProgramT.GET["ROLE"] () == "SUPORT" then 
+			          				say.special "ROLE:SUPORT"
+			          				local a = false;
+								    if not requestAPI.inspectThis("front", chestArray ) then turtle.dig() a=true; end 
+									requestAPI.selectThis(chestArray)
+									say.alert (turtle.place() and "Place chest Front." or "Chest Front.")
+									--else drop chest to exsisting one
+									say.alert ((not a ) and ("Droping Chest"..( a  and "'s" or "")) or "No Chest To Drop.") 
+									requestAPI.giveItemsFrom("front",1, chestArray  )
+								    turtle.digDown()
+								    HomeCoordProgram.SET.PlacedChests(true) -- Okey bucky you done your job now you can go rest.
+								    say.alert((a) and ("Chest"..( a and "'s" or "").." was placed first time.") or "Chest Was placed before me :(." )
+								    say.success ("Complete")
+							end 
+
+		          end  			 	
+		   	  end   
+		 say.success "Successfuly arrived Home first time !"
+		 end   	     
+	else
+	    say.danger "No home cord.Terminated"	
+	end
+say.special ("Complete setup!")
+end 
+-- sleep(50)
+-- Complete Task getting to Home Cord with given data from Super Computer
+--End of Aplcication that boot turtles
+
+os.unloadAPI("/moreFile/programs/perip") --
+os.unloadAPI("/moreFile/programs/config/defaultProgramT")
+os.unloadAPI("/moreFile/programs/config/HomeCoord/HomeCoordProgram")
+os.unloadAPI("/moreFile/programs/requestAPI") --
+os.unloadAPI("/moreFile/GPS/gps")
+os.unloadAPI("/moreFile/GPS/gps/refuelLib")
+
+
+
+

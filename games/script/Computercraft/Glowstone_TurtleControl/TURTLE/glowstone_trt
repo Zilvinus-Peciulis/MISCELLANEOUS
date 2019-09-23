@@ -1,0 +1,202 @@
+--TURTLE PROGRAM ONLY
+
+local wasReceived = 0
+local xSize ,zSize = term.getSize()
+
+function dig(side)
+local side = side or ""
+while turtle['dig'..side]() do print (side) sleep(.5) end
+end
+
+local action = {
+  ['fd'] = function () while not turtle.forward() do turtle.dig() end end;
+  ['up'] = function () while not turtle.up() do turtle.digUp() end end;
+  ['dn'] = function () while not turtle.down() do turtle.digDown() end end;
+  ['dfd']= function () while not turtle.forward() do dig() dig("Up") dig ("Down")  end end;
+  ['bk'] = function () while not turtle.back () do turtle.turnRight() turtle.turnRight() while turtle.dig() do sleep(0.5) end turtle.turnLeft() turtle.turnLeft() end end;
+  ['lt'] = function () turtle.turnLeft() end;
+  ['rt'] = function () turtle.turnRight() end;
+  ['dg'] = function () dig() dig("Up") dig ("Down") end;
+  ['xdg'] = function () dig() dig("Up") dig ("Down") for x=1,4 do turtle.turnLeft() dig()end end;
+}
+
+-- connect  modem  peripherals
+local modemSides = {"top","bottom","right","left","front","back"}
+      condition = false;
+for x = 1 ,#modemSides do
+local type = peripheral.getType( modemSides[x] )
+  
+  if type == "modem" then 
+      local type =peripheral.getType("back")
+       rednet.open(modemSides[x])
+       condition = true
+       break
+  end
+end
+
+function intoWords (num)
+  local numVal ={
+    'one','two','three','four','five','six','seven','eight','nine','ten';
+    'eleven', 'twelve' ; 
+  }
+  if num <= #numVal then 
+     return numVal[num]
+   else
+    return num
+  end
+end
+
+--action['dfd']()
+--action['bk']()
+function cutArgs(dt)
+  local dt = dt.." " or '' --- adding empty space for check last one left
+    ---chech if eny argument space exsist
+ if string.find(dt , " ") ~= nil then 
+    ---first find action 
+    local act = string.sub(dt ,1,string.find(dt," ") ) -- adding one to lose " " empty string
+    --- second get position whithout act-ion
+   local _,new_start = string.find(dt,act)
+    --- subtract from data string act-ion
+   local dt = string.sub(dt,new_start+1,#dt-1)
+   --- try to get rid of empty brackets in the end of string
+    if string.find( act, " " ) then 
+        local _,empty_string = string.find(act," ")
+              act = string.sub (act,1,empty_string-1) 
+    end     
+     return act , dt   
+ end
+end
+ 
+ local x = "up 564 rt 45  "
+-- arg ,data= cutArgs (x)
+-- print (arg)
+-- arg, data = cutArgs (data)
+-- print (arg,": len ",#arg)
+-- arg,data= cutArgs(data)
+-- print(arg,": len ",#arg )
+--arg,data=cutArgs(data)
+--print (arg,": len ",#arg) 
+
+function checkSpelling (dt)
+-- looped use to count argument steps and oblvously the count
+local  looped = 1
+ -- first looking if exsist sometihing
+local   act , data = cutArgs(dt)
+-- print ("data :",data)
+-- print ("act :",act)
+ while #act > 0 do
+   --chest in array ifact-ion exist
+local function  actionAvailable()
+  
+  for tb_act, _ in pairs(action) do 
+    if act == tb_act then 
+         -- print(act.. " exsit") 
+         return true
+    end 
+  end
+end 
+  
+  -- if find action try to look for a number by dicrementing a string
+   if actionAvailable() then  
+      looped = looped + 1
+      -- push act-ion
+      act , data = cutArgs(data)
+      -- try to look numbers that represent rapeting times
+      if tonumber (act) then 
+       -- print ("Found a number: "..act)
+       --- if does find number , push fother to look
+       act , data = cutArgs(data)
+       -- increment bicucle a jump
+       looped = looped + 1
+      end
+    else
+      -- give full description about posible actions
+      local a = ""
+      for i,v in pairs (action) do 
+          a = a .. i.." "
+      end  
+        local string = "Cannot use '"..act.."' direction "..intoWords(looped)..".\nTry: "..a
+          -- in quick check
+          -- print (string)
+        return false , string
+   end
+   -- sleep(1.5)
+ end
+ -- if act doesnt hav chars then return false also
+ if #tostring(dt) == 0  then return false,"Usage: <direction> <distance>" end
+    return true, "" 
+end
+
+function executeCode (dt)
+ -- first looking if exsist sometihing
+local   act , data = cutArgs(dt)
+ while #act > 0 do
+   --chest in array ifact-ion exist
+  local actionAvailable = false
+  for tb_act, _ in pairs(action) do 
+    if act == tb_act then 
+         -- print(act.. " exsit") 
+         actionAvailable =  act
+    end 
+  end
+  
+  -- if find action try to look for a number by dicrementing a string
+   if actionAvailable then  
+      local reapet_loop = 1
+      -- push act-ion
+      act , data = cutArgs(data)
+      -- try to look numbers that represent reapeting times
+      if tonumber (act) then 
+        -- cach reapeting values
+           reapet_loop = act
+       -- print ("Found a number: "..act)
+       --- if does find number , push fother to look
+       act , data = cutArgs(data) 
+      end
+      -- execute string of line   code while cutting
+      print(reapet_loop.." x "..actionAvailable)
+        for x = 1, reapet_loop do 
+           action[actionAvailable]()
+        end   
+   end
+ end
+end
+-- print (checkSpelling("fd 532 43"))
+-- executeCode ("fd up dn bk fd 5 bk 5")
+while true do 
+wasReceived = wasReceived + 1
+  print ("Reseiving intructions")
+local  tb  = {os.pullEvent("modem_message")}
+ 
+ local senderId = tb[4]
+ local message = tb[5].message
+ local distance = tb[6]
+
+local function outputScreen() 
+   print ("Sender #"..senderId .. " was Sent "..wasReceived .." time's")
+   print ("command \""..message.."\"")
+   print ("distance "..distance)
+   print (string.rep("-",xSize))
+end
+
+-- clear screen if in bottom
+local xtm , ztm = term.getCursorPos()
+  -- latch condition about command was succsessfully executed
+  local commandExecuted = false --
+  
+  if ztm >= zSize then 
+      term.clear()
+      term.setCursorPos(1,1)
+      outputScreen()
+    else
+      outputScreen()
+  end
+
+ local succsees , errorMessage = checkSpelling (message)
+ -- send back distace and succses to sender
+ rednet.send(senderId , textutils.serialize({a = distance , b = succsees or errorMessage,c = turtle.getFuelLevel()}))
+-- and execute after sending all inforamtion
+   if succsees then 
+     executeCode (message)
+  end 
+end

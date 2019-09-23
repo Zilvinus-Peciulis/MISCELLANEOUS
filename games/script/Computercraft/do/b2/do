@@ -1,0 +1,159 @@
+local tArgs = { ... }
+if #tArgs < 1 then
+	print( "Usage: go <direction> <distance>" )
+	return
+end
+
+local sMaterial = {"minecraft:cobblestone","minecraft:dirt"}
+
+-- Always run method when  selected event keys not triger
+function waitMehtod( tbEvents,... )
+	assert (type (tbEvents)=="table","Expected table with event keys.")
+	assert (type (arg)=="table" and #arg~=0,"Expected arguments with function.")
+local exec = true      
+function running( )
+	while exec do 
+		for selected=1,#arg do
+			if type (arg[selected])=='function' then
+			exec = arg[selected]()-- break if function return false or nil
+			end 
+		end
+		sleep(0)
+	end 	
+end
+
+ local function event ()  
+	while exec do 	
+    local par = {os.pullEvent()}
+		for _,key in pairs(tbEvents) do
+			-- print ( tostring(keys[key]).. " == ",par[2])
+			if keys[key] == par[2] then 
+				exec = false
+			end 	
+		end
+	 end 
+   end 
+	parallel.waitForAny (event,running)
+end
+
+function fake(  )
+	return true
+end
+
+local tHandlers = {
+	["fd"] = turtle.forward,
+	["forward"] = turtle.forward,
+	["forwards"] = turtle.forward,
+	["bk"] = turtle.back,
+	["back"] = turtle.back,
+	["up"] = turtle.up,
+	["dn"] = turtle.down,
+	["down"] = turtle.down,
+	["lt"] = turtle.turnLeft,
+	["left"] = turtle.turnLeft,
+	["rt"] = turtle.turnRight,
+	["right"] = turtle.turnRight,
+	["digup"] = fake,
+	["digdown"] = fake,
+	["dig"] = fake,
+	["place"] = fake,
+	["placeup"] = fake,
+	["placedown"] = fake,
+}
+function dig (what)
+  local what = what or ""
+  while turtle["dig"..what]() do sleep(.1) end
+end
+
+function replace (where,boolean)
+  local where = where or ""
+	if boolean or not turtle["detect"..where]()  then 
+		  for slt = 1,16 do 
+		        if turtle.getItemCount(slt) > 0 then 
+				  	local t =turtle.getItemDetail (slt)
+				  	for _,item in ipairs(sMaterial) do
+				  		if item == t.name then 
+				  			turtle.select(slt)
+				  			turtle["place"..where]()
+				  			return 
+				  		end	
+				  	end
+		        end
+		  end
+	  end	  
+end
+
+function fueling ()
+	if turtle.getFuelLevel() <= 1	 then
+		for slt = 16,1,-1 do
+			if turtle.getItemCount(slt)>0 then 
+			turtle.select(slt)
+			
+			 if turtle.refuel(1) then return end
+			end	
+		end	
+	end
+end
+local nArg = 1
+
+ waitMehtod( {"space"}, function () 
+
+while nArg <= #tArgs do
+	sDirection = tArgs[nArg]
+	local nDistance = 1
+	if nArg < #tArgs then
+		local num = tonumber( tArgs[nArg + 1] )
+		if num then
+			nDistance = num
+			nArg = nArg + 1
+		end
+	end
+	nArg = nArg + 1
+
+	local fnHandler = tHandlers[string.lower(sDirection)]
+	if fnHandler then 		
+
+while nDistance > 0 do
+  fueling ()
+  local dir = string.lower(tostring( sDirection ))
+  
+  if dir == "down" or dir == "dn" then 
+    dig("Down")
+  elseif dir =="fd" then 
+    dig("Up") ; dig() ; replace ("Down")
+  elseif dir == "up" then 
+  dig("Up")  
+  elseif  dir == "placedown" then
+  	replace ("Down",true) 
+  elseif dir == "place" then 
+  	replace (nil,true) 
+  elseif dir == "placeup" then
+  	replace ("Up",true) 
+  elseif dir =="dig" then 
+  	dig()
+  elseif dir == "digdown" then 
+  	dig ("Down")
+  elseif dir == "digup"	then 
+  	dig ("Up")
+  end
+
+			if   fnHandler() then
+				nDistance = nDistance - 1
+			elseif turtle.getFuelLevel() == 0 then
+				print( "Out of fuel" )
+				return
+			else
+				sleep(0.5)
+			end
+		end
+	else
+		print( "No such direction: "..sDirection )
+		print( "Try: forward, back, up, down" )
+		return
+	end
+
+end
+
+end )
+
+

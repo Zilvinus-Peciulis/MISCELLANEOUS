@@ -1,0 +1,10 @@
+Turtle name: "Quary"
+ManagerID: 0
+yProgressEnd: 5
+DropJunkItem: true
+ROLE:
+xManager: 97
+yManager: 63
+zManager: 1680
+fManager: "WEST"
+DungeonChest: false

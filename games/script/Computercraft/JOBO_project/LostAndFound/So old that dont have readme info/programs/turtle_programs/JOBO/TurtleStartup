@@ -1,0 +1,3 @@
+print "Startup from Disk TurtleStartup"
+shell.run ("text") -- run sum/defoult api from text file soon as possible
+shell.run("/moreFile/projectT/index")

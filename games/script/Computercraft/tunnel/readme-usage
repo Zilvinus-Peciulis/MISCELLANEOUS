@@ -1,0 +1,9 @@
+[lenght][cmd]
+
+cmd = "return" -- return in starting location when complete mining 
+
+
+--use 
+fueling --> put in eny slot coal,wood to refuel eny time when low
+torch --> put in turtle inventory torth for auto place on wall
+solid blocks --> turtle try place block in bottom as bridge or then detect lava in front also try place block in that.

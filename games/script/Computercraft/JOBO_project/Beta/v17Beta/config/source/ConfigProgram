@@ -1,0 +1,245 @@
+--print (shell.dir())
+os.loadAPI("config".."/source/FileLibrary/fLib")
+-- os.loadAPI("/config/DATA/GenerateJobCoord/JobCoordProgram")
+--SuperComputer
+local  yJobEndValue = 4
+local  MaxWorldHeight = 248
+SET = {
+	POST  = function ( line , text )
+		assert(line, "Requare initial line")
+		assert(text~=nil, "Requare initial text")
+		return fLib.replaceLineValue( "config/config" , line ,text , ":" )
+	end;
+
+	isDisk = function ( this ) 
+	    assert (type(this)=="boolean" , "Requare initial boolean isDisk.")
+		SET.POST(1, this)
+	end;
+    
+    xPos = function ( this ) 
+	    assert (type(this)=="number" , "Requare initial number xPos.")
+		SET.POST(2, this)
+	end;
+	yPos = function ( this ) 
+	    assert (type(this)=="number" , "Requare initial number yPos.")
+		SET.POST(3, this)
+	end;
+	
+	zPos = function ( this ) 
+	    assert (type(this)=="number" , "Requare initial number zPos.")
+		SET.POST(4, this)
+	end;
+	fPos = function ( this ) 
+	    assert (type(this)=="number" , "Requare initial number fPos.")
+		SET.POST(5, this)
+	end;
+
+	SuperComputerID = function ( this ) 
+	    assert (type(this)=="number" , "Requare initial number SuperComputerID.")
+		SET.POST(6, this)
+	end;
+
+	GiveFuelLevel = function ( this ) 
+	    assert (type(this)=="number" , "Requare initial number SuperComputerID.")
+		SET.POST(7, this)
+	end;
+
+	FloppyName = function ( this ) 
+	    assert (type(this)=="string" , "Requare initial name FloppyName.")
+		SET.POST(8, this)
+	end;
+
+	askTurtleType = function ( this ) 
+	    assert (type(this)=="boolean" , "Requare initial boolean askTurtleType.")
+		SET.POST(9, this)
+	end;
+
+	askCoord = function ( this ) 
+	    assert (type(this)=="boolean" , "Requare initial boolean askCoord.")
+		SET.POST(10, this)
+	end;
+
+	TurtlesName = function ( this ) 
+	    assert (type(this)=="string" , "Requare initial name TurtlesName.")
+		SET.POST(11, this)
+	end;
+
+	TurtlesHomeRows = function ( this ) 
+	    assert (type(this)=="number" , "Requare initial number TurtlesHomeRows.")
+		SET.POST(12, this)
+	end;
+
+	MaxTurtlesHome = function ( this ) 
+	    assert (type(this)=="number" , "Requare initial number MaxTurtlesHome.")
+		SET.POST(13, this)
+	end;
+
+	TurtlesGapsSize = function ( this ) 
+	    assert (type(this)=="number" , "Requare initial number TurtlesGapsSize.")
+		SET.POST(14, this)
+	end;
+
+	xStartJob = function ( this ) 
+	    assert (type(this)=="number" , "Requare initial number xStartJob.")
+		SET.POST(15, this)
+	end;
+
+	zStartJob = function ( this ) 
+	    assert (type(this)=="number" , "Requare initial number zStartJob.")
+		SET.POST(16, this)
+	end;
+
+
+	xEndJob = function ( this ) 
+	    assert (type(this)=="number" , "Requare initial number xEndJob.")
+		SET.POST(17, this)
+	end;
+
+	zEndJob = function ( this ) 
+	    assert (type(this)=="number" , "Requare initial number zEndJob.")
+		SET.POST(18, this)
+	end;
+
+	yJob = function ( this ) 
+	    assert (type(this)=="number" , "Requare initial number yJob.")
+				if this > yJobEndValue and this < MaxWorldHeight then SET.POST(19, this)  else SET.POST(19, yJobEndValue)  end 
+	end;
+      
+      yJobEnd = function ( this ) -- poiter always set value as defoult to turtle
+	    assert (type(this)=="number" , "Requare initial number yJobEnd.")
+		if this > yJobEndValue and this < MaxWorldHeight then SET.POST(20, this)  else SET.POST(20, yJobEndValue)  end 
+		
+	end;
+
+   GenerateJob = function ( this ) --speciol cas where need specific type of generation
+	    assert (type(this)=="string" , "Requare specific name of  GenerateJob.")
+		local Succsess, errorMsg = JobCoordProgram.isCorrectName( tostring(this) )
+		if Succsess then  SET.POST(21, this) else error ("GenerateJob expected:['"..errorMsg.."'] got:"..tostring(this)) end 
+	end;
+
+	DropJunkItem = function ( this ) 
+	    assert (type(this)=="boolean" , "Requare initial boolean DropJunkItem.")
+		SET.POST(22, this)
+	end;
+}
+
+
+GET ={
+	 GETPOST = function( line )
+	 	assert(type(line)=="number", "Requare initial line")	 	 
+	 	return fLib.getLineValue( "config/config" , line ,":")
+	 end;
+
+	isDisk = function (  ) 
+		return GET.GETPOST(1)
+	end;
+    
+    xPos = function (  )
+		return GET.GETPOST(2)
+	end;
+	yPos = function (  ) 
+		return GET.GETPOST(3)
+	end;
+	
+	zPos = function (  ) 
+		return GET.GETPOST(4)
+	end;
+	fPos = function (  ) 
+		return GET.GETPOST(5)
+	end;
+
+	fPos = function (  ) 
+		return GET.GETPOST(5)
+	end;
+
+	SuperComputerID = function (  ) 
+		return GET.GETPOST(6)
+	end;
+
+	GiveFuelLevel = function (  ) 
+		return GET.GETPOST(7)
+	end;
+
+	FloppyName = function (  ) 
+		return GET.GETPOST(8)
+	end;
+
+	askTurtleType = function (  ) 
+		return GET.GETPOST(9)
+	end;
+
+	askCoord = function (  ) 
+		return GET.GETPOST(10)
+	end;
+
+	TurtlesName = function (  ) 
+		return GET.GETPOST(11)
+	end;
+
+	TurtlesHomeRows = function (  ) 
+		return GET.GETPOST(12)
+	end;
+
+	MaxTurtlesHome = function (  ) 
+		return GET.GETPOST(13)
+	end;
+
+	TurtlesGapsSize = function (  ) 
+		return GET.GETPOST(14)
+	end;
+
+	xStartJob = function (  ) 
+		return GET.GETPOST(15)
+	end;
+
+	zStartJob = function (  ) 
+		return GET.GETPOST(16)
+	end;
+
+	xEndJob = function (  ) 
+		return GET.GETPOST(17)
+	end;
+
+	zEndJob = function (  ) 
+		return GET.GETPOST(18)
+	end;
+
+	yJob = function (  ) 
+	    local x = GET.GETPOST(19)
+
+		if x~=nil and  x > yJobEndValue and x < MaxWorldHeight then return x  else SET.POST(19, GET.yPos()) return GET.GETPOST(19)  end 
+	end;
+ 
+    yJobEnd = function (  ) 
+			 local x = GET.GETPOST(20)
+			if x~=nil and x > yJobEndValue and x < MaxWorldHeight then return x  else SET.POST(20, yJobEndValue) return GET.GETPOST(20)  end 
+	end;
+	GenerateJob = function (  ) 
+		local Succsess, errorMsg = JobCoordProgram.isCorrectName( tostring(GET.GETPOST(21)) )
+		if Succsess then  return GET.GETPOST(21) else error ("Get GenerateJob expected:['"..errorMsg.."'] got:"..GET.GETPOST(21)) end 
+	end;
+
+	DropJunkItem = function (  ) 
+		local x = GET.GETPOST(22)
+		if type (x) ~= "boolean" then SET.POST(22, true) end 
+		return GET.GETPOST(22)
+	end;
+}
+
+
+os.unloadAPI("config".."/source/FileLibrary/fLib")
+os.unloadAPI("/config/DATA/GenerateJobCoord/JobCoordProgram")
+--[[
+SET.isDisk(false)
+SET.xPos(55)
+print(GET.xPos())
+
+	print(GET.isDisk())
+	print(GET.xPos())
+	print(GET.yPos())
+	print(GET.zPos())
+	print(GET.fPos())
+print ( type(GET.isDisk()))
+
+--os.unloadAPI(shell.dir().."/source/FileLibrary/fLib")
+]]

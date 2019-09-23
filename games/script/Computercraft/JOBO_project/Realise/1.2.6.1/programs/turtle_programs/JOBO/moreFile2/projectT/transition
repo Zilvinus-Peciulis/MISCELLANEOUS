@@ -1,0 +1,291 @@
+
+
+--Recoppy backup files
+os.loadAPI("OS")
+local FileName = "transition"
+OS.loadAPI("/moreFile/programs/perip",FileName)
+OS.loadAPI("/moreFile/programs/requestAPI",FileName) --
+OS.loadAPI("/moreFile/programs/config/HomeCoord/HomeCoordProgram",FileName)
+OS.loadAPI("/moreFile/GPS/gps",FileName)
+OS.loadAPI("/moreFile/programs/config/configProgramT",FileName)
+OS.loadAPI("/moreFile/programs/config/source/defaultProgramT",FileName)
+OS.loadAPI("/moreFile/programs/turtleLib",FileName)
+OS.loadAPI("/moreFile/programs/config/source/FileLibrary/fLib",FileName)
+OS.loadAPI("/moreFile/programs/say",FileName)
+OS.loadAPI("/moreFile/programs/protocol",FileName) 
+OS.loadAPI("/moreFile/programs/orientation",FileName)
+
+OS.loadAPI("/moreFile2/programs/calculate",FileName)
+OS.loadAPI("/moreFile2/programs/refuel",FileName)
+OS.loadAPI("/moreFile2/programs/travel",FileName)
+OS.loadAPI("/moreFile2/programs/junkItem",FileName)
+OS.loadAPI("/moreFile2/mining/tool/item",FileName) --
+OS.loadAPI("/moreFile2/mining/tool/operate",FileName) --
+OS.loadAPI("/moreFile2/programs/expect",FileName)
+OS.loadAPI("/moreFile2/projectT/GUI/screen",FileName)
+OS.loadAPI("/moreFile2/mining/quarry",FileName)
+
+OS.loadAPI("text")
+local Manager = defaultProgramT.GET.ManagerID()
+
+function jobStatus(  )
+local xJob = configProgramT.GET.xJob()
+local yJob = configProgramT.GET.yJob()
+local zJob = configProgramT.GET.zJob() 
+local yProgress = configProgramT.GET.yProgress()
+	say.special ("Job available x:"..xJob.." y "..yJob.." z "..zJob)
+    say.writeSuccess ("yProgress "..yProgress)say.alert(" DropJunk #"..tostring(defaultProgramT.GET["DropJunkItem"] ()))
+	say.writeAlert ("Dungeon Chest "..tostring(defaultProgramT.GET.DungeonChest()) ) say.warning (" Type: "..configProgramT.GET.JobType())
+	if not configProgramT.GET.JobComplete(  ) then say.warning " Job in Progress !" else say.success ("Job complete !") end 
+end
+
+xHome = HomeCoordProgram.GET.xHome()
+yHome = HomeCoordProgram.GET.yHome()
+zHome = HomeCoordProgram.GET.zHome()
+fHome = HomeCoordProgram.GET.fHome() 
+
+xManager = defaultProgramT.GET['xManager']()  
+yManager = defaultProgramT.GET['yManager']()  
+zManager = defaultProgramT.GET['zManager']()  
+fManager = defaultProgramT.GET['fManager']()  
+
+xJob = configProgramT.GET.xJob()
+yJob = configProgramT.GET.yJob()
+zJob = configProgramT.GET.zJob() 
+fJob = configProgramT.GET.fJob() 
+
+local yProgressEnd = defaultProgramT.GET.yProgressEnd()
+local yProgress = configProgramT.GET.yProgress()
+local JobComplete = configProgramT.GET.JobComplete()
+local JobType = configProgramT.GET.JobType()
+	say.alert (BOOT_HOMECOORD.status and "I was sececcfuly booted" or "Error I cannot boot." )
+
+-- travel.checkFuelLevel(   )
+-- Alway when booting try go home, best way right now to manage unstack
+	 		if not calculate.inHomeLocation(  ) and BOOT_HOMECOORD.status then -- if not in the home when come back home after startup.	
+ 				  term.clear() 			
+  			 	  screen.ShowProgressBar(  )
+ 				  term.setCursorPos(1,2) 
+ 				 if calculate.locateInQuarry(  ) then 
+ 				 	say.warning "I stuck in quary, need get out of there soon !"
+		 			 sleep(15)
+ 				 	travel.EscapeChaftToHome(  )
+			 	    travel.Home()
+ 				 else  			
+		 			 say.alert "I will come back home soon !"	 
+		 			 sleep(15)
+		 			 travel.Home()
+	 			end 
+	 			operate.displayChest(  )
+			 end
+
+function update(  )
+ xJob = configProgramT.GET.xJob()
+ yJob = configProgramT.GET.yJob()
+ zJob = configProgramT.GET.zJob() 
+ fJob = configProgramT.GET.fJob() 
+
+ yProgressEnd = defaultProgramT.GET.yProgressEnd()
+ yProgress = configProgramT.GET.yProgress()
+ JobComplete = configProgramT.GET.JobComplete()
+ JobType = configProgramT.GET.JobType()
+end
+
+
+if BOOT_HOMECOORD.status then 
+	gps.Global:setCondition(true)
+	print "Waiting order"
+end 
+
+while BOOT_HOMECOORD.status do 
+
+	 local sender ,  instruction = turtleLib.Receive( )
+
+	 if instruction ~= nil  then 
+     	 -- Always feed default values here from protocol
+     	 if instruction.Manager == Manager then 
+		    defaultProgramT.SET.DropJunkItem(instruction.DropJunkItem)
+		    defaultProgramT.SET.TurtlesName(instruction.TurtlesName)
+		    defaultProgramT.SET.DungeonChest(instruction.DungeonChest)
+		    defaultProgramT.SET.yProgressEnd(instruction.yJobEnd)
+		    configProgramT.SET.JobType(instruction.GenerateJob)
+     	 	text.changeLabel(  )
+     	 end 
+
+	 	if  protocol.CHECK_ExecuteJob( instruction,Manager )  then 
+		 		say.super ( "Fuel to proceed "..calculate.quarryAndTravelTotal(  )..",have "..calculate.FuelTotal(  ) )
+			 	 screen.ShowProgressBar(  )
+			       while turtle.suck() do end -- try suck fuel
+			       turtle.select (1)
+			       refuel.organizeFuel(  )
+			 	-- Drop section 
+			 	   -- update(  )
+			 	   calculate.locateInQuarry(  )
+			 	 
+			 	 travel.BackToChaft(  )
+			 	 say.special ("Working on quarry!")
+			 	 quarry.quarryFull(  )
+			 	 screen.ShowProgressBar(  )
+			 	 travel.EscapeChaftToHome(  )
+			 	 travel.Home()
+			 	 calculate.locateInQuarry(  )
+
+		elseif protocol.CHECK_StoreJob( instruction,Manager ) then 
+		         
+		         -- defouklteverything
+		          configProgramT.SET.xJob(instruction.x)
+		          configProgramT.SET.yJob(instruction.y)
+		          configProgramT.SET.zJob(instruction.z)
+		          configProgramT.SET.fJob(instruction.f)
+		          
+		          configProgramT.SET.xProgress(instruction.x)
+		          --Moust inportant is yProgress
+		          configProgramT.SET.yProgress(instruction.yJob)
+		          configProgramT.SET.zProgress(instruction.z)
+		          configProgramT.SET.fProgress(instruction.f)
+		          -- for quarring loops 
+		          configProgramT.SET.line(1)
+		          configProgramT.SET.lines(1)
+
+		          
+		          configProgramT.SET.JobComplete( false )--type(Progress) == "boolean" and Progress or false)
+		          configProgramT.SET.JobType( instruction.JobType )
+		          --Change turtle name 
+
+		          if instruction.fTime == true then
+		          	say.warning "Accepted new job!"
+		          -- configProgramT.SET.JobComplete( true )--type(Progress) == "boolean" and Progress or false)
+		          else 
+		          	say.warning "I have my own job!"
+		          end	
+		          
+	 	elseif protocol.CHECK_ManagerGetStatus( instruction,Manager ) then
+	 	  --
+			     --rule cachMissing if all okey always shoud be false
+           	 -- expect.suckFuelinFront( Fuelvalue )
+			     local Goquarry , Fuelvalue = travel.checkFuelQuarry(  )
+        				while  not junkItem.isJunk(  ) and turtle.suckDown()do  end  -- Only for junk flag return 
+			     if Goquarry or  junkItem.isJunk(  ) then -- all posityve
+			     	-- Do something
+			     	cachMissing = true
+			     -- print (" I have junk: "..junkItem.junkCount(  ).." ="..tostring(junkItem.isJunk(  )))
+			       -- junkItem.dropJunkAndFuelSlave( calculate.FuelTotal(  )- calculate.quarryAndTravelTotal ()  )    
+			     else 
+			     	-- All okey 
+			     	cachMissing = false
+			     end 
+  			     if cachMissing then say.danger "I need fuel or take junk to go!" else say.warning"I will go!" end 
+  			     turtleLib.Send(Manager,{
+   					 -- Working on statistic
+     					    JobComplete = configProgramT.GET.JobComplete();
+     				   	 MissingItems = cachMissing; 
+   				   	 --workingon log 
+   				   	   material = {fuel = Fuelvalue; full = junkItem.isJunk(  )  };
+			     	}) 
+  			       jobStatus(  )
+
+			        if cachMissing then 
+            		expect.suckFuelinFront( Fuelvalue )
+			     		  -- drop overfloaw fuel to junk chest
+			     		  junkItem.dropJunkAndFuelSlave( calculate.FuelTotal(  )- calculate.quarryAndTravelTotal ()  )    
+			        	  
+			        end 
+
+
+			 	 screen.ShowProgressBar(  )
+
+
+	 	elseif protocol.CHECK_Connected( instruction,Manager ) then 	
+	 		local JobCompleteT = configProgramT.GET.JobComplete()
+			turtleLib.Send(Manager, {text = " I Connected with manager."; JobComplete = JobCompleteT;})
+	 	
+	 	elseif protocol.CHECK_GoHome( instruction,Manager )then  -- if Receive from manager and if Go Home  
+		 		print "Going Home "
+	 			 travel.Home()
+	 	elseif protocol.CHECK_Disassemble( instruction,Manager ) then 
+	 			 travel.xDissassemble(  )
+	 		
+
+
+-- Specific usage
+	 	elseif protocol.CHECK_JunkAndFuelDissassemble( instruction,Manager ) then 
+     -- try to check if junk in chest by takeking one 
+     while  not junkItem.isJunk(  ) and turtle.suckDown()do  end 
+     -- take sum fuel 
+     local success,Fuelvalue,fuelAbsolut =  travel.checkFuelxTarget( xManager,yManager+4,zManager ) -- Up and down
+     turtleLib.Send(Manager,{
+          --workingon log 
+           material = {fuel = Fuelvalue; full = junkItem.isJunk(  )  };
+         }) 
+         say.super ("Continue:refuel "..fuelAbsolut.." "..tostring(refuel.values( fuelAbsolut )).. " .") -- refuel if have fuel before all stuf are taked
+   
+
+   
+    elseif protocol.CHECK_dropJunk( instruction,Manager ) then
+     local success,Fuelvalue =  travel.checkFuelxTarget( xManager,yManager+4,zManager ) -- Up and down
+         refuel.valuesTotal( Fuelvalue ) -- refuel if have fuel before all stuf are taked
+    junkItem.dropAll( "Down" ) 
+    elseif protocol.CHECK_suckFuel( instruction,Manager ) then  
+     refuel.valueSuck(8000 ,"Front" )
+    elseif protocol.CHECK_DestroyHomeChest( instruction,Manager ) then 
+       turtle.dig() turtle.digDown()
+--
+
+
+-- Support section 
+
+	 	elseif protocol.CHECK_Support_Movement( instruction,Manager ) then 
+	 			local Movement = false
+	 			local material = instruction.material
+	 			--  support refuel from chest 
+     local _,xTravelFuelValue = travel.checkFuelxTarget( instruction.x+3,instruction.y+1,instruction.z+3,"silence" )
+     -- check bouht when need fuel to slave and then traveling 
+     refuel.valueSuckTotal(xTravelFuelValue ,"Front" )
+     refuel.valueSuckTotal(material.fuel ,"Front" )
+     			local  a = travel.checkFuelxTarget( instruction.x+3,instruction.y+1,instruction.z+3 )
+     			local  b = calculate.fuelInvCompare( material.fuel )
+	 			if a and b  then 
+	 			 -- true means , always can move if you want 
+	 			  say.success "Travel Refuel and take junk!"
+	 			  Movement = true 
+	 			 elseif a and material.full then 
+	 			 	say.danger "Travel only take junk!"
+	 			 	Movement = true 
+	 			 --  elseif travel.checkFuelxTarget( instruction.x+1,instruction.y,instruction.z+1 ) and material.fuel then 
+	 			 -- Movement = true 
+	 			
+     		end
+	 			say.alert ("Sending back "..(Movement and "fuel was enough" or "fuel not enough!") )
+	 			turtleLib.Send(Manager,{Movement = Movement}) 	
+	 	
+
+	 	elseif protocol.CHECK_Support_MultypleItem( instruction,Manager ) then 
+	 	      -- where turtle go to slave turtle where was given request
+	 	      local material = instruction.material
+			  	  	
+			 	  	if travel.checkFuelxTarget( instruction.x+1,instruction.y,instruction.z+1 ) then --calculate extra move 
+          				say.alert "Fuel enough move to turtle!"
+				          if material.full then say.alert ("Chest is full to "..instruction.turtleID..",taking junk!") junkItem.takeAllJunkFromSlaveChest(instruction )  
+				         	 if material.command == "JunkSlave" and material.full then say.alert ("Slave inventory is full to "..instruction.turtleID..",taking jumk!") junkItem.takeAllJunkFromSlave( instruction,"default" ) end 
+				          end 
+          		if calculate.fuelInvCompare( material.fuel ) and material.fuel > 0 then say.alert("Prepare give fuel to "..instruction.turtleID.."!") travel.supFuelChest( instruction.x,instruction.y,instruction.z,instruction.f ) refuel.valuesDrop( material.fuel  , "Front")   end 
+			 	 			 travel.supHome(   )
+			 	 		 	 travel.supDropFoundTurtleManager(  )
+			 	 			 travel.supHome(   )
+
+			 	 		 -- Send back information must be 
+	 		       	else
+			 	  		say.danger(instruction.turtleID.." fuel not enouth to x:"..instruction.x..",z:"..instruction.z.." move there!")
+			 	  	end
+ 		-- get rid of junk from turtle !
+			 	  	junkItem.dropJunkAndMaterialsSupport(  )
+
+	 	elseif Manager ~= instruction.Manager  then 
+	 		print ("Expected manager "..tostring(Manager).." got "..tostring(sender).." uknown.")
+	 	
+	 	end  
+	 
+	 else 
+	 	print "Message equal nil ??"
+	 end 
+end 

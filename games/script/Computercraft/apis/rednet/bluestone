@@ -1,0 +1,26 @@
+
+function receive (timer)
+ 
+local isTimer = false  
+ -- If timer is set then wait until end
+ if timer~= nil then if  type (timer) == "number" and timer >-1 then isTimer = true os.startTimer(timer) else print "Timer Not set correctly" end end
+
+-- loop until get timer end or received message
+while true do  
+  local  e = {os.pullEvent()}
+
+   if e[1] == "modem_message" then 
+    --After receive return data   
+       return e[4],e[5].message,e[6] 
+   end
+ 
+ if isTimer and  e[1] == "timer" then
+    --- Where time is out break
+     break
+  end
+end
+end
+
+
+
+

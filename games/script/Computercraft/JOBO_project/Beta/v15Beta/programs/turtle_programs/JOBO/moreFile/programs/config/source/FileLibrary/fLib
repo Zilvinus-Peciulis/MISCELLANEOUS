@@ -1,0 +1,566 @@
+--[[Core Method, Wide use]]
+function fwrite( path , text )
+--core	
+	assert(type(path)=="string", "fwrite:\nRequare path.")
+	local file =  assert(io.open(path ,'w')) --do --loop
+	   file:write(text)
+	   file:close()
+	 --end
+	-- exs: fwrite( 'text' , 'text' )
+end
+
+function writeFromTable (path ,t)
+--core		
+	assert(type(path)=="string", "writeFromTable:\nRequare path.")
+	assert (type(t)== "table", "writeFromTable expected table got "..tostring(t))
+	local text = '';
+	 for _ , index in pairs(t) do
+        text=text..index..'\n'
+	 end
+	fwrite( path , text )
+
+--exs:ass = {'mabo','jambo'};writeFromTable ('text' ,ass)
+end
+
+
+-- [[Manipulate types]]
+
+function fromType( changeTo ) -- translate in string
+--core		
+	assert(tostring(changeTo), "toType:Requare changeTo argument.")
+	 
+ 				if tostring(changeTo) == "true" then  return "true"
+ 				elseif tostring(changeTo) == "false" then  return   "false"
+ 				elseif tostring(changeTo) == "" then  return "nil"
+ 			    elseif type(tonumber(changeTo)) == "number" then  return tonumber (changeTo)
+ 				elseif type(tostring(changeTo)) == "string" then  return "\""..tostring(changeTo).."\""
+ 				end  				
+ 				--return tostring ("'"..changeTo.."'")    
+end
+
+
+
+
+
+function toType( changeTo ) -- translate in type 
+--core		
+	assert(changeTo, "toType:Requare changeTo argument.")
+	local    a1 = string.find(changeTo ,"\"",1) or string.find(changeTo ,"\'",1) -- check "" or '' return position
+	 local    b2 = string.find(changeTo ,"\"",2) or string.find(changeTo ,"\'",2)
+	           a1 = a1~=b2 and a1 or 0 -- HAHA got you 
+-- print (changeTo,changeTo=="\"nil\"")
+ 				if changeTo == "true" then return true
+ 				elseif changeTo == "false" then   return false	
+ 				elseif changeTo == "" or changeTo=="\"nil\"" then  return nil
+ 			    elseif type(tonumber(changeTo)) == "number" then return tonumber(changeTo)
+ 				elseif type(tostring(changeTo)) == "string" then  return tostring( string.sub(changeTo,a1 and a1+1 or 1,b2 and b2-1 or #changeTo) ) 
+ 				end          
+end
+
+ -- print ( fromType( true ).." ?" )
+
+
+ function getTable( path ) --read everything from file/path and return table
+ --core	
+ --print(fs.exists(path) and "Path found" or "Path to found")
+ if fs.exists(path) then 
+ 	 local file =   io.open(path ,'r');
+ 	 local lines = {};
+ 	 local i = 1;
+ 	 local line = file:read('*l');
+ 	   while  line~=nil  do --loop
+ 	    lines[i]=line;
+ 	    line = file:read('*l');
+ 	    i=i+1;
+ 	  end
+ 	  file:close()
+ 	   return lines
+    end
+	return {}
+
+--exs: mama = rgetTable( 'text' );print ( mama[1] )
+end 
+
+
+
+
+
+
+-----------------------------------------------------------------------------------------
+
+
+function setContent( path,text) --support only simple data "One line"
+	assert(fs.exists(path), "setContent:Requare correct path")
+	assert(type(text),"setTabletoType:Reuqare sum of coontet!")
+	local content = fromType( text ) 
+	fwrite( path , content )
+end
+
+
+function getContent( path) --support only simple data/translate to type "One line"
+	assert(fs.exists(path), "getContent:Requare correct path")
+	 local content = getTable( path )[1]
+	 if content then return toType( content ) else error "getContent:No contect found!" end
+end
+
+
+--[[Simple config family]]
+function replaceLine( path , n ,text )
+	local  lines = getTable(path); --read file to table
+	lines[n]=text                  --return text
+	writeFromTable(path ,lines)    --write back
+  return lines[n]                     --return what are made
+--exs: ptb=replaceLine( 'text' , 1 ,"hello World" )
+end
+
+
+
+function append( path , addtext )--prideda teksta
+local file =   assert(  io.open(path ,'a')) 
+file:write(addtext..'\n')
+file:close()
+	-- body
+end
+
+--append( 'text' , "Mother of good" )
+
+--[[SINGLE BIT CONSTRUCTOR]]
+
+function replaceLineValue( path , n ,chValue ,syntax,len)
+	assert (path, "replaceLineValue:Requare file path.")
+	assert (n ,"replaceLineValue:Requare file line.")
+	assert (chValue~=nil, "replaceLineValue:Requare  input value.")
+	assert(syntax, "replaceLineValue:Requare syntax for \":, =, ;\"  ")
+
+	local  lines = getTable(path);
+    local  isStax = string.find(lines[n] , syntax  )
+	          if isStax then          		  
+		   	        local isText = string.sub(lines[n] , 1 , string.find(lines[n], syntax or ":"))
+		      	       lines[n] = isText..string.rep(" ",len or 1)..tostring(chValue)
+				      writeFromTable(path ,lines)    --write back
+  					return lines[n] 
+	          end	
+end
+
+
+
+
+
+function getLineValue( path , n ,syntax,len)
+	assert (path, "getLineValue:Requare file path.")
+	assert (n ,"getLineValue:Requare file line.")
+	assert(syntax, "getLineValue:Requare syntax for \" :, =, ; \"  ")
+	
+	local  lines = getTable(path);   
+    local  isStax = string.find(lines[n] , syntax  )
+	          if isStax then          		  
+		   	         local  whatType =  (string.sub( lines[n], string.find(lines[n],":")+2 ) )
+	                 return toType( whatType )
+	          end       
+end
+
+
+
+
+function getAllValuesByType( path ) -- return all values in type in table
+	assert(type(path)=="string", "getAllValuesByType:\nRequare path.")
+	local  lines = getTable(path);
+	local  tb ={}           
+	            for line = 1 , #lines do  
+				  local text = toType( lines[line] )
+	              table.insert(tb,text)
+	              --print(text)
+	            end 
+       return tb
+end
+
+
+
+
+
+
+
+
+
+----------------------------------------------------------------------------------------
+
+
+
+
+
+
+--[[MULTIPLE BITS CONTRUCTORS]]
+---[[Long String Family]]
+
+function ReplaceLongLineValue( path, ln ,arg) -- serialize data
+--CORE
+    assert(type(path)=="string", "createLongLineValue:\narg1 Requare path.")
+    assert(type(ln)=="number", "createLongLineValue:\narg2 Requare line value.") 
+    assert(type(arg)=="table", "createLongLineValue:\narg3 Requare table.")      
+    --assert(arg and #arg>0, "createLongLineValue:\narg3 Table is emtpy.")
+     --fwrite( path , text )
+     --writeFromTable (path ,t)
+    local lines =  getTable( path )
+    local text1 = ""     
+    local text2 = ""      
+          for line = 1,ln-1 do --puch down
+    			
+    		
+    		-- print(bracet.."BR")
+           if bracet ~= nil or lines[line] ~= nil then 
+   		         -- print(line.." yes")
+   		          local bracet = string.sub(lines[line], string.find(lines[line],")")+1 or 1 ,string.len(lines[line]) )
+   		          text1 =text1..line..")".. bracet.."\n"   		   
+   		   else 
+   		        -- print(line.." No")
+   		         text1 =text1..line..")".."\n"    
+   		   end 
+          
+          end -- then write stuff
+	     	--set values
+
+	     			 text1 = text1..ln..")".."{"	 
+	     		for index , content in pairs (arg) do  
+   		 		  		
+     		 		    text1 = text1.."|"..fromType( index ).."]="..fromType( content ).."," -- Stranslate To type
+     		 		
+     		    end 
+
+     		         text1 = text1.."}\n"
+     		-- Finish text
+     	 for line = ln+1 , #lines do -- comlete string 
+     	       
+        local bracet = string.sub(lines[line], string.find(lines[line],")")+1 or 1 ,string.len(lines[line]) )
+     	       text1 =text1..line..")".. bracet.."\n"
+     	 --  print(text2)
+     	 end 	 --text=text..index..'\n'
+         fwrite( path , text1 )
+        --print(text2)
+
+--ReplaceLongLineValue("config/ctest",5,{"mambo",lamda=false,hera="WOWOW",lol=55,haha="YES"} )
+end
+
+
+function ReplaceSilenceLongLineValue( path, ln ,arg) -- serialize data
+--CORE
+    assert(type(path)=="string", "ReplaceSilenceLongLineValue:\narg1 Requare path.")
+    assert(type(ln)=="number", "ReplaceSilenceLongLineValue:\narg2 Requare line value.") 
+    assert(type(arg)=="table", "ReplaceSilenceLongLineValue:\narg3 Requare table.")      
+    --assert(arg and #arg>0, "createLongLineValue:\narg3 Table is emtpy.")
+     --fwrite( path , text )
+     --writeFromTable (path ,t)
+    local lines =  getTable( path )
+    local text1 = ""     
+    local text2 = ""      
+          for line = 1,ln-1 do --puch down
+    			
+    		
+    		-- print(bracet.."BR")
+           if bracet ~= nil or lines[line] ~= nil then 
+   		         -- print(line.." yes")
+   		          local bracet = string.sub(lines[line], string.find(lines[line],")")+1 or 1 ,string.len(lines[line]) )
+   		          text1 =text1..line..")".. bracet.."\n"   		   
+   		   else 
+   		        -- print(line.." No")
+   		         text1 =text1..line..")".."\n"    
+   		   end 
+          
+          end -- then write stuff
+	     	--set values
+
+	     			 text1 = text1..ln..")".."{"	 
+	     		for index , content in pairs (arg) do  
+   		 		  		
+     		 		    text1 = text1.."|"..fromType( index ).."]="..fromType( content ).."," -- Stranslate To type
+     		 		
+     		    end 
+
+     		         text1 = text1.."}\n"
+     		-- Finish text
+     	 for line = ln+1 , #lines do -- comlete string 
+     	       
+        local bracet = string.sub(lines[line], string.find(lines[line],")")+1 or 1 ,string.len(lines[line]) )
+     	       text1 =text1..line..")".. bracet.."\n"
+     	 --  print(text2)
+     	 end 	 --text=text..index..'\n'
+
+          return text1
+        --print(text2)
+
+--ReplaceLongLineValue("config/ctest",5,{"mambo",lamda=false,hera="WOWOW",lol=55,haha="YES"} )
+end
+
+
+function GetLongLineValue( path, ln) -- unserialize data/where magic happend
+--CORE
+
+	assert(type(path)=="string" , "GetLongLineValue:Reuqare path.")
+	assert(type(ln)=="number", "GetLongLineValue:Reuqare line.")
+	
+	local index = ""
+	local text = ""
+	local lines =  getTable( path )[ln] -- get data
+	local tb = {}
+	if Lenght(path) == 0 then error (path.." is empty.")  end 
+	if type(string.find(lines,"{"))=="nil" then error "Unable to find'{' Brackets." end --error acurves 
+	     
+	      lines = string.sub (lines , string.find(lines,"{"), string.len(lines)) -- leave line pure data
+      while string.find(lines,",") and lines ~= nil do 
+	    	 index = string.sub(lines, string.find(lines,"|")+1,  string.find(lines,"]")-1) -- get index Text 
+         	text = string.sub(lines, string.find(lines,"=")+1,  string.find(lines,",")-1) -- get Text
+		 	tb[toType(index)] = toType( text ) -- save in table , leave data type/dranslate . 
+	     	lines = string.sub (lines, string.find(lines, ",")+1, string.len( lines))-- remove latest data leaving left ones. 
+     		--print("["..index.."] "..text)
+	   		--print(lines)	   		
+     		--print(tb[index])
+     		--sleep(3)
+     end 	   
+
+	return tb
+-- tb = fLib.GetLongLineValue( "config/ctest", 5) 
+--call print(tb[hera].." -??")
+end
+
+
+function AppendLoongLine( path , arg ) --Add one by one 
+	
+	assert(type(path)=="string" , "AppendLoongLine:Reuqare path.")
+	assert(type(arg)=="table", "AppendLoongLine:Requare table\nTable with sum values\n{\"mambo\",lamda=false,lol=55}.")   
+	local linesCount = #(getTable(path))
+	ReplaceLongLineValue( path, linesCount+1 ,arg)
+-- AppendLoongLine( path , {ID="...", status=false , isAvailable = true})
+end
+
+
+
+
+function TakeLastLongLine( path ) -- take data and  Remove
+	assert(type(path)=="string" , "TakeLastLongLine:Reuqare path.")
+	
+local lines = getTable(path)
+local lastLine = GetLongLineValue( path, #lines) -- unserialize.
+local text =""
+
+     for line = 1, #lines-1   do 
+     	text = text..lines[line].."\n"
+     end 
+       
+      fwrite( path , text )
+   	  return lastLine
+   	 --fLib.AppendLoongLine( "config/DATA/GenerateHomeCoord/HomeCoordDATA" , {x=math.random(1,1000),y=math.random(1,1000),z=math.random(1,1000),f=math.random(1,4),turtleID = math.random(1,1000), used = false} )	
+end
+
+function TakeFirstLongLine( path ) -- take data and  Remove/disapend
+	assert(type(path)=="string" , "TakeFirstLongLine:Reuqare path.")
+	
+local lines = getTable(path)
+local lastLine = GetLongLineValue( path, 1) -- unserialize.
+local text =""
+
+     for line = 2, #lines   do 
+     	text = text..lines[line].."\n"
+     end 
+       
+      fwrite( path , text )
+   	  return lastLine
+   	 --fLib.AppendLoongLine( "config/DATA/GenerateHomeCoord/HomeCoordDATA" , {x=math.random(1,1000),y=math.random(1,1000),z=math.random(1,1000),f=math.random(1,4),turtleID = math.random(1,1000), used = false} )	
+end
+
+
+function GetFirstLongLine( path ) -- take data and  Remove/disapend
+	assert(type(path)=="string" , "GetFirstLongLine:Reuqare path.")
+	
+local lines = getTable(path)
+local lastLine = GetLongLineValue( path, 1) -- unserialize.
+local text =""
+
+     for line = 1, #lines   do 
+     	text = text..lines[line].."\n"
+     end 
+       
+      fwrite( path , text )
+   	  return lastLine
+   	 --fLib.AppendLoongLine( "config/DATA/GenerateHomeCoord/HomeCoordDATA" , {x=math.random(1,1000),y=math.random(1,1000),z=math.random(1,1000),f=math.random(1,4),turtleID = math.random(1,1000), used = false} )	
+end
+
+function GetLastLongLine( path ) -- take data and  Remove
+	assert(type(path)=="string" , "GetLastLongLine:Reuqare path.")
+	
+local lines = getTable(path)
+local lastLine = GetLongLineValue( path, #lines) -- unserialize.
+local text =""
+
+     for line = 1, #lines   do 
+     	text = text..lines[line].."\n"
+     end 
+       
+      fwrite( path , text )
+   	  return lastLine
+   	 --fLib.AppendLoongLine( "config/DATA/GenerateHomeCoord/HomeCoordDATA" , {x=math.random(1,1000),y=math.random(1,1000),z=math.random(1,1000),f=math.random(1,4),turtleID = math.random(1,1000), used = false} )	
+end
+
+
+
+
+function GetAllLongLines( path ) -- always return table , usefull when no need to protect from none exsisting table
+	assert(fs.exists(path), "getAllLongLines:Requare path.")
+	local Lenght = Lenght( path )
+	local tb= {}
+	for line = 1 , Lenght do 
+		tb[line] = GetLongLineValue( path, line)
+	end 
+	return tb 	
+end
+function ReplaceAllLongLine(path , table  )
+ assert ( type (path)== "string" and fs.exists (path), "ReplaceAllLongLine expected path got nil " )
+ assert ( type ( table )== "table" , "ReplaceAllLongLine expected table got "..tostring(type (table)))
+  local  text = ""
+  local ln = 0 
+   for k,pointer in pairs(table) do
+   	ln = ln + 1 
+   	 ReplaceLongLineValue( path, ln ,pointer)
+   end
+end
+
+function GetIndexValue( path, pointindex ) -- Looking for index value , more specific ,return value
+	assert(fs.exists(path), "IndexExists:\nRequare path.")
+	assert (pointindex~=nil, "IndexExists:Requare pointindex.")
+	local tb = {}	
+		for xline = 1, Lenght(path) do 
+			local line = GetLongLineValue( path, xline)
+			for index,value in pairs(line) do
+				--print (index.." = "..tostring(value))
+				if index == pointindex  then 
+					--print ("Find that ="..tostring(value))
+					tb[xline] = line[pointindex]
+
+					--print(tb[xline])
+				end 
+			--sleep(3)
+			end
+		end  
+    return tb
+end
+
+--Chesk Loong Line----------------------------------------------------------------------- 
+--[[]] 
+
+-- Chesk if indexe and value is exsist return line 
+function Inspect(path, pointindex,pointvalue ) --Core
+    assert(fs.exists(path), "IndexExists:\nRequare path.")
+	assert (pointindex~=nil, "IndexExists:Requare pointindex.")
+	assert (pointvalue~=nil, "IndexExists:Requare pointvalue.")
+		
+		for xline = 1, Lenght(path) do 
+			--print (xline)
+			local line = GetLongLineValue( path, xline)
+			for index,value in pairs(line) do
+				--print (index.." = "..tostring(value))
+				if index == pointindex and value == pointvalue then 
+					--print "Find that"
+					return xline
+				end 
+			end
+		end  
+    return false
+--exstm" fLib.IndexExistsLongLine(path, 2,"Status" ) -- look index Status
+end
+
+
+
+---------Pointer-Replace-------------------------------------------------------------------
+
+
+--Golden
+
+-- find pointing line then find where toIndex need to save a new value. Rape Style
+function PointIndexToValue( path, pointindex ,pointvalue,toIndex, setvalue )--Core --Find index and value then replace it
+	assert(fs.exists(path), "PointIndexToValue:Requare path.")
+	assert (pointindex~=nil, "PointIndexToValue:Requare pointindex.")
+	assert (pointvalue~=nil, "PointIndexToValue:Requare pointvalue.")
+	assert (toIndex~=nil,"PointIndexToValue:Requare toIndex.")
+	assert(setvalue~=nil,"PointIndexToValue: Requare set value.")
+	
+
+	local Lenght = Lenght( path )
+	for line = 1 , Lenght do 
+		local data = GetLongLineValue( path, line)
+		for name,content in pairs(data) do
+			if name == pointindex and pointvalue == content then 
+				 for toName,_ in pairs(data) do
+					  if toName == toIndex then 
+					  	-- print "Saving new value."
+					  	 data[toIndex] = setvalue
+					  	 ReplaceLongLineValue( path, line ,data)
+					  	 return true
+					  end 
+				  end
+			end 	
+		end
+	end 
+return false 	
+-- PointIndexToValue( pathDATA, "ID" ,258,"Status", 5558 )
+end
+
+--FUCK THE POLICE
+
+----------------------------------------------------------------------------------------
+--[[Utilities]]
+
+function ArhiveNameAPI( pathAPI  ) -- Arhive Library name from string 
+     assert(type(pathAPI)=="string","Please I need name ob api.")
+     local nameAPI = pathAPI --"config/DATA/GenerateJobCoord/GenerateQuarry/GenerateQuarry"   
+     while string.find(nameAPI,"/") and nameAPI ~= nil do 
+      nameAPI  = string.sub(nameAPI,string.find(nameAPI,"/")+1,string.len( nameAPI))        
+    end   
+   return nameAPI
+end 
+
+function Lenght( path )--get content lenght
+	assert(type(path)=="string" , "Lenght:Reuqare path.")
+	return  #getTable( path )
+end
+
+function isContent( path )--check if stil is some of content
+	assert(type(path)=="string" , "DeleteContent:Reuqare path.")
+	return  #getTable( path )~=0 and true or false 
+end
+
+function isContentLongLines( path ) -- CHECK CONTENT still
+	assert(type(path)=="string" , "isContentLongLine:Reuqare path.")
+		local lines = getTable( path )
+		for line = 1,#lines do 	
+			if  string.find (lines[line],",") then return true end 
+		end 
+return false 
+end
+
+function isContentLongLine( path, ln ) -- CHECK CONTENT still
+	assert(type(path)=="string" , "isContentLongLine:Reuqare path.")
+	assert(type(ln)=="number", "isContentLongLine: Requare line.")
+		local lines = getTable( path )
+			if  string.find (lines[ln],",") then return true end 
+		
+return false 
+end
+
+function DeleteContent( path )--Delete whole content in file
+	assert(type(path)=="string" , "DeleteContent:Reuqare path.")
+	fwrite( path , "" )
+end
+
+
+function DeleteLongLine( path , ln )-- Delete Long line values
+	assert(type(path)=="string" , "DeleteLongLine:Reuqare path.")
+	assert(type(ln)=="number", "Requare to line delete.")
+	-- ReplaceLongLineValue( path, ln ,{})
+	replaceLine( path , ln ,nil )
+end
+
+
+--Little bit different :D
+function SpamLine( path,ln ,text)-- Just do somehing in line LD
+	assert (type(path)=="string", "SpamLine:Requare path")
+	assert(type(ln)=="number", "Requare to line delete.")
+	ReplaceLongLineValue( pathDATA, ln ,{tostring(text or " ")})
+end

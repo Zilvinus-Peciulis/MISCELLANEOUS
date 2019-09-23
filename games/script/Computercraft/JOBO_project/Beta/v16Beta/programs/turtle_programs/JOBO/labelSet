@@ -1,0 +1,35 @@
+
+function createLabel (labelArg ,boolAcceptName)
+ local id = os.getComputerID();
+ local getLb = os.getComputerLabel()
+ local label;
+ 
+ if labelArg and getLb ==nil or boolAcceptName ==true then 
+     label = labelArg.."["..id.."]"  
+     print ("Creating new label '"..label.."'")
+     sleep(0.7)
+     os.setComputerLabel(label)
+     print("Complete")     
+   elseif labelArg == nil and getLb == nil then
+     print("Creating default name...")
+     label="JOBO["..id.."]"
+     os.setComputerLabel(label)
+     print"Done"
+   elseif labelArg == nil and getLb~=nil then      
+     label =getLb
+     print("This computer have label\n--> "..label..".")
+   else
+     print"No label created"
+             
+ end 
+ return label 
+end
+
+local arg = {...}
+
+
+if arg[1] ~= nil then 
+     createLabel(tostring(arg[1]))
+else
+    createLabel()
+end

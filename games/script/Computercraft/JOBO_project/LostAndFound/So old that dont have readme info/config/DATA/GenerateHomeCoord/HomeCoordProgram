@@ -1,0 +1,117 @@
+os.loadAPI("config".."/source/FileLibrary/fLib")
+
+local pathDATA = "config/DATA/GenerateHomeCoord/HomeCoordDATA"
+local pathGenerator = "config/DATA/GenerateHomeCoord/GenerateHomeCoord"
+
+function isHomeCoord(  )
+   return fLib.isContent( pathDATA )
+end
+
+
+function isAvailable(  ) -- --Check if available to stora Data/ turtle ids
+   local lastline = fLib.Lenght( pathDATA )
+   local isContent = fLib.isContent( pathDATA ) -- get boolean :D
+
+        if isContent then -- odd bugg apear when everything is mepty
+         Status =   fLib.GetLongLineValue( pathDATA, lastline).STATUS 
+        return not Status or false   --invert nicely
+        end 
+        --if 
+     return false    
+end
+
+function GenerateHomeCoord(  )
+    --if not isHomeCoord(  ) then  -- if not left ent tj=hen generate 
+     	print "Generating Home Coord..."
+     	os.loadAPI( pathGenerator )
+     	os.unloadAPI( pathGenerator )
+     	print"Complete generating Home Coord."
+    --end
+end
+
+
+function getHomeCoord(  ) -- return and delete line value
+  if isHomeCoord(  ) then 
+		local tb = fLib.GetFirstLongLine( pathDATA)
+		return tb
+  else
+  	    print "Okey guys. No more Room left in xHome."
+  end
+end
+
+--construct
+function getHomeCoordAdvanced( id ) -- check correct id if same then return line else create and return new line value
+  if isHomeCoord(  ) then
+    local empty = false   --status
+    local emptyline; -- line value
+    local etb = {}-- content
+
+    local path = pathDATA
+        assert (type (id)== "number", "getHomeCoordAdvanced:Requare inicial id.") 
+        local lenD = fLib.Lenght( pathDATA )
+              for xLine = 1 , lenD do   
+                  local line = fLib.GetLongLineValue( path, xLine)         
+                     -- if id math then return data
+                         if line.ID == id then 
+                               return line
+                         end 
+                        -- Check empty ID slots save line 
+                         if not  line.STATUS and not empty then -- triger new line
+                               empty = true 
+                               etb = line
+                               emptyline = xLine   
+                         end 
+              end                      
+                          -- else here
+                          if empty then --if in loop not found same id then create/register in memory                         
+                          local     oldData = fLib.GetLongLineValue( path, emptyline)          
+                                    etb.STATUS = true-- change Status to true 
+                                    etb.ID     = id -- and given id 
+                                    fLib.ReplaceLongLineValue( path, emptyline ,etb) -- Replace with new id thant data
+                            return oldData --then return table wiht old data before replasing it. 
+                          end
+
+  end
+end
+
+function isID( id )
+  assert (type (id)== "number", "isID:Requare inicial id.") 
+        local lenD = fLib.Lenght(pathDATA)
+         local path = pathDATA     
+              for xLine = 1 , lenD do   
+                  local line = fLib.GetLongLineValue( path, xLine)         
+     
+                         if line.ID == id then -- if math then return true  
+                               return true
+                          elseif line.STATUS == false then 
+                                return false
+                         end 
+              end          
+        return false 
+end
+
+function getStatus( id )
+  assert (type (id)== "number", "getStatus:Requare inicial id.") 
+        local lenD = fLib.Lenght(pathDATA)
+         local path = pathDATA     
+              for xLine = 1 , lenD do   
+                  local line = fLib.GetLongLineValue( path, xLine)         
+     
+                         if line.ID == id then -- if math then return true  
+                               return line.STATUS
+                         elseif line.STATUS == false then 
+                                return false
+                         end 
+
+
+              end          
+        return false 
+end
+
+--print (fLib.Lenght( "config/DATA/GenerateHomeCoord/HomeCoordDATA" ))
+
+
+os.unloadAPI("config".."/source/FileLibrary/fLib")
+
+
+status =  false

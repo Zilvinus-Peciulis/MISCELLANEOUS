@@ -1,0 +1,4 @@
+Added  cmd [lenght][cmd] 
+cmd handle to turtle return option in starting point
+fixed endles return error
+Added lawa walls protection/Fixed with ispect methods

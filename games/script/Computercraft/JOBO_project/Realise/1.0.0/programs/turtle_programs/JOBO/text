@@ -1,0 +1,34 @@
+os.loadAPI("OS")
+OS.loadAPI("/moreFile/programs/config/source/defaultProgramT")
+
+local Name = defaultProgramT.GET.TurtlesName()  
+-- set label 
+ local id = os.getComputerID();
+ local getLb = os.getComputerLabel() or ""
+ local label;
+
+
+     function changeLabel(  )
+      local Name = defaultProgramT.GET["TurtlesName"]() 
+      local id = os.getComputerID();
+      if defaultProgramT.GET["ROLE"]() == "SUPORT" then
+         label = "["..defaultProgramT.GET['ManagerID']().."]Suport".."#"..id.."" 
+      else 
+         label = "["..defaultProgramT.GET['ManagerID']().."]"..Name.."#"..id 
+      end  
+     os.setComputerLabel(label)
+     end
+
+-- open modem
+local modemSides = {"top","bottom","right","left","front","back"}
+local condition = false;
+for x = 1 ,#modemSides do
+local type = peripheral.getType( modemSides[x] )
+  if type == "modem" then 
+       rednet.open(modemSides[x])
+       break
+  end
+end
+
+
+os.unloadAPI("/config/defaultProgramT")

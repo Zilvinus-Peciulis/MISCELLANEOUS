@@ -1,0 +1,11 @@
+1){|"JobComplete"]=false,|"z"]=1703,|"ID"]=6,|"JobAvailable"]=true,|"Connected"]=false,|"fTime"]=false,|"Disassemble"]=true,|"MissingItems"]="DontKnow",|"f"]="WEST",|"y"]=70,|"x"]=-3,}
+2){|"JobComplete"]=false,|"z"]=1723,|"ID"]=4,|"JobAvailable"]=true,|"Connected"]=false,|"x"]=7,|"Disassemble"]=true,|"MissingItems"]="DontKnow",|"f"]="WEST",|"y"]=70,|"fTime"]=false,}
+3){|"JobComplete"]=false,|"z"]=1713,|"ID"]=13,|"JobAvailable"]=true,|"Connected"]=true,|"fTime"]=false,|"Disassemble"]=false,|"MissingItems"]=true,|"f"]="WEST",|"y"]=70,|"x"]=-3,}
+4){|"JobComplete"]=false,|"z"]=1683,|"ID"]=8,|"JobAvailable"]=true,|"Connected"]=false,|"fTime"]=false,|"Disassemble"]=true,|"MissingItems"]="DontKnow",|"f"]="WEST",|"y"]=70,|"x"]=-3,}
+5){|"JobComplete"]=false,|"z"]=1743,|"ID"]=1,|"JobAvailable"]=true,|"Connected"]=false,|"x"]=7,|"Disassemble"]=true,|"MissingItems"]="DontKnow",|"f"]="WEST",|"y"]=70,|"fTime"]=false,}
+6){|"JobComplete"]=false,|"z"]=1753,|"ID"]=5,|"JobAvailable"]=true,|"Connected"]=false,|"x"]=7,|"Disassemble"]=true,|"MissingItems"]="DontKnow",|"f"]="WEST",|"y"]=70,|"fTime"]=false,}
+7){|"JobComplete"]=false,|"z"]=1693,|"ID"]=3,|"JobAvailable"]=true,|"Connected"]=false,|"fTime"]=false,|"Disassemble"]=true,|"MissingItems"]="DontKnow",|"f"]="WEST",|"y"]=70,|"x"]=-3,}
+8){|"JobComplete"]=false,|"z"]=1763,|"ID"]=11,|"JobAvailable"]=true,|"Connected"]=false,|"x"]=7,|"Disassemble"]=true,|"MissingItems"]="DontKnow",|"f"]="WEST",|"y"]=70,|"fTime"]=false,}
+9){|"JobComplete"]=false,|"z"]=1673,|"ID"]=12,|"JobAvailable"]=true,|"Connected"]=false,|"x"]=-3,|"Disassemble"]=true,|"MissingItems"]="DontKnow",|"f"]="WEST",|"y"]=70,|"fTime"]=false,}
+10){|"JobComplete"]=false,|"z"]=1773,|"ID"]=10,|"JobAvailable"]=true,|"Connected"]=false,|"fTime"]=false,|"Disassemble"]=true,|"MissingItems"]="DontKnow",|"f"]="WEST",|"y"]=70,|"x"]=7,}
+11){|"JobComplete"]=false,|"z"]=1773,|"ID"]=2,|"JobAvailable"]=true,|"Connected"]=false,|"x"]=27,|"Disassemble"]=true,|"MissingItems"]="DontKnow",|"f"]="WEST",|"y"]=70,|"fTime"]=false,}

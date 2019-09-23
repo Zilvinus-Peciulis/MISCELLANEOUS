@@ -1,0 +1,96 @@
+os.loadAPI("/moreFile/GPS/gps")
+os.loadAPI("/moreFile/programs/config/source/defaultProgramT")
+os.loadAPI("/moreFile/programs/config/configProgramT")
+os.loadAPI("/moreFile/programs/say")
+os.loadAPI("/moreFile/GPS/source/gps_Program")
+os.loadAPI("/moreFile/programs/requestAPI") --
+
+
+
+local yProgressEnd = defaultProgramT.GET.yProgressEnd()
+
+-- Global/ use some programs us parametres
+square = 9
+
+-- local function bedrock(  )
+--  return	requestAPI.inspectThis("front", {"minecraft:bedrock"} 
+-- end
+
+local function forward( )
+	if turtle.detectDown() then turtle.digDown() end 
+	while turtle.detect() or not gps.forward() do 
+		if not turtle.dig( ) and  turtle.detect() then say.danger ("I got bedrock in front") return false end  
+	 end 
+	 return true 
+end 
+
+function down(  )
+ turtle.digDown()
+ turtle.attackDown()
+  if not gps.down()   then print ("Turtle cannot move down// BeadRock?") return false  end 
+  return true 
+end
+
+local function line(  )
+	for i=1,square-1 do
+	-- if turtle.detect() then print (" I saw somthing bad D:") end 
+	if not forward( ) then return false end 
+	end
+	return true 
+end
+
+
+
+
+function lines(  )
+	for rows=1,square do
+  if not line(  ) then return false end 	
+		if rows%2 ==0 then 
+		 -- print "Right"
+		 gps.right()
+		 forward( )
+		 gps.right ()
+		 elseif rows%2 ==1 and rows ~= square  then   
+		 	-- print ("Left"..tostring(rows%2 ) )
+		 	gps.left()
+		 	forward ()
+		 	gps.left()
+		end 	
+	end
+	 return true 
+end
+
+function quarryFull( ... )
+ 	 local yTrack = configProgramT.GET["yProgress"]() + 1
+ 	 
+ while  yTrack > yProgressEnd do 
+     say.alert ("yTrack: "..yTrack-1)
+ 	 if not lines(  ) then break end -- bedrock detection 
+     yTrack = yTrack  - 2 
+ 	 local height = yTrack <= yProgressEnd
+ 	 say.warning (yTrack.." .<= "..yProgressEnd.." == "..tostring(height))
+	-- for last block
+	if turtle.detectDown() then turtle.digDown() end 
+ 	if  height  then say.success( "I reached bedrock" ) 
+ 		 break
+ 		 else 
+ 		 gps.right()
+ 	 	 gps.right()
+ 		 if not down(  ) then  break end 
+ 		 if not down(  ) then  break end 
+    end 
+     configProgramT.SET["yProgress"](gps_Program.GET["yLocation"]())
+ 	 print "Still Doing it "
+ end 
+end
+
+-- for i=1,4 do
+
+	-- turtle.turnRight()
+	-- turtle.turnRight()
+	-- if i ~= 4 then 
+	-- turtle.digDown(	)
+	-- turtle.down()
+	-- end 
+-- end
+

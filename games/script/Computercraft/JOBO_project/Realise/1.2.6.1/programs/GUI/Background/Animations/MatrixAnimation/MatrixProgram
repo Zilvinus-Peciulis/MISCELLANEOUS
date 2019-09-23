@@ -1,0 +1,17 @@
+local xTerm , yTerm = term.getSize()
+
+function Matrix(  ) -- print on monitor matrix like a boss
+	-- Matrix xack :P
+	term.clear()
+	term.setCursorPos(1,1)
+	print"Requare Advancet turtle to run JOBO."
+	print"This computer is not advanced"
+	sleep(5)
+	os.loadAPI("/programs/GUI/Background/Animations/MatrixAnimation/Matrix")
+	term.clear()
+	term.setCursorPos(1,1)
+	local text = ".--- --- -... ---"
+	term.setCursorPos((xTerm-#text)/2 , yTerm/2)
+	textutils.slowPrint(".--- --- -... ---",4)
+	sleep(1)
+end

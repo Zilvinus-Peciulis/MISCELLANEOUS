@@ -1,0 +1,236 @@
+term.clear()
+term.setCursorPos(1,1)
+
+local tArg = {...}
+local length = tonumber(tArg[1]);
+local cmd = tArg[2]
+assert(type(length)=="number" or type(height)=="number","Require [length]")
+
+ 
+
+print "Tunneling..."
+if cmd == "return" then print(" return OK..!") end
+
+function placeBlock(side,cmd)
+local side = side or ""
+assert(side == "Down" or side == "Up" or side =="", "placeBlock require 'Down','Up'") 
+ if not turtle.detectDown() or cmd =="notDetect" then  
+    for slt = 1,16 do 
+      if turtle.getItemCount(slt)>0 then 
+        turtle.select(slt)
+        if turtle["place"..side] ()then 
+        break
+        end
+      end
+    end
+   turtle.select(1)
+  end 
+end 
+
+function refuel()
+ if turtle.getFuelLevel() < 10 then 
+  for slt = 16,1,-1 do 
+       if turtle.getItemCount(slt) >0 then  
+          turtle.select(slt)
+         if turtle.refuel(1) then
+          turtle.select(1)
+           break
+         end 
+       end 
+    end  
+ end
+  return true -- while fuel enouht or refuel 
+end
+
+local m = 0
+function mined (rtn)
+ if rtn ~= "return" then 
+   m  = m + 1
+   else return m
+ end
+end
+
+function up()
+  while refuel() and not turtle.up() do 
+   if turtle.digUp() then mined() end
+    end
+end
+
+
+function down() 
+  while refuel() and not turtle.down() do 
+   if turtle.digDown() then mined() end
+  end
+end
+
+function fd(cmd)
+ if cmd == "lowFuel" then  
+   while not turtle.forward() do
+     turtle.dig()
+     refuel()
+   end  
+   else  
+       while (refuel() and not turtle.forward()) do
+         if turtle.dig()   then mined() end
+       end
+  end
+end
+
+function bk()
+ while not turtle.back() do 
+ sleep(1)
+ end
+end
+
+function dig(side)
+local side = side or ""
+assert(side=="Up" or side =="Down" or side=="","dig require side 'Up' 'Down'")
+  while turtle["detect"..side]() do 
+     if turtle["dig"..side]()  then mined() return true end
+  end
+end
+
+function ignored(slt)
+assert (type(slt) == "number","ignored require slot")
+local t = {"minecraft:torch",}
+  
+  for _,v in pairs  (t) do
+    if turtle.getItemCount(slt) > 0 then 
+     local itm = turtle.getItemDetail(slt)
+     if v ~= itm.name  and turtle.getItemCount(slt) > 0 then  return true end
+    end 
+  end
+return false
+end
+
+function lava (side)
+  local _,iup = turtle.inspectUp()
+  local _,ifd = turtle.inspect() 
+  local lv = "minecraft:flowing_lava"
+  if side == nil and type(ifd) =="table" and ifd.name==lv  then return true
+     
+  elseif side =="Up" and type(iup)=="table" and (iup.name==lv) then return true 
+  
+  end
+end
+
+
+function replace()
+if lava() then -- when not wall, trye replace
+   for slt = 1,16 do 
+    -- try replace block where no detected as wall  
+     if ignored(slt)  then
+        turtle.select(slt)
+        if turtle["place"]() then  turtle.select(1) break end
+     end
+   end
+ end
+end
+
+function replaceUp()
+if not turtle.detectUp() then 
+   for slt = 1,16 do 
+     if ignored(slt) then 
+         turtle.select(slt)
+         if turtle.placeUp() then  turtle.select(1) break end     
+     end
+   end
+ end
+end
+
+function replaceDown() 
+ if not turtle.detectDown() then  
+    for slt = 1,16 do 
+      if ignored(slt) then
+         turtle.select(slt)
+         if turtle.placeDown() then turtle.select(1) break end
+      end
+    end
+  end
+end
+
+
+function move()
+fd()
+dig("Up")
+end
+
+function torch (crnt)
+  local trcRad = 8;
+  if crnt%trcRad == 0 then 
+    for slt = 1,16 do 
+      if turtle.getItemCount(slt)>0 then
+        local itm = turtle.getItemDetail(slt)        if itm.name == "minecraft:torch" then
+          turtle.select(slt)
+           local pl =  turtle.place()
+           turtle.select(1) 
+           return pl
+        end      
+      end
+    end 
+  end
+return true -- while no torch or torch is placed correctly
+end
+
+function layer (crnt,cmd)
+local emty = cmd  == "emty"
+turtle.turnRight()
+    replaceDown() 
+    if emty then dig() end; replace()
+    up()
+    if emty then dig() end; replace()
+    replaceUp()
+     if crnt ~=nil and not torch(crnt) then fd() placeBlock(nil,"notDetect"); replaceUp();  bk() torch(crnt) end
+    turtle.turnLeft();turtle.turnLeft()
+      if emty then dig() end; replace()
+    down()
+      if emty then dig() end; replace()
+    turtle.turnRight() 
+end 
+
+function annonce (crnt) -- annonce by current execution step
+ local proc = crnt;
+ local about = 7;
+ if crnt%about == 0  then 
+  print ("Mined "..mined("return").." block's, "..math.floor(proc/length*100).."%")
+ end
+end
+
+
+local traveled = 0 --keep traveled count to be back
+
+if refuel() then -- check fuel availability
+
+for exec = 1, length do 
+ if refuel() then  
+    traveled = traveled + 1
+    annonce(exec)
+    layer(exec,"emty")
+    if length > exec then move() end
+   else print "Oh no, don't have enouth fuel";  break
+ end
+end
+
+if cmd == "return" then 
+  turtle.turnRight(); turtle.turnRight();
+  
+  for bkc = 1 , traveled-1 do
+   local lv = lava() or lava("Up")
+     if lv then layer() end 
+     
+      fd("lowFuel")
+     
+     -- if lv then layer() end 
+     
+  end
+   turtle.turnRight();turtle.turnRight();
+end 
+
+term.clear()
+term.setCursorPos(1,1)
+
+print ("Mined "..mined("return").." block's")
+   
+   else print "I'm not prepare work with low fuel"
+end
+--]]

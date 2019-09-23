@@ -1,0 +1,173 @@
+if fs.exists ("/moreFile/programs/requestAPI") then 
+os.loadAPI("/moreFile/programs/requestAPI") --
+os.loadAPI("/moreFile/programs/material")
+	print "From turtle"
+else
+os.loadAPI("config".."/source/FileLibrary/fLib")
+os.loadAPI("programs/material")
+	print "From manager"
+end 
+
+
+function count_fuel_value(  )
+ local count = 0;
+ local  mt = {} 
+   for item=1,#material.turtlefuel do
+    mt = material.turtlefuel[item].name
+    local value = requestAPI.CountThis({mt})
+    -- print ("name: "..mt.." value "..value)
+
+   	     count = count + ( value  *  material.turtlefuel[item].value )
+    end 
+	 return count
+end
+
+
+
+function find_fuel_nameSlot(  slot  )
+   		  for item=1,#material.turtlefuel do
+			   	 if  requestAPI.getDataName  (slot) == material.turtlefuel[item].name then 
+			   	 	return material.turtlefuel[item].name
+			   	 end 
+		  end 	   	 	
+	return false 
+end
+
+function find_fuel_valueSlot(  slot  )
+   		  for item=1,#material.turtlefuel do
+			   	 if  requestAPI.getDataName  (slot) == material.turtlefuel[item].name then 
+			   	 	return material.turtlefuel[item].value
+			   	 end 
+		  end 	   	 	
+	return false 
+end
+
+
+function find_fuel_indexSlot(  slot  )
+   		  for item=1,#material.turtlefuel do
+			   	 if  requestAPI.getDataName  (slot) == material.turtlefuel[item].name then 
+			   	 	return item
+			   	 end 
+		  end 	   	 	
+	return false 
+ end 
+
+
+
+
+function fuelList(  )
+	local tb = {}
+	local c = 0
+	for slot=1,16 do
+		if find_fuel_indexSlot(  slot  ) then 
+		c = c + 1
+		tb[c] = slot
+		end 	
+	end
+	return tb 
+end
+
+-- return total count in inventory 
+function fuelTotal(  )
+local  count = 0	
+	for _,item in pairs(fuelList(  )) do
+		-- print (find_fuel_valueSlot(  item  ))
+		count = count + (find_fuel_valueSlot(  item  )*turtle.getItemCount(item))
+	end
+	return count 
+end
+
+ fuelTotal(  )
+-- always refuel by value   like 81 refuel two items
+function value( refuelvalue )
+local count = 0;
+local val = 0
+ local  mt = {} 
+ local fuelSlots = fuelList(  )
+	assert (type (refuelvalue) == 'number', "refuel_value expected number got "..tostring(refuelvalue))
+      if side == "Front" then side = "" end 
+    	for _,fuelSlot in pairs(fuelSlots) do
+    		print ("fuelSlot: "..fuelSlot)
+	    			turtle.select(fuelSlot)
+	    			for itm_count = 1 , requestAPI.Count( fuelSlot , {find_fuel_nameSlot(  fuelSlot  )} ) do
+	    				 count = count +  material.turtlefuel[ find_fuel_indexSlot(  fuelSlot  )].value 
+	    				 val = val + 1
+	    			if count > refuelvalue then break end 	
+	    			end 
+	    			 if  refuelvalue  >= count or  refuelvalue > 0 then 
+	    				 print (">>>is count Max:"..count.." refuel: "..val)
+	    				 turtle["refuel"](val)
+	    				 val = 0
+	    				 end 
+	    		if count > refuelvalue then break end 	
+    	end
+end
+
+
+ -- value( 81 )
+
+
+
+
+
+function valueObject( refuelvalue  , side)
+	assert (side == "Up" or side == "Down" or side == "Front", "valueObject expected Up , Down , Fron got "..tostring(side))
+local count = 0;
+local val = 0
+ local  mt = {} 
+ local fuelSlots = fuelList(  )
+	assert (type (refuelvalue) == 'number', "refuel_value expected number got "..tostring(refuelvalue))
+      if side == "Front" then side = "" end 
+    	for _,fuelSlot in pairs(fuelSlots) do
+    		print ("fuelSlot: "..fuelSlot)
+	    			turtle.select(fuelSlot)
+	    			for itm_count = 1 , requestAPI.Count( fuelSlot , {find_fuel_nameSlot(  fuelSlot  )} ) do
+	    				 count = count +  material.turtlefuel[ find_fuel_indexSlot(  fuelSlot  )].value 
+	    				 val = val + 1
+	    			if count > refuelvalue then break end 	
+	    			end 
+	    			 if  refuelvalue  >= count or  refuelvalue > 0 then 
+	    				 print (">>>is count Max:"..count.." gave: "..val)
+	    				 turtle["drop"..side](val)
+	    				 val = 0
+	    				 end 
+	    		if count > refuelvalue then break end 	
+    	end
+end
+
+-- valueObject( 90000  , "Front")
+
+function valueSuck(refuelvalue ,side )
+local count = 0
+assert (side == "Up" or side == "Down" or side == "Front", "valueSuck expected Up , Down , Front got "..tostring(side))
+	if side == "Front" then side = "" end 
+	local fuelRequare = fuelTotal(  ) + refuelvalue
+	while true  do 
+		local fuelCnt = fuelTotal(  )
+	    		-- print ("fuelCnt: "..fuelCnt)
+	    		-- print ("fuelRequare: "..fuelRequare)
+		 if  fuelCnt  > fuelRequare   or not turtle["suck"..side]()  then break end 
+   	end
+
+end
+
+
+function valueSuckTotal(refuelvalue ,side )
+local count = 0
+assert (side == "Up" or side == "Down" or side == "Front", "valueSuck expected Up , Down , Front got "..tostring(side))
+	if side == "Front" then side = "" end 
+	while true  do 
+		local fuelCnt = fuelTotal(  )
+	    		print ("fuelCnt: "..fuelCnt)
+		 if  refuelvalue < fuelCnt or not turtle["suck"..side]()  then break end 
+   	end
+
+end
+
+
+-- valueSuck(5048 ,"Front" )
+-- print "HELLO WORLD"
+
+ -- value( 81 )
+
+-- value( 81 )

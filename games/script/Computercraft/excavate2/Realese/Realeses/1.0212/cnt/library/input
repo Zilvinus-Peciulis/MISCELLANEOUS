@@ -1,0 +1,224 @@
+local xSize,zSize = term.getSize()
+local function resetScreen(  )
+  local xPos,zPos = term.getCursorPos()
+  if  zPos>=zSize then term.clear(); term.setCursorPos(1,1) end 
+end
+ 
+
+ function getNInput(  txt,history,command )
+          resetScreen(  )
+          say.writeAlert (""..txt.." # ")
+           local tb -- select table is not created 
+          local xPos,zPos = term.getCursorPos()
+           if type(history)~="table" then  tb = {history} else tb = history end 
+              local  n = tonumber(read(nil,tb))
+                while n == nil do
+                     term.setCursorPos (1,zPos)
+                     term.clearLine()
+                     say.writeAlert (""..txt.." # ")
+                n = tonumber(read(nil,tb))
+
+  		end
+                  if command == "clearInput" then 
+                          term.setCursorPos (1,zPos)
+                          term.clearLine()
+                          say.alert (""..txt.." # ")
+                    end     
+               return n,xPos,zPos
+  end
+
+  function getSInput(  txt,history,command )
+          resetScreen(  )
+          say.writeAlert (""..txt.." % ")
+           local tb -- select table is not created 
+          local xPos,zPos = term.getCursorPos()
+           if type(history)~="table" then  tb = {history} else tb = history end 
+              local  n = tostring(read(nil,tb))
+                while #n==0 do
+                    term.setCursorPos (1,zPos)
+                     term.clearLine()
+                    say.writeAlert (""..txt.." % ")
+                    n = tostring(read(nil,tb))
+
+      end               if command == "clearInput" then 
+                          term.setCursorPos (1,zPos)
+                          term.clearLine()
+                          say.alert (""..txt.." % ")
+                        end  
+               return n,xPos,zPos
+  end
+
+
+
+function acceptedUser( text )
+  resetScreen(  )
+  local xPos,zPos = term.getCursorPos()
+    local text = type(text)=="string" and (text.." y/n # ") or "Are you shure y/n # "
+    say.writeQuestion (text)
+    local input  = read (nil,{"y","n"})
+  
+  if input == "y" or input == "Y" then   
+        term.setCursorPos (1,zPos)
+        term.clearLine()
+        say.writeQuestion (text)
+        term.setCursorPos (#text,zPos)
+        term.write (string.rep(" ",(xSize-#text)>0 and (xSize-#text) or  0) )
+        term.setCursorPos (#text,zPos)
+        say.success (" y")
+
+    return true 
+    else 
+        term.setCursorPos (1,zPos)
+        term.clearLine()
+        say.writeQuestion (text)
+        term.setCursorPos (#text,zPos)
+        term.write (string.rep(" ",(xSize-#text)>0 and (xSize-#text) or  0) ) -- java lan error
+        term.setCursorPos (#text,zPos)
+        say.danger (" n")
+      return false 
+  end     
+end
+
+--Read methods with time out 
+--Basic read() with woking time out
+function readTimeDelays(delay,historyArr)
+    assert(delay,"[readTimeDelays(delay,historyArr)]: No Delay Time");
+    if type(historyArr)~="table" then  history = {historyArr} else history = historyArr end 
+    
+         local timer=0;
+         local readOut;
+        function getInput()
+                readOut = read (nil, history or {"y","n"}); --<< nil,{"y","n"}
+                return readOut;
+        end --end function
+
+       
+        local function startTimer()
+        --Timer
+           while true do
+               timer=timer+1
+               sleep(1);
+               if timer >= delay then return nil end 
+            end--end while
+        --return nil
+        end--end function
+
+        local input = parallel.waitForAny(getInput, startTimer);
+
+        if input ==1 then 
+            return readOut
+         else
+            return nil
+        end       
+
+end
+--print ("    Was->  "..tostring(readTimeDelay(5))) OR print ("    Was->  "..tostring(index.app.readTimeDelays(5)))
+--------------------------------------------------
+function acceptedUserDelay(delay,text)
+    local input 
+    local timeout;
+    
+    resetScreen(  )
+    local xPos,zPos = term.getCursorPos()
+    local text = type(text)=="string" and (text.." ") or "Are you shure "
+    
+    say.writeQuestion (text)
+
+    --[waitForAny] Works with function only
+    local function countdownDispay() -- Display countdown value to user
+      local  GetTotalLen;
+      local  enable = true;
+      for i = 0,delay-1 do 
+        term.setCursorPos (1,zPos)
+        
+            say.writeQuestion (text)
+            term.setCursorPos (#text,zPos)
+            say.writeQuestion(" y/n ");
+
+              local timerDisp = "["..delay-i -- No Copy/Paste                                  ]:
+              local fixCountdownNumberError =  GetTotalLen ~= nil and GetTotalLen - #timerDisp or 0 -- fix floating dots with cursor blinking each other like ::_
+
+              if  (delay-i) > 10 then-- Color red under 10 while counting 
+                say.writeQuestion (timerDisp..string.rep(" ",fixCountdownNumberError).."]:" );
+              else  
+                say.writeDanger (timerDisp..string.rep(" ",fixCountdownNumberError).."]:");
+              end  
+             -- Get full lenght of text for  numbers spaces 10: to 9::
+          -- term.setCursorPos (#text+4,zPos)
+              
+              if  enable then 
+                 GetTotalLen = #timerDisp;
+                 enable = false
+              end
+              -- term.setCursorPos(1,5)
+              -- print ("Total len "..GetTotalLen)
+             -- Works perfectly in here but not in top or loop return nil
+            if (i == delay-1) then 
+              timeout = true
+             else 
+              timeout = false;
+            end  
+            sleep(1);
+            
+      end
+        timeout = true
+      return nil;
+    end
+    --[waitForAny] Works with function only
+   local function Read( )
+      input  = readTimeDelays(delay,{"y","n"}); -- cach input value then return 
+      return input 
+   end
+    
+  
+   parallel.waitForAny(countdownDispay,Read)
+  -- print (" ");
+   sleep (.1) -- debug with print random timeout codition  OR does have enout time to overwrite same varables outside returnedz
+ 
+  if input == "y" or input == "Y" then   
+        term.setCursorPos (1,zPos)
+        term.clearLine()
+        say.writeQuestion (text)
+        term.setCursorPos (#text,zPos)
+        term.write (string.rep(" ",(xSize-#text)>0 and (xSize-#text) or  0) )
+        term.setCursorPos (#text,zPos)
+        say.writeAlert (" :");
+        say.success ("y")
+
+    return true , timeout -- when time out return true
+    else 
+        term.setCursorPos (1,zPos)
+        term.clearLine()
+        say.writeQuestion (text)
+        term.setCursorPos (#text,zPos)
+        term.write (string.rep(" ",(xSize-#text)>0 and (xSize-#text) or  0) ) -- java lan error
+        term.setCursorPos (#text,zPos)
+        say.writeAlert (" :");
+        say.danger ("n")
+      return false , timeout -- when time out return true
+  end     
+end
+  --------------------------
+
+-- Use for making array of 1-255 like so 
+function NumberElipse( start, ends  )
+  assert (type(start)=="number" and type(ends)=="number","NumberElipse expected number")
+  local cnt = 1
+  local tb = {}
+  if ends >= start then 
+      for i=start,ends do
+        tb[cnt]=tostring(i)
+        cnt=cnt+1
+      end
+  else 
+    for i=start,ends,-1 do
+        tb[cnt]=tostring(i)
+        cnt=cnt+1
+      end
+  end 
+  return tb 
+end
+
+function HelloWord( )
+   print "Hello World Everybody"
+end

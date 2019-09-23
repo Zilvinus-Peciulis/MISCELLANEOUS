@@ -1,0 +1,17 @@
+local modemSides = {"top","bottom","right","left","front","back"}
+      condition = false;
+for x = 1 ,#modemSides do
+local type = peripheral.getType( modemSides[x] )
+  
+  if type == "modem" then 
+      local type =peripheral.getType("back")
+       rednet.open(modemSides[x])
+       --print("Modem in:"..modemSides[x]..".")
+       condition = true
+       break
+  end
+end
+  
+ --if not condition then error "Modem not found" end
+ 
+  

@@ -1,0 +1,45 @@
+print "Run extra script "
+os.loadAPI("OS")
+OS.loadAPI("/moreFile/programs/config/source/defaultProgramT")
+
+local Name = defaultProgramT.GET.TurtlesName()  
+-- set label 
+ local id = os.getComputerID();
+ local getLb = os.getComputerLabel() or ""
+ local label;
+
+
+     function changeLabel(  )
+      local Name = defaultProgramT.GET["TurtlesName"]() 
+      local id = os.getComputerID();
+      if defaultProgramT.GET["ROLE"]() == "SUPORT" then
+         label = "["..defaultProgramT.GET['ManagerID']().."]Suport".."#"..id.."" 
+      else 
+         label = "["..defaultProgramT.GET['ManagerID']().."]"..Name.."#"..id 
+      end  
+     os.setComputerLabel(label)
+     end
+
+-- open modem
+function openModem(  )
+  -- body
+local modemSides = {"top","bottom","right","left","front","back"}
+local condition = false;
+for x = 1 ,#modemSides do
+local type = peripheral.getType( modemSides[x] )
+  
+  if type == "modem" then 
+      --local type =peripheral.getType("back")
+       rednet.open(modemSides[x])
+       --print("Modem in:"..modemSides[x]..".")
+       --condition = true
+       break
+  end
+end
+end 
+openModem(  )
+
+ --if not condition then error"Eny modem not found" end
+ 
+
+os.unloadAPI("/config/defaultProgramT")

@@ -1,0 +1,339 @@
+os.loadAPI("config".."/source/FileLibrary/fLib")
+os.loadAPI("/config/DATA/GenerateJobCoord/JobCoordProgram")
+os.loadAPI ("programs/turtleLib")
+os.loadAPI("/config/source/ConfigProgram")
+os.loadAPI("/config/DATA/GenerateHomeCoord/HomeCoordProgram")
+os.loadAPI("programs/tbLib")
+os.loadAPI("programs/orientation")
+os.loadAPI("programs/say")
+
+local pathDATA = "config/statistics"
+local myID = os.getComputerID()
+--local config = fLib.getTable( "config/statistics" )
+
+				  					
+
+local ManagerX = ConfigProgram.GET.xPos()
+local ManagerY = ConfigProgram.GET.yPos()
+local ManagerZ = ConfigProgram.GET.zPos()
+local ManagerF = ConfigProgram.GET.fPos()
+local yProgress = ConfigProgram.GET.yJob()
+
+local yJob =  ConfigProgram.GET.yJob()
+
+
+-- inportant as fuck , use forever here 
+local DefoultProtocol = {
+				Manager = myID
+}
+
+function ProtocolNew(  protocol,data  )--Constructor -- data if needet  
+	assert (type(protocol)=="table","Requare merge protocol")
+	local protocol =  tbLib.merge(protocol,DefoultProtocol)
+	return  tbLib.merge(data,protocol) 
+end
+
+
+function Protocol( tb )
+	return ProtocolNew(  {protocol="HelloMom"},tb  )
+end
+
+
+function ProtocolGoHomeHERE(  )
+	return ProtocolNew(  {protocol="GoHome"}	   )
+end
+
+
+
+
+--// Local Library'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+
+
+---------------------
+
+local function set_JobAvailable( id, set )-- Set value by id
+	assert(type(id)=="number","set_isAvailable:Requare compare id.")
+	assert(type(set)=="boolean", "set_isAvailable:Requare boolean.")
+	 return fLib.PointIndexToValue( pathDATA, "ID" ,id,"JobAvailable", set ) --return success
+end
+
+ function set_Progress( id, set )-- Set value by id
+	assert(type(id)=="number","set_Progress:Requare compare id.")
+	assert(type(set)=="boolean", "set_Progress:Requare boolean.")
+	 return fLib.PointIndexToValue( pathDATA, "ID" ,id,"Progress", set ) --return success
+end
+
+function set_Disassemble( id, set )-- Set value by id
+	assert(type(id)=="number","set_Disassemble:Requare compare id.")
+	assert(type(set)=="boolean", "set_Disassemble:Requare boolean.")
+	 return fLib.PointIndexToValue( pathDATA, "ID" ,id,"Disassemble", set ) --return success
+end
+
+function set_Connected( id, set )-- Set value by id
+	assert(type(id)=="number","set_Connected:Requare compare id.")
+	assert(type(set)=="boolean", "set_Connected:Requare boolean.")
+	 return fLib.PointIndexToValue( pathDATA, "ID" ,id,"Connected", set ) --return success
+end
+
+function set_JobComplete( id, set )
+	assert(type(id)=="number","set_JobComplete:Requare compare id.")
+	assert(type(set)=="boolean", "set_JobComplete:Requare boolean.")
+	 return fLib.PointIndexToValue( pathDATA, "ID" ,id,"JobComplete", set ) --return success
+end
+
+function set_yProgress( id, set )
+	assert(type(id)=="number","set_Connected:Requare compare id.")
+	assert(type(set)=="number", "set_yProgress:Requare number.")
+	 return fLib.PointIndexToValue( pathDATA, "ID" ,id,"yProgress", set ) --return success
+end
+-- 
+function set_Doing( id, set )
+	assert(type(id)=="number","set_Doing:Requare compare id.")
+	assert(type(set)=="boolean", "set_Doing:Requare number.")
+	 return fLib.PointIndexToValue( pathDATA, "ID" ,id,"Doing", set ) --return success
+end
+-- Get informatyion by condition 
+
+function set_fTime( id, set )
+	assert(type(id)=="number","set_fTime:Requare compare id.")
+	assert(type(set)=="boolean", "set_fTime:Requare number.")
+	 return fLib.PointIndexToValue( pathDATA, "ID" ,id,"fTime", set ) --return success
+end
+
+ 
+ function inspect_ID( id ) -- Check by condition if found return line else false
+	assert(type(id)=="number", "Requare ID.")
+	return fLib.Inspect(pathDATA, "ID",id )
+end
+
+ function inspect_isAvailable( condition ) -- Check by condition if found return line else false
+	assert(type(condition)=="boolean", "Requare condition")
+	return fLib.Inspect(pathDATA, "isAvailable",condition )
+end
+
+ function inspect_Disassemble( condition ) -- Check by condition if found return line else false
+	assert(type(condition)=="boolean", "Requare condition")
+	return fLib.Inspect(pathDATA, "Disassemble",condition )
+end
+
+ function inspect_Connected( condition ) -- Check by condition if found return line else false
+	assert(type(condition)=="boolean", "Requare condition")
+	return fLib.Inspect(pathDATA, "Connected",condition )
+end
+
+function inspect_JobAvailable( condition ) -- Check by condition if found return line else false
+	assert(type(condition)=="boolean", "Requare condition")
+	return fLib.Inspect(pathDATA, "JobAvailable",condition )
+end
+
+ function get_ExistingIDs( ) -- just list of ids 
+	return fLib.GetIndexValue( pathDATA, "ID" )
+end
+-- inspectID
+
+
+-----------------Comunications----------------------------------------------------------------------
+ 
+
+--###############JobCoordProgram#Lib############################################################
+ function isJob(  )
+ 	return JobCoordProgram['getJobAvailable']()--line or false
+ end
+function isLeftJobAvailabel(  )
+	return JobCoordProgram["getLeftJobAvailabel"](  ) -- return count of available jobs
+end
+
+ function DeleteJobData(  )
+	JobCoordProgram["DeleteContentData"](  )
+end
+
+ function getGeneratorPath(  )
+	return JobCoordProgram["getJobGenerators"](  )
+end
+
+ function Costructor( GeneratorName ) -- Construck type of Mining Generation
+	return JobCoordProgram["ConstructorGenerators"]( GeneratorName ) --succsecc
+end
+
+function GetJob(  ) -- look , not change enything :) 
+  return JobCoordProgram["GetJobCoordAdvanced"]()--data
+end
+
+function TakeJob(  ) -- stealing Job Coord forever :D 
+   return JobCoordProgram["TakeJobCoordAdvanced"](  )--data of job 
+end
+--Costructor( "GenerateQuarry" )
+
+
+
+--############################################################################
+function completeJobs( )
+  local data = fLib.GetAllLongLines( pathDATA )	
+	for k,info in pairs(data) do
+	if  not info.JobComplete then return false  end 
+	end
+	return true
+end
+
+function isEmpty(  )
+ return fLib["isContentLongLines"](pathDATA)
+end
+
+
+
+function DeleteStatistic(  )
+	Delete(  )
+end
+
+function setAllfTime( condition )
+	assert ( type(condition) == "boolean", "setAllfTime expected boolean got "..tostring (type (condition)))
+  local data = fLib.GetAllLongLines( pathDATA )	
+  	for pointer = 1 , # data do
+  	 data[pointer].fTime = condition
+  	  -- print (pointer.." "..tostring(data[pointer].fTime))
+  end 
+  fLib.ReplaceAllLongLine(pathDATA , data  )
+end
+
+--///////////HomeCoord/////////////////////////////////////////////////////////////
+function GenerateHomeCoord(  )
+	HomeCoordProgram.GenerateHomeCoord(  )
+end
+function DeleteHome(  )
+	fLib.DeleteContent( "/config/DATA/GenerateHomeCoord/HomeCoordDATA" )
+end
+--//////////////////////////////////////////////////////////////////////////////////
+
+
+local function checkID( isID )
+	 assert(type(isID)=="number", "checkID:Requare ID.")
+	return fLib.Inspect(pathDATA, "ID",isID ) -- return true if find same index and value :D
+end 
+
+
+
+local function setContent( id )
+	assert (type(id)=="number","Need id to return :/")
+	local JobAvailable = isJob(  ) -- take job from generator memory 
+	 local content
+	if JobAvailable then -- if still job content do else return return somehing else
+				         
+				       return  {
+				  				    ID=id,
+				  					x=nil; --JobAvailable.x,
+				  					z=nil;--JobAvailable.z,
+				  					y=yJob;
+				  					f =nil; --JobAvailable.f,
+				  					JobComplete='DontKnow',
+				  					JobAvailable = true, 	  --set job is available
+				  					Disassemble = false,
+				  					Connected = " ? ",
+				  					fTime = true,
+				  				}
+    				    else 
+				    	
+				    	
+				    	return {
+				    	           ID=id,
+				    	           Connected = " ? ",
+				    	           Disassemble = false,
+				    	           JobAvailable = false, 
+				                    }
+						
+    			end 
+end
+
+
+
+function setNew( newid ) -- Set newid id in here
+	local newid = tonumber(newid)
+	assert(type(newid)== "number" , "Requare newid id value.")
+
+	if not checkID( newid )  then 
+					 local isJobAvailable = setContent( newid ) -- get Data in here
+				       if isJobAvailable then term.setTextColor(colors.cyan) print("Wrote \""..newid.."\" id in ".."\"statistics\"") term.setTextColor(colors.white)
+	    				         -- Write All in next pocsition if JobAvailable  
+	    				         fLib.AppendLoongLine( pathDATA , isJobAvailable )  
+    				   end       
+    				       
+    else                
+    	print("ID["..newid.."] exists in \"Statistics\" memory.") 
+    	-- when turtle is booted/placed again , make shure return sum defoult option for more control
+    	set_Disassemble( newid, false ) -- 
+    	set_Connected( newid, false  )
+    end
+
+end
+
+function setJob( id )
+	assert (type(id)=="number", "Man, i Need id to proceed Set the Job.")
+	  local  idPos  = checkID( id )
+	  if idPos then 
+            local JobAvailable = setContent( id )
+	  	            if JobAvailable then print ("Set next Job to "..id.." turtle.")
+	  	             	     fLib['ReplaceLongLineValue']( pathDATA, idPos ,JobAvailable)
+	  	            end 
+	  				return JobAvailable 
+	  else
+	  		       print (id.. " not found.")
+	  end 
+ return false 
+end
+
+
+
+
+
+
+
+--Costructor( "GenerateQuarry" )
+--setNew( 35 )
+
+
+
+
+
+
+
+
+
+
+
+----Utiltity-------------------------------------------------------------------------
+
+function isContent(  )
+	return fLib.isContent( pathDATA )
+end
+
+function DeleteLine( ln )
+	fLib.DeleteLongLines( pathDATA , ln )
+end
+
+function SpamLine( ln ,text)
+	fLib.ReplaceLongLineValue( pathDATA, ln ,{tostring(text)})
+end
+
+function Delete(  )
+	fLib.DeleteContent(pathDATA)
+end
+
+os.unloadAPI("config".."/source/FileLibrary/fLib")
+
+
+function changeCoord( xPos,yPos,zPos,fPos )
+	ConfigProgram.SET.xPos(xPos)
+	ConfigProgram.SET.yPos(yPos)
+	ConfigProgram.SET.zPos(zPos)
+	ConfigProgram.SET.fPos(fPos)
+
+end
+
+function changeJobLocation( xStartJob,zStartJob,xEndJob,zEndJob,yProgress )
+	ConfigProgram.SET.xStartJob(xStartJob)
+	ConfigProgram.SET.zStartJob(zStartJob)
+	ConfigProgram.SET.xEndJob(xEndJob)
+	ConfigProgram.SET.zEndJob(zEndJob)
+	ConfigProgram.SET.yProgress(yProgress)
+
+end

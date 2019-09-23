@@ -1,0 +1,35 @@
+local moveDown = 0
+print ("Moving down")
+
+ function inspectDown(block)
+  succ ,tb = turtle.inspectDown()
+  return tb.name == block
+ end
+
+ local name = "minecraft:bedrock"
+
+while not inspectDown(name) do 
+ turtle.digDown()
+   if turtle.down() then  
+   for x= 1,4 do
+     turtle.dig()
+     turtle.turnLeft()
+   end
+ moveDown = moveDown + 1
+    else 
+    sleep(1)
+  end 
+end
+print ("Back to up")
+local height = moveDown
+
+while turtle.getFuelLevel() > 0 
+and moveDown > 0  do 
+ if turtle.up() then 
+   moveDown = moveDown - 1
+   else
+   print ("Some one standing on me!")
+   sleep(3)
+ end
+end
+print ("Well was successfuly "..height.." digget")

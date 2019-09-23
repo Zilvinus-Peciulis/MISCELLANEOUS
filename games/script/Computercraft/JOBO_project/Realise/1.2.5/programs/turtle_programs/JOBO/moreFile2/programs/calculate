@@ -1,0 +1,229 @@
+--  Works on turtle only
+os.loadAPI("OS")
+local FileName = "calculate"
+OS.loadAPI("/moreFile/programs/config/HomeCoord/HomeCoordProgram",FileName)
+OS.loadAPI("/moreFile/GPS/source/gps_Program",FileName)
+OS.loadAPI("/moreFile/programs/config/configProgramT",FileName)
+OS.loadAPI("/moreFile2/programs/refuel",FileName)
+OS.loadAPI("/moreFile2/mining/quarry",FileName)
+OS.loadAPI("/moreFile/programs/say",FileName)
+
+local xSize ,zSize = term.getSize()
+
+
+-- always same 
+local xHome = HomeCoordProgram.GET["xHome"] ()
+local fHome = HomeCoordProgram.GET["fHome"] ()
+local yHome = HomeCoordProgram.GET["yHome"] ()
+local zHome = HomeCoordProgram.GET["zHome"] ()
+
+
+
+
+function inHomeLocation(  ) -- cheking where are home location or false
+	
+ if xHome ==  gps_Program.GET["xLocation"] () and 
+ 	zHome == gps_Program.GET["zLocation"] () then return true end
+  return false
+end
+
+-- Rule.1 From Home
+-- Rule.2 To Home
+
+--- Fix Coords
+--fix Home to xTravel  while going From Home 
+function crossTravelFrom(orientation, xDis , zDis   ) -- desid where to move to look good. DONT DERP METHOD
+assert ( orientation == "SOUTH" or orientation == "WEST" or orientation == "NORTH" or orientation == "EAST", "crossTravel:Requare,SOUTH,WEST,NORTH,EAST." )	
+assert (type (xDis)== "number", "xDis requare number")	
+assert (type (zDis)== "number", "zDis requare number")	
+	-- - 48
+	-- - -185
+	local xLoc =  gps_Program.GET["xLocation"] () 
+	local zLoc =  gps_Program.GET["zLocation"] ()
+	local xCor;
+	local zCor;
+
+	if orientation == "WEST" or orientation == "EAST" then 
+			xCor = xDis;
+			zCor = zLoc;
+	else 
+			xCor = xLoc;
+			zCor = zDis;
+
+	end 	
+return xCor , zCor
+end
+
+--fix xTravel when going home 
+-- orentate to more friendly traveling to xDistination
+function crossTravelTo(orientation, xDis , zDis   ) -- desid where to move to look good. DONT DERP METHOD
+assert ( orientation == "SOUTH" or orientation == "WEST" or orientation == "NORTH" or orientation == "EAST", "crossTravel:Requare,SOUTH,WEST,NORTH,EAST." )	
+assert (type (xDis)== "number", "xDis requare number")	
+assert (type (zDis)== "number", "zDis requare number")	
+	-- - 48
+	-- - -185
+	local xLoc =  gps_Program.GET["xLocation"] () 
+	local zLoc =  gps_Program.GET["zLocation"] ()
+	local xCor;
+	local zCor;
+
+	if orientation == "WEST" or orientation == "EAST" then 
+			xCor = xLoc;
+			zCor = zDis;
+	else 
+			xCor = xDis;
+			zCor = zLoc;
+
+	end 	
+return xCor , zCor
+end
+
+---
+
+
+-- Calcule home much path will face in x job.
+function TravelTotalBlocks( )
+
+local xJob = configProgramT.GET["xJob"]()
+local yJob = configProgramT.GET["yProgress"]()
+local zJob = configProgramT.GET["zJob"]()
+
+local upDownTravel = (2 + 1) * 2 
+assert (xJob and yJob and zJob , "TravelTotalBlocks: requare xJob , yJob , zJob got:"..tostring("x:",xJob," y:",yJob," z:",zJob))	
+
+ local total = (   math.abs(xHome - xJob)  + math.abs(yHome - yJob) + math.abs(zHome - zJob) ) *2 + upDownTravel
+return total 
+ end
+
+ function TravelTotal(xTarget,yTarget,zTarget )
+assert(type(xTarget)== "number" or type(yTarget)== "number" or type(zTarget)== "number", "TravelTotal expected xTarget,yTarget,zTarget numbers got x "..tostring(xTarget).." y "..tostring(yTarget).." z "..tostring(zTarget))
+local xJob = xTarget
+local yJob = yTarget
+local zJob = zTarget
+
+assert (xJob and yJob and zJob , "TravelTotalBlocks: requare xJob , yJob , zJob got:"..tostring("x:",xJob," y:",yJob," z:",zJob))	
+ local total = (   math.abs(xHome - xJob)  + math.abs(yHome - yJob) + math.abs(zHome - zJob) ) *2 
+ -- print ("Total Calcule: ",total)
+ 
+return total  -- go to, back from 
+ end
+
+function TravelFuelJob(  )
+	return TravelTotalBlocks(  ) - (turtle.getFuelLevel() + refuel.fuelTotal(  ))
+end
+
+--alway return true when fuel is above the margin
+ function fuelInvCompare( value )
+ 	assert (type(value)== "number", "fuelCompare expected number got "..tostring(value))
+	local sub = value < ( refuel.fuelTotal(  ))
+	 say.special ("fuelCompare: "..tostring(sub)..", ".. value .." value < ".. refuel.fuelTotal(  ))
+	 return sub
+ end
+--check if traveled in same x z spot 
+function isTravelTo( xTarget,yTarget,zTarget )
+assert(type(xTarget)== "number"  and type(yTarget)== "number" and type(zTarget)== "number", "isTravelTo expected xTarget,yTarget,zTarget numbers got x "..tostring(xTarget).." y "..tostring(yTarget).." z "..tostring(zTarget))
+	if xTarget == gps_Program.GET["xLocation"] () and yTarget == gps_Program.GET["yLocation"] ()  and zTarget == gps_Program.GET["zLocation"] () then 
+		say.success ("isTravelTo coordinates is equal !")
+		return true 
+	end 
+		say.alert("isTravelTo x "..xTarget.." == "..gps_Program.GET["xLocation"] ().." y "..yTarget.." == "..gps_Program.GET["yLocation"] ()..",z "..zTarget.." == "..gps_Program.GET["zLocation"] () )
+	return false
+end
+
+function FuelTotal(  )
+	return refuel.fuelTotal(  ) + turtle.getFuelLevel()
+end
+
+
+
+-- Mining
+ function quarryTotal(  )
+ 	local yProgressEnd = defaultProgramT.GET["yProgressEnd"]()
+ 	local oneIfLayer = 1
+	local quarrySize = quarry.getSquare(  )
+ 	local EscapeQuarry = quarrySize + quarrySize
+    local  yPrg = configProgramT.GET["yProgress"]() or 0
+ 	local heightLeft = math.ceil  ( (yPrg - yProgressEnd ) /2 ) + oneIfLayer
+ 	local asnwer = heightLeft*(quarrySize*quarrySize)+ EscapeQuarry
+ 	local extra = 80
+ 
+ 	return  asnwer + extra
+ end
+
+
+ function quarryAndTravelTotal(  )
+ 	 local quarrySQ = calculate.quarryTotal(  )
+	 return (calculate.TravelTotalBlocks(  ) + quarrySQ)
+ end
+
+
+-- warning fueling 
+function RequareFuelComeBackHome(  )
+	local x = math.abs (gps_Program.GET["xLocation"] () - xHome )
+	local y = math.abs (gps_Program.GET["yLocation"] () - yHome)
+	local z = math.abs (gps_Program.GET["zLocation"] () - zHome)
+	return (x+z+y)
+end
+
+function fuelEnauthBack(  )
+
+	local coord = RequareFuelComeBackHome(  ) < FuelTotal(  )
+	 if not coord then 
+	 say.alert ( "Fuel enouth come back home: "..tostring (coord).."!")
+	 say.warning ("Requare fuel to back x:"..xHome..",y:"..yHome..",z:"..zHome)
+	 say.warning ("All equal: "..(xHome+yHome+zHome).." are "..FuelTotal(  ).." fuel!")
+	 say.warning (string.rep(" ",xSize))
+	 end 
+	return coord
+end
+
+function JobProcent(  )
+	local bedrock = 5
+	local yProgressEnd = defaultProgramT.GET["yProgressEnd"]()
+	local height =   configProgramT.GET["yProgress"]()  
+	local yJobHeight	= configProgramT.GET["yJob"]()
+	local sum = (yJobHeight-yProgressEnd) - (height-yProgressEnd)
+	local procent = math.floor ((sum/(yJobHeight-yProgressEnd) ) *100 )
+	if procent > 100 then procent = 100 end 
+	 return procent
+end
+
+function locateInQuarry(  ) -- tell about is in quarry or not 
+	local qSize = quarry.getSquare(  )
+	local xLoc = gps_Program.GET["xLocation"] ()
+	local yLoc = gps_Program.GET["yLocation"] ()
+	local zLoc = gps_Program.GET["zLocation"] ()
+	local xMin = configProgramT.GET["xJob"]()
+	local yJob = configProgramT.GET["yJob"]()
+	local zMin = configProgramT.GET["zJob"]()
+	local xGo,xGo2 = orientation.Front( fHome,qSize-1 ) -- overlap of quarry by one !
+	local zGo,zGo2 = orientation.Left( fHome,qSize-1 )
+	local xMax =  xMin + (xGo+xGo2)
+	local zMax = zMin + (zGo+zGo2)
+	-- say.warning ("xMin "..xMin.." xMax "..xMax.." zMin "..zMin.." zMax "..zMax)
+	-- say.danger ("Front "..xGo+xGo2.." Left "..zGo+zGo2.." fHome "..fHome)
+	-- say.super ("xLoc "..xLoc.." zLoc "..zLoc)
+	-- -- print ("xMin >= xLoc",xMin >= xLoc)
+	-- print ("xMax <= xLoc ",xMax <= xLoc )
+	-- print ("zMin <= zLoc",zMin <= zLoc)
+	-- print ("zLoc >= zMax",zLoc >= zMax)
+	-- print ("zLoc >= zMax",zMax >= zLoc)
+	--SOUTH
+	if  xMax >= xLoc and xMin <= xLoc and zMax >= zLoc and zMin <= zLoc and yJob>= yLoc then  --and yJob>=yLoc
+		say.writeDanger "SOUTH:"
+		return true 
+	elseif xMax >= xLoc and xMin <= xLoc and zMin>=zLoc and zMax<=zLoc and yJob>= yLoc then  
+		say.writeDanger "EAST:"
+		return true 
+	elseif xMin >= xLoc and xMax <= xLoc and zMin >= zLoc and zMax <= zLoc and yJob>= yLoc then  	
+		say.writeDanger "NORTH:"
+		return true 
+	elseif xMin >= xLoc and xMax <= xLoc and zMin <= zLoc and zMax >= zLoc and yJob>= yLoc then 
+		say.writeDanger "WEST:"
+		return true 
+	else 
+		-- say.warning "I em not in job location!"
+	end 	
+	return false
+	-- body
+end

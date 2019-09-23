@@ -1,0 +1,396 @@
+local perfectCLearLine = function (getY)
+local x,y=term.getSize()
+  term.setCursorPos(1, getY or term.getCursorPos())
+  print (string.rep(" " , x-1 , x) ) -- in this way folow clearing with empty string 
+-- print(x)
+end
+--perfectCLearLine()
+--[[EFFECTS]]
+text = function (x,y ,txt,color)  
+   if term.isColor() and color ~= nil  then 
+--Set text color!
+       term.setTextColor(color)   
+    end 
+           term.setCursorPos(x,y)
+            print(txt) 
+ end
+
+local effect1 = function (x,y ,txt ,color,blinkNewColorVal)
+    --jei turtle nera spalvotas tai '=>'
+     
+      local blinkNewColorVal = tonumber(blinkNewColorVal)
+         perfectCLearLine(y)
+        --blink text for fun ^_^
+        --if statment for not beaing crahed
+        if color >= (blinkNewColorVal)and term.isColor() then 
+        text(x , y , txt, color-blinkNewColorVal)  
+           else 
+           text(x, y , txt , color+blinkNewColorVal)
+           end
+            
+
+            sleep(0.2)
+            if not term.isColor() then txt=txt.." <--" end ; 
+            text ( x , y , txt , color)
+            sleep(0.2) 
+                
+      end
+
+--print 'mammbo'
+--for x = 1 , 10 do
+--effect1 (8 , 9 ,"Helo", colors.blue , 554) 
+
+--end
+
+
+
+
+
+--[[CUT NAMES]]
+
+function SortNames( Array ) -- sort names to readable in table
+   assert(type(Array)=="table", "SortName:\nRequare table")
+   local s;
+   local tb = {}
+   for _ , name in pairs(Array) do
+       if type(name) == "string" and string.find(name,":") then  
+          s = string.sub(name ,  string.find(name,":")+1, string.len(name)  )
+          table.insert(tb , s)
+       end
+   end
+ return tb
+--requestAPI.SortNames( {"minecraft:coal","minecraft:planks"})
+end
+
+
+function SortString( Array ) -- Sort tbName in string
+   local tb = SortNames( Array );
+   local s="";
+          for index, name in pairs(tb) do
+              if #tb == index then s=s..name..'.'
+              else s=s..name..","
+              end               
+          end
+     return s
+--requestAPI.SortString( {"minecraft:coal","minecraft:planks"})
+end
+
+
+
+--[[REQUEST ITEMS FROM USERT]]
+
+
+function loopItem  (value, slot,y, txt ,minecraftData,color,blink,flag) 
+       local a = txt    
+           turtle.select(slot) 
+     local cnt = turtle.getItemCount(slot)
+      --create log registry for looking 
+        effect1(1 , y, txt , color , blink)
+      while cnt < value  or not isListedRequest(getDataName() , minecraftData )  do 
+cnt = turtle.getItemCount(slot)	      
+--chesk if not correct item then say ???
+		
+	--Bad positioning couse failing clearLine functionality	
+	--Flag are use when no specific item needed
+	if not isListedRequest(getDataName() , minecraftData )and flag==true and cnt>0 then txt = a.." ???" end
+	if cnt==0 then txt = a end --wipe little bit then nothing in slot
+	-- Then get correct item return correct text leyout	
+	if  isListedRequest(getDataName() , minecraftData ) then txt = a  end       
+-- exit from loop if when get correct value and is  not specific item
+	if cnt >= value and flag==false then break end   
+      effect1(1 , y, txt , color , blink)          
+  end   
+--exsample: requestAPI.loopItem (1 , 1 ,1, "1. 1-ComputerCraft:disk" ,{"ComputerCraft:diskExpanded","ComputerCraft:disk"},colors.brown ,10000,true)
+end
+
+--ask user for item in all 1024 count 
+-- Advanced request multyple types - NAME == say what name need 
+function requestByCountFrom( slot,text, Array )-- reqest items by multyple type for 
+     assert(type(slot)=="number", "requestByCountFrom:\n Requare slot.")
+     assert(type(text)=="string", "requestByCountFrom:Requare text.")
+     assert(type(Array)=="table","requestByCountFrom:\nRequare table {,value=}." )
+     assert(type(Array.value)=="number" ,"requestByCountInSlot:Requare value.")
+     local  istype = checkAll({Array})
+     local  a;
+     local slot = slot>16 and 16 or slot 
+     if not istype then -- void, okey billy i know you like coal but i don't have eny fuel now, so I ask you to give me for sum fuel please.
+       while true  do    
+          local Max_c = ( Array.value - CountThis(Array) ) >0 and Array.value - CountThis(Array) or 0
+                if Max_c <= 0 then break end 
+                term.clear()
+                term.setCursorPos(1,1)
+         local x64 = Max_c>64 and 64 or Max_c
+               loopItem (x64 , slot ,1, "1."..x64.." "..((text=="NAME") and  SortString( Array ) or text or "No text") ,Array ,colors.brown ,math.random(10000),true)
+               sortSlotsFromThis  ( slot, Array )              
+               sleep(1)
+       end 
+     end        
+--requestAPI.requestByCountFrom( 3,"NAME", {"minecraft:coal",value=5} ) -- "NAME" then return by name
+end
+
+-- force ask user for item in one slot
+function requestInSlot( slot,text, Array  ) --ask uneque in specific slot values
+   print(Count( slot , Array ))
+     assert(type(slot)=="number", "requestByCountFrom:\n Requare slot.")
+     assert(type(text)=="string", "requestByCountFrom:Requare text.")
+     assert(type(Array)=="table","requestByCountFrom:\nRequare table {,value=}." )
+     assert(type(Array.value)=="number" ,"requestByCountInSlot:Requare value.")
+     local  istype = isListedRequest(getDataName  (slot) , Array )
+     
+     if not istype then -- void, okey billy i know you like coal but i don't have eny fuel now, so I ask you to give me for sum fuel please.
+      
+   
+          local Max_c = ( Array.value - Count( slot , Array ) ) >0 and Array.value - Count( slot , Array ) or 0 
+                term.clear()
+                term.setCursorPos(1,1)
+         local x64 = Max_c>64 and 64 or Max_c
+               loopItem (x64 , slot ,1, "1."..x64.." "..((text=="NAME") and  SortString( Array ) or text or "No text") ,Array ,colors.brown ,math.random(10000),true)
+               --sortSlotsFromThis  ( slot, Array )              
+ sleep(1)
+     end        
+end
+--REQUEST end 
+-----------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+--[[CHECK VALUES FROM INVETORY]]
+
+function getDataName  (slot)
+local data = "ErrorData"
+if  turtle.getItemCount(slot or nil) > 0 then 
+  t = turtle.getItemDetail(slot or nil) 
+   data = t.name
+   end
+  return data
+end
+
+
+
+ function isListedRequest(compare , arg ) -- check name if true in all invetory
+  assert(type(compare)=="string", "isListedRequest: compare item.")
+  assert (type(arg)=="table", "isListedRequest:Requare table.")
+   for i , sItem in pairs (arg) do 
+         if sItem == compare then 
+          return sItem 
+         end 
+   end
+   return false
+end
+
+function isListedRequestSlot(slot , arg ) -- check name if true in all invetory
+  assert(type(slot)=="number", "isListedRequest: requare slot.")
+  assert (type(arg)=="table", "isListedRequest:Requare table.")
+   for i , sItem in pairs (arg) do 
+         if sItem == getDataName(slot)  then 
+          return sItem 
+         end 
+   end
+   return false
+end
+
+function isListedRequestSlotValue(slot , arg, value ) -- check name if true in all invetory
+  assert(type(slot)=="number", "isListedRequestSlotValue: expected slot number  got"..tostring (type (slot)))
+  assert (type(arg)=="table", "isListedRequestSlotValue: expected arg table  got"..tostring (type (arg)))
+  assert (type(value)=="number", "isListedRequestSlotValue: expected value number  got"..tostring (type (value)))
+   for i , sItem in pairs (arg) do 
+    -- print ( turtle.getItemCount(slot) >= value )
+    -- sleep(5)
+         if sItem == getDataName(slot) and turtle.getItemCount(slot) >= value   then 
+          return sItem 
+         end 
+   end
+   return false
+end
+
+
+function Count( slot , Array )
+  assert(type(Array) =="table", "Count:Requare table {\"minecraft:coal\"}")
+  if requestAPI.isListedRequest( requestAPI.getDataName (slot), Array) then 
+           return turtle.getItemCount(slot) 
+      end 
+ return 0 
+end
+
+function CountThis(Array) -- count in all invetory 
+  assert(type(Array) =="table", "CountThis:Requare table {\"minecraft:coal\"}")
+  local c = 0
+    for slot = 1,fSlot or 16 do   
+      if requestAPI.isListedRequest( requestAPI.getDataName (slot), Array) then 
+           c =turtle.getItemCount(slot) + c
+      end 
+    end
+ return c
+end 
+
+function checkAll( arg )
+local is;
+local value;
+        
+        --print(arg[1].value)
+        assert (type(arg)== "table", "checkAll:Requare a table { }.")
+        assert (type(arg[1])=="table", "checkAll:Requare a table2 {{ }}.")
+        assert(type(arg[1][1])=="string","checkAll:Requare {{\"minecraft:\",...; value=_}}.")
+        assert(type(arg[1].value)=="number" , "checkAll:Requare item value=_ to procceed in table.")
+    for i, sItem in pairs (arg) do
+       assert(type(sItem.value)=="number" , "checkAll:Requare item value=_ to procceed in table.")
+       is = false -- Reset in new cycle creating chain logic
+       value = 0; -- reset count   per cycle
+         for slt = 1 ,16 do 
+          local OnItem =  isListedRequest(getDataName (slt) , sItem ) -- look multyple items at once
+            if OnItem ~= false then -- if somthething found then 
+              --local slt = checkOne( OnItem )           print(OnItem and sItem.value == turtle.getItemCount(slt) )
+              --print(OnItem..slt.." ---- "..turtle.getItemCount(slt))
+                --print((turtle.getItemCount(slt) >= sItem.value) )
+                value = (turtle.getItemCount(slt) + value  ) -- count current item count 
+            end 
+        end   
+                is = (value >= sItem.value  ) -- return if value is correct 
+               -- print(tostring(is).." is ".." val "..value.." requare-> "..sItem.value)
+        if not  is  then  return false end -- if chain is to short break return 
+   end 
+    return true -- if chain was not interupted return true that is everything is correct
+
+--Exsample : requestAPI.checkAll( {{"ComputerCraft:diskExpanded","ComputerCraft:disk" ,value = 1}, {"minecraft:torch",value=128}} )
+--EXSAMPLE@   --requestAPI.checkAll({{"minecraft:coal","minecraft:planks","minecraft:charcoal",value=99}})
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--[[GIVE ITEMS TO Chest/Turtle]]
+
+function giveItemsFrom(side,value, arg  ) -- Give in turtle items by current value automaticly like fuel 
+  assert(type(side)=="string", "giveItemsFrom:\n Transfer items side To \"top\",\"bottom\",\"front\"")
+  assert(type(value)=="number" and value>0, "giveItemsFrom:\nRequare initial transfer value.")
+  assert(type(arg)=="table", "giveItemsFrom:\nRequare table {\"minecraft:coal\"}")
+  local Max_c =  value ;
+  local Cur_c = 0;
+  local answer;
+  local stack = 0
+  local side = side==(side=="front" and "") or (side=="top" and "Up")  or (side=="bottom" and "Down") or ""
+   for slot = 1 , 16 do 
+       if isListedRequest( getDataName (slot), arg)  then             
+            answer = (Max_c - Cur_c) > 0 and  Max_c - Cur_c or 0
+            stack = (answer>64) and turtle.getItemCount(slot) or answer      
+            turtle.select(slot)
+            Cur_c = turtle.getItemCount(slot) + Cur_c
+            turtle["drop"..side](stack )
+            if  Cur_c >= Max_c then break end 
+       end
+   end
+--requestAPI.giveItemsFrom("front", 10,  {"minecraft:coal","minecraft:planks"}  ) 
+end
+
+
+
+
+
+
+
+
+--[[SORT ITEMS IN INVENTORY]]
+-- Move around
+ function sortSlotsFromThis  ( slotfrm,Array )-- Sort item by type in iventory
+    assert(type(slotfrm) =="number", "sortSlotsFromThis:Requare parrent slot.")
+    assert(type(Array) =="table", "sortSlotsFromThis:Requare table {\"minecraft:coal\"}")
+    -- turtle.transferTo (1 , 64)
+     local fSlot = slotfrm or 16
+     turtle.select(fSlot)
+     local s = requestAPI.getDataName (fSlot)
+     -- print("Transfer--> "..string.sub(s,string.find(s,":")or #s+1,#s ) ) --string.find(nItem,":"),5
+     for slot = 1,15 do 
+          local value = turtle.getItemCount(fSlot)
+          if requestAPI.isListedRequest( requestAPI.getDataName (slot), Array) then 
+                     value = 64- turtle.getItemCount(slot) 
+                        --print(tostring(value).." COUNT "..slot)
+                     turtle.transferTo(slot, value)
+                    if turtle.getItemCount(fSlot) ==0 then break end 
+          end 
+----requestAPI.sortSlotsFromThis  ( 15, {"minecraft:coal","minecraft:planks"} )     
+     end
+     
+     for slot = 1,16 do 
+          if turtle.getItemCount(slot)==0  then 
+              turtle.transferTo(slot,64)
+               if turtle.getItemCount(fSlot) == 0 then break end 
+          end
+     end
+end
+
+
+--[Select items,item from inventory]
+--------------------------------------------------------------------------
+
+
+function selectThis( arg )
+  assert(type(arg)=="table", "selectThis:Requre items table.")
+    for slot = 1,16 do 
+       if isListedRequest(getDataName  (slot) , arg ) then 
+          -- turtle.select(slot)
+          return slot 
+       end  
+    end 
+ return false 
+end
+
+
+
+
+
+--Select slot end 
+--------------------------------------------------------------------------------------------
+--[Inspect block,blocks]
+
+function inspectSide( side )
+ local string = ""
+   if side == "front" then string = "inspect"
+   elseif side == "bottom" then string = "inspectDown"
+   elseif side == "top" then string = "inspectUp" 
+   else 
+   assert (false , "inspectSide:Requre side->front,top,bottom.") 
+   end  
+   local success, data =  turtle[string]()
+   return (data.name or false) 
+end
+
+function inspectThis(side, arg )
+   assert(type(side)=="string", "inspectThis:Requare side.")
+   assert(type(arg)=="table", "inspectThis:Requre items table.")
+    for item = 1 , #arg do 
+        if inspectSide( side ) == arg[item] then 
+            return true 
+        end   
+    end  
+    return false 
+end
+
+footer1 = function ()
+print"yes"
+end
+footer = function(txt,color,height , len)
+local leyout = txt 
+local len = len or 38 
+local height = height or 13
+
+if term.isColor() then term.setBackgroundColor(23) end
+effect1((len-#leyout)/2,height-1 ,leyout,color or 128,500)
+ if term.isColor() then term.setBackgroundColor(128) end	
+end
+
+

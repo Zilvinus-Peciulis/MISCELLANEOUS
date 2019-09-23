@@ -1,0 +1,51 @@
+local DefaultColor = colors.orange
+
+-- --white
+-- orange
+-- magenta
+-- lightBlue
+-- yellow
+-- lime
+-- pink
+-- gray
+-- lightGray
+-- cyan
+-- purple
+-- blue
+-- brown
+-- green
+-- red
+
+local function TheNewColor(text,newColor)
+assert (type(newColor) == "number", "TheNewColor expected number value got "..type(newColor))
+ if term.isColor() then 	
+  term.setTextColor(newColor)	
+	print (text)
+  term.setTextColor(DefaultColor)	
+  else 
+  print (text) 
+ end 	
+end 
+
+
+function alert( text )
+	 TheNewColor(text,colors.yellow)
+end
+
+function warning( text )
+ TheNewColor(text,colors.blue)
+end
+
+function danger( text )
+ TheNewColor(text,colors.red)
+end
+
+
+function success( text )
+ TheNewColor(text,colors.green)
+end
+
+function special( text )
+ TheNewColor(text,colors.cyan)
+end
+

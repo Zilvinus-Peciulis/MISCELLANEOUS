@@ -1,0 +1,19 @@
+
+refuelTo = function (slot ,refuVal , minfuel)
+local gotoSlot =	turtle.getSelectedSlot() 
+local fuelSlot = slot 
+local minfuel = minfuel 
+local refuVal = refuVal or 1
+
+if turtle.getFuelLevel()  <= minfuel then 
+turtle.select(fuelSlot)
+local flag , string = turtle.refuel(refuVal)
+    	 if flag then -- not select stupidly ;( 
+  		 turtle.select(gotoSlot)
+		 end
+return flag
+end
+end
+
+
+--number count 	turtle.getItemCount

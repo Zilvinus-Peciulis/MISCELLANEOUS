@@ -1,0 +1,53 @@
+os.loadAPI("config".."/source/FileLibrary/fLib")
+os.loadAPI("config".."/source/ConfigProgram")
+os.loadAPI("programs/orientation")
+
+
+
+
+local xPos = ConfigProgram.GET.xPos()
+local yPos = ConfigProgram.GET.yPos()
+local zPos = ConfigProgram.GET.zPos()
+local fPos = ConfigProgram.GET.fPos()
+
+
+-- print ("xPos "..xPos)
+-- print ("yPos "..yPos)
+-- print ("zPos "..zPos)
+-- print ("fPos "..fPos)
+----------------------------------------------------------------------------------------------------------------------
+
+-- print ( orientation.turnLeft( fPos+1 ))
+
+local maxTurtle = 2
+local gap = 2
+--fLib.AppendLoongLine( "config/DATA/GenerateHomeCoord/HomeCoordDATA" , {x=-55, y=yPos ,z=zPos ,f=fPos ,turtleID = 112, STATUS = false} )	
+local lookinBack = orientation.turnBack(orientation.turnLeft( fPos+1 ))
+
+-- Delete Content was before 
+    fLib.DeleteContent( "config/DATA/GenerateSupportCoord/SupportCoordDATA" )
+
+-- near us possible 
+	 local xNew, zNew = orientation.Left(fPos+1,gap-1  )
+
+	for Widht = 1 , maxTurtle do 
+	 -- Add line
+	 xPos = xNew + xPos
+	 zPos = zNew + zPos
+	 -- print("xNew: "..xPos)
+	 -- print("zNew: "..zPos)
+      fLib.AppendLoongLine( "config/DATA/GenerateSupportCoord/SupportCoordDATA" , {x=xPos, y=yPos ,z=zPos ,f=lookinBack ,ID = "..support..", STATUS = false} )		
+		-- print ("xNew: "..xNew)
+		-- print ("zNew: "..zNew)
+	 xNew, zNew = orientation.Left(fPos+1,gap  )
+	end
+
+
+--for x = 1,MaxColumns do 
+ --fLib.AppendLoongLine( "config/DATA/GenerateSupportCoord/HomeCoordDATA" , {x=math.random(1,1000),y=math.random(1,1000),z=math.random(1,1000),f=math.random(1,4),turtleID = math.random(1,1000), used = false} )	
+--end
+
+
+
+os.unloadAPI("config".."/source/FileLibrary/fLib")
+os.unloadAPI("config".."/ConfigProgram")

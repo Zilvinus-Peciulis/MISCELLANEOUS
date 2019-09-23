@@ -1,0 +1,1 @@
+Added single jobs complete managment system

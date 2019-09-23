@@ -1,0 +1,130 @@
+--print (shell.dir())
+os.loadAPI("/moreFile/programs/config/source/FileLibrary/fLib")
+--Turtle
+
+SET = {
+	POST  = function ( line , text )
+		assert(line, "Requare initial line")
+		assert(text~=nil, "Requare initial text")
+	    fLib.replaceLineValue( "/moreFile/programs/config/configT" , line ,text , ":" )
+	end;
+   
+   -- ManagerID = function (this)
+   --    assert (type(this)=="number" , "Requare initial number ManagerID got:"..tostring(this))
+	  -- SET.POST(1, this)
+   -- end;
+	
+	isBooted = function (this)
+      assert (type(this)=="boolean" , "Requare initial boolean isBooted got:"..tostring(this))
+	  SET.POST(1, this)
+   end;
+
+   -- TurtlesName = function (this)
+   --    assert (type(this)=="string" , "Requare initial string TurtlesName got:"..tostring(this))
+	  -- SET.POST(3, this)
+   -- end;
+
+---- Job ---------------------------------------
+   xJob = function (this)
+      assert (type(this)=="number" , "Requare initial number xJob got:"..tostring(this))
+	  SET.POST(2, this)
+   end;
+   yJob = function (this)
+      assert (type(this)=="number" , "Requare initial number yJob got:"..tostring(this))
+	  SET.POST(3, this)
+   end;
+   zJob = function (this)
+      assert (type(this)=="number" , "Requare initial boolean zJob got:"..tostring(this))
+	  SET.POST(4, this)
+   end;
+   fJob = function (this)
+      assert (type(this)=="string" , "Requare initial string fJob got:"..tostring(this))
+	  SET.POST(5, this)
+   end;
+   
+   JobComplete = function (this)
+      assert (type(this)=="boolean" , "Requare initial boolean JobComplete got:"..tostring(this))
+	  SET.POST(6, this)
+   end;
+
+   yProgress = function (this)
+      assert (type(this)=="number" , "Requare initial number yProgress. got:"..tostring(this))
+	  SET.POST(7, this)
+   end;
+
+  
+
+   Progress = function (this)
+      assert (type(this)=="boolean" , "Requare initial boolean Progress.")
+	  SET.POST(8, this)
+   end;
+
+    JobType = function (this)
+      assert (type(this)=="string" , "Requare initial string jobType got "..tostring(this))
+    SET.POST(9, this)
+   end;
+}
+
+
+GET ={
+	 GETPOST = function( line )
+	 	assert(type(line)=="number", "Requare initial line")	 	 
+	 	return fLib.getLineValue( "/moreFile/programs/config/configT" , line ,":")
+	 end; 
+
+	-- ManagerID = function ()
+	--   return  GET.GETPOST(1)
+ --    end;
+
+    isBooted = function ()
+	  return  GET.GETPOST(1)
+    end;
+     
+   --   TurtlesName = function ()
+	  -- return  GET.GETPOST(3)
+   --  end;
+  -------JOB-----------------------------------   
+    xJob = function ()
+	  return  GET.GETPOST(2)
+    end;
+    yJob = function ()
+	  return  GET.GETPOST(3)
+    end;
+    zJob = function ()
+	  return  GET.GETPOST(4)
+    end;
+    fJob = function ()
+	  return  GET.GETPOST(5)
+    end;
+     JobComplete = function ()
+	  return  GET.GETPOST(6)
+    end;
+    
+    yProgress = function ()
+	  return  GET.GETPOST(7)
+    end;
+
+    Progress = function ()
+	  return  GET.GETPOST(8)
+    end;
+     JobType = function ()
+    return  GET.GETPOST(9)
+    end;
+}
+
+os.unloadAPI("/moreFile/programs/config/source/FileLibrary/fLib")
+
+--[[
+SET.isDisk(false)
+SET.xPos(55)
+print(GET.xPos())
+
+	print(GET.isDisk())
+	print(GET.xPos())
+	print(GET.yPos())
+	print(GET.zPos())
+	print(GET.fPos())
+print ( type(GET.isDisk()))
+
+--os.unloadAPI(shell.dir().."/source/FileLibrary/fLib")
+]]

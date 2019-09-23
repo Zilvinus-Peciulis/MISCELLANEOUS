@@ -1,0 +1,84 @@
+os.loadAPI("config".."/source/FileLibrary/fLib")
+local pathDATA	 = "config/log"
+
+function addLog( id, tableLog )
+	local data = fLib.GetAllLongLines( pathDATA )
+	local lin = 0;
+	 if type(id) == "number" and type (tableLog) == "table" then 
+		for k,info in pairs(data) do
+			lin = lin + 1
+			if info.ID == id then
+			print"I got id"
+			tableLog.ID = id;
+			fLib.ReplaceLongLineValue( pathDATA, lin ,tableLog)
+			return tableLog 
+			end  
+	    end
+		tableLog.ID = id 
+		fLib.AppendLoongLine( pathDATA , tableLog )
+	 else print ("Number Id or tableLog not equal table")
+	 end 	
+  return false  		
+end
+
+function removeLog( id )
+	local data = fLib.GetAllLongLines( pathDATA )
+	local ln = 0;
+	for _,info in pairs(data) do
+			ln = ln +1 
+		if info.ID == id then
+			print ("I got "..info.ID.." remove")
+			 fLib.DeleteLongLine( pathDATA , ln )
+			 break
+		end 	
+	end
+end
+
+function readLog( id )
+	local data = fLib.GetAllLongLines( pathDATA )
+	local lin = 0;
+	 if type(id) == "number" then 
+		for k,info in pairs(data) do
+			lin = lin + 1
+			if info.ID == id then
+			print"I got id to read"
+			return info
+			end  
+	    end
+	 end    
+  return false  
+end
+
+
+function takeFirstLog(  )
+ if fLib.isContent( pathDATA ) then 
+ 	return fLib.TakeFirstLongLine( pathDATA )  
+  else 
+    print "Log is empty."
+    return false 
+ end    	
+end
+
+--  addLog( 144,{["fuel"] = 45} )
+
+
+function getMissigItemsID(  )
+local data = fLib.GetAllLongLines( pathDATA )
+local tb = {}
+local index = 0;
+	 for k,info in pairs(data) do
+	 	index = index + 1 
+	 		say.danger("okey need something: "..info.ID)
+	 		tb[index] = info.ID 
+	 end
+	 if #tb == 0 then return false else return tb end 
+end
+
+function countLogs(  )
+	 return fLib.Lenght( pathDATA )
+end
+function DeleteLog(  )
+	fLib.DeleteContent( pathDATA )
+end
+
+-- removeLog( 44 )

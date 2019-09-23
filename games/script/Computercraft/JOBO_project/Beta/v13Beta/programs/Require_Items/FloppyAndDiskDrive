@@ -1,0 +1,62 @@
+term.clear()
+term.setCursorPos(1,1)
+
+os.loadAPI("config/DATA/GenerateHomeCoord/HomeCoordProgram")
+os.loadAPI("/programs/Require_Items/source/requestAPI")
+--os.loadAPI("config/source/ConfigProgram")
+os.loadAPI("/programs/perip")
+
+
+local   function inspect(name )
+local lol,data = turtle.inspect() 
+      if  data.name == name then 
+          return true 
+      end 
+   return false
+end
+
+
+ local ITEMS = {
+ [1] ={ name={"Diks drive","ComputerCraft:CC-Peripheral", value = 1}, SLOT =1 , isValue = 1, this = true};
+ [2] ={ name={"Floppy disk","ComputerCraft:disk","ComputerCraft:diskExpanded", value = 1} ,SLOT =2 , isValue =1 , this = true};
+}
+
+local namesArray = {}
+for item = 1, #ITEMS do table.insert(namesArray , ITEMS[item].name) end -- Set names automaticly 
+
+  local a = requestAPI.isListedRequestSlot(1, ITEMS[1].name )-- requaest beatyfully
+  local b = requestAPI.isListedRequestSlot(2, ITEMS[2].name )
+
+-- or ConfigProgram.GET.SuperComputerID() ~= os.getComputerID()
+if not (a and b)   then -- not items in invetory then 
+repeat  --Elegant
+   for line = 1, #ITEMS do 
+    requestAPI.loopItem (ITEMS[line].isValue , ITEMS[line].SLOT ,line, "1. "..ITEMS[line].isValue.." "..ITEMS[line].name[1], ITEMS[line].name, colors.cyan ,math.random(1, 10000),ITEMS[line].this )
+   end
+  local a = requestAPI.isListedRequestSlot(1, ITEMS[1].name )-- requaest beatyfully
+  local b = requestAPI.isListedRequestSlot(2, ITEMS[2].name )
+  until  a and b 
+end 
+  
+  --Ask chests , check if was placed , void ask again in same spot
+  --Load peipheral api 
+
+----------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+  --print( requestAPI.checkOne("ComputerCraft:disk") )
+--local isAll= requestAPI.checkAll( {ITEMS[1].name, ITEMS[2].name} )
+--isAll = requestAPI.checkAll( { {"minecraft:torch" , value =128}}  ) return boolean
+--print(isAll and "Torch test is seccessfully done "..tostring(isAll) or "Torch is failed with count "..tostring(isAll))
+--print(isAll and "All items in place "..tostring(isAll) or "No items that needed "..tostring(isAll))
+ 
+os.unloadAPI("/programs/Require_Items/source/requestAPI")
+ os.unloadAPI("config/DATA/GenerateHomeCoord/HomeCoordProgram")
+ os.unloadAPI("/programs/Require_Items/source/requestAPI")
+ os.unloadAPI("/programs/perip")

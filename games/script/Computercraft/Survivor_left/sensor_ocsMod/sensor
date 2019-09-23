@@ -1,0 +1,35 @@
+os.loadAPI("apis/object")
+local sensor = object.getData ("sensor")
+if not sensor then print "Cannot find sensor" return  end
+local items = sensor.getTargets()
+if not items then print "Cannot find sensor card!" return false end 
+local detail = sensor.getTargetDetails()
+term.clear () term.setCursorPos(1,1)
+print ("items: ",items)
+print ("detail: ",detail)
+
+for i , v in pairs ( items ) do
+ print (i," |=| ",v)
+ if type(v) == "table" then 
+    for i2 ,v2 in pairs (v) do  
+      print (i2," = { ")
+      if type(v2) == "table" then 
+        for i3,v3 in pairs (v2) do 
+         print (i3.." = "..textutils.serialize(v3) )
+         read()
+        end  
+      else
+      print (i2,":/=/ ",textutils.serialize(v2))
+      read()
+     end 
+     print (" }")
+   end 
+ end
+ print ("------------------")
+sleep(0.3)
+read()
+
+end
+
+print ">complete"
+sleep(1.2)

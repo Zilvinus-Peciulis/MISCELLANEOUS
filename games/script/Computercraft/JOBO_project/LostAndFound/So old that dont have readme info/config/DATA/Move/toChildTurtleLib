@@ -1,0 +1,26 @@
+-- Update from Source API
+local function copy (fromPath, toPath)
+ if fs.exists(fromPath) then  	
+	if fs.exists(toPath) then 
+		--print ("From ["..fromPath.."]\nTo ["..toPath.."]")
+		fs.delete (toPath) --delete
+		fs.copy (fromPath,toPath)--create
+	else print ("To file ['"..toPath.."'] not exists.") 
+	end 
+ else print ("From file ['"..fromPath.."'] not exists.") 
+ end 
+end 	
+
+
+
+
+to = "/programs/turtle_programs/JOBO/moreFile/programs"
+
+ -- File managment Lib
+copy ("/config/source/FileLibrary/fLib",to.."/config/source/FileLibrary/fLib" )
+-- turtle Library
+copy ("/programs/turtleLib/",to.."/turtleLib" )
+-- Turtle check data from turtles
+copy ("programs/perip",to.."/perip" )
+--request Data/transfer
+copy("/programs/Require_Items/source/requestAPI", to.."/requestAPI")

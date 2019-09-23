@@ -1,0 +1,12 @@
+
+-- fLib.replaceLineValue( "/programs/turtle_programs/JOBO/moreFile/programs/config/configT" , 2 ,false , ":" ) -- set turtleStatus in config file false . enather way that woud be sematic error
+fLib.replaceLineValue( "/programs/turtle_programs/JOBO/moreFile/programs/config/configT" , 8 , ConfigProgram.GET.yJobEnd()  , ":" ) -- save in turtle config file  id  
+fLib.replaceLineValue( "/programs/turtle_programs/JOBO/moreFile/programs/config/HomeCoord/HomeCoord" , 8 , false  , ":" ) -- save in turtle config file  id  
+
+
+-- to default
+local default = "/programs/turtle_programs/JOBO/moreFile/programs/config/default"
+fLib.replaceLineValue( default , 1 ,(ConfigProgram.GET.TurtlesName() and "\""..ConfigProgram.GET.TurtlesName().."\"" ) or ConfigProgram.SET.TurtlesName("\"JOBO\"") or "\"JOBO\"" , ":" ) -- set turtleStatus in config file false . enather way that woud be sematic error
+fLib.replaceLineValue( default , 2 ,os.getComputerID() , ":" ) -- save in turtle config file  id  
+-- fLib.replaceLineValue( default , 3 ,ConfigProgram.GET.yJobEnd() , ":" ) -- save in turtle config file  id  
+

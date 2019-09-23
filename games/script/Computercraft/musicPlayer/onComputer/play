@@ -1,0 +1,163 @@
+--READ/Write ONLY
+local SIDE = "bottom"
+local newMusicTime = 1055;
+
+--READ ONLY
+local toggle1 = false;
+local globaT =0;
+local musicInstantly = true ;
+
+playList = {[1] = {name = "C418 - block", time = 251};
+            [2] = {name = "C418 - strad", time = 188};
+            [3] = {name = "C418 - stal" , time = 150};
+            [4] = {name = "C418 - mellohi", time = 96};
+            [5] = {name = "C418 - mall" , time = 197};
+            [6] = {name = "C418 - far"  , time = 174};
+            [7] = {name = "C418 - chirp", time = 185};
+            [8] = {name = "C418 - blocks", time = 345};
+            [9] = {name = "C418 - cat"  , time = 185};
+            [10]= {name = "C418 - 13"   , time = 178};
+            [11]= {name = "C418 - wait" , time = 228};
+            [12]= {name = "C418 - 11"   , time = 71};
+      
+    }
+    
+function getAudio()
+ local Music = disk.getAudioTitle(SIDE)
+-- print(Music)
+ for x=1,#playList do
+   
+    if Music == playList[x].name then
+--     print("Playing \""..playList[x].name.."\"")
+     local playMusic = playList[x].name
+     local playTime = playList[x].time
+      return playMusic , playTime             
+    end
+ end
+return false , false
+end
+
+
+--print (getAudio() )
+function audioPlay()
+ while true do  
+   rednet.open("top")
+sender , message ,_ =  rednet.receive()
+local playMusic , playTime = getAudio()   
+--  print "I receive request"
+  if message == "stop" then
+      rednet.send(sender , "Stop playing for you babe")
+      disk.stopAudio(SIDE)
+  globalT = 0;
+  elseif message == "play" then sleep(0.2) --for ping effet :D  
+      rednet.send(sender ,"Start playng for you babe")
+      disk.playAudio(SIDE)
+      globalT = playTime 
+  elseif message =="fast" then  sleep(0.2)              
+          rednet.send(sender,"I play this all the time")
+          musicInstantly = false;
+  elseif message == "slow" then  sleep(0.2)
+          rednet.send(sender , "Slow as fuck ")
+          musicInstantly = true 
+  elseif message =="status" then sleep(0.2) 
+  rednet.send(sender, "Fast playing is :"..tostring(not musicInstantly ))     
+  
+  end
+--   print ("Music is ".. tostring(musicInstatly) )
+ end
+sleep(1)--forall receives not get nasty music
+end
+function singlePrint(txt  , boolean)
+if toggle0 == true then 
+print(txt)
+end
+toggle0 = boolean
+end
+
+
+
+function run1()
+globalT = 0
+    while true do   
+        if  globalT ~= nil or globalT ~= false then 
+             if 0 < globalT then 
+                globalT = globalT - 1;
+                sleep(1)
+              else 
+               sleep(0.4)
+            end
+          else
+          sleep(0.4)
+        end
+--     print(globaL)
+     end     
+end
+
+function run2()
+
+ 
+--print(disk.hasAudio(SIDE) )
+--print(type ( disk.hasAudio(SIDE) ) )
+
+     while true do
+      sleep(0.1)
+      if disk.hasAudio(SIDE) or type( disk.hasAudio(SIDE) ) =="string" then
+       local music , time = getAudio() 
+       
+       if time ~= false  then
+           shell.run"clear"
+           globalT = time ;          
+           print("I have audio   "..music)
+           disk.playAudio(SIDE)
+               --imitating tmusic time     
+            while globalT ~= 0 do 
+                     if not disk.hasAudio(SIDE) then
+                         break 
+                     end
+               sleep(1) -- imitating music playing time
+            end
+                  print"Music is not playing eny more"
+          globalT = 0;
+         local counter = newMusicTime
+          print(musicInstatly) 
+            --Module Sleeper
+            while disk.hasAudio(SIDE)  and musicInstantly and 0<counter do  
+                 sleep(1) counter =counter - 1 
+              --   if musicInstatly == false then break end
+           -- print"YES"
+           end
+        end
+       else
+     globalT = 0; -- This guy shoud update if user break cycle
+--     print"No disk to play"
+        end
+
+
+  if not music then
+     shell.run"clear" 
+         if  disk.hasAudio(SIDE) then 
+          singlePrint("Unnown music disk \""..disk.getAudioTitle(SIDE).."\"" , false)
+         elseif not disk.hasAudio(SIDE) then 
+          singlePrint("I need music disk")
+         end
+    end
+singlePrint(" ",true) --update next time to say somethig nice :?
+   end
+end
+ 
+
+  function run3()
+      local xSize , ySize = term.getSize() 
+     while true do   
+      if globalT ~= 0 then
+        local string = ( "Time playing "..tostring(globalT) ) 
+        term.setCursorPos( (xSize - #string) , ySize-3)
+        term.clearLine()
+         term.write(string)
+      end
+    sleep(5)
+    end   
+  end
+
+parallel.waitForAll(run1 , run2, run3 , audioPlay )
+

@@ -1,0 +1,56 @@
+print "Run extra script "
+os.loadAPI("/moreFile/programs/config/configProgramT")
+
+local Name = configProgramT.GET.TurtlesName()   or configProgramT.SET.TurtlesName("\"JOBO\"") or "JOBO"
+function createLabel (labelArg ,boolAcceptName)
+ local id = os.getComputerID();
+ local getLb = os.getComputerLabel()
+ local label;
+ 
+ if labelArg and getLb ==nil or boolAcceptName ==true then 
+     label = labelArg.."["..id.."]"  
+     print ("Creating new label '"..label.."'")
+     sleep(0.7)
+     os.setComputerLabel(label)
+     print("Complete")     
+   elseif labelArg == nil and getLb == nil then
+     print("Creating default name...")
+     label=(Name.."["..id.."]")
+     os.setComputerLabel(label)
+     print"Done"
+   elseif labelArg == nil and getLb~=nil then      
+     label =getLb
+     print("This computer have label\n--> "..label..".")
+   else
+     print"No label created"
+             
+ end 
+ return label 
+end
+
+
+    createLabel();
+
+
+
+local modemSides = {"top","bottom","right","left","front","back"}
+local condition = false;
+for x = 1 ,#modemSides do
+local type = peripheral.getType( modemSides[x] )
+  
+  if type == "modem" then 
+      --local type =peripheral.getType("back")
+       rednet.open(modemSides[x])
+       --print("Modem in:"..modemSides[x]..".")
+       --condition = true
+       break
+  end
+end
+  
+ --if not condition then error"Eny modem not found" end
+ 
+
+
+
+
+os.unloadAPI("/config/configProgramT")

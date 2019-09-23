@@ -1,0 +1,53 @@
+termX , termY = term.getSize ()
+ 
+ 
+
+clear = function ()
+term.setBackgroundColor(colors.black)
+term.clear()
+term.setCursorPos(1,1)
+end
+
+drawText = function (x, y , text , color_txt , color_bg ) 
+term.setBackgroundColor(color_bg)
+term.setTextColor(color_txt)
+term.setCursorPos ( x , y ) 
+term.write(text)
+end
+
+drawLine = function (x, y ,height , lenght , size , color_bar)
+ for yPos = y, y+height  do 
+	term.setBackgroundColor(color_bar)
+	term.setCursorPos(x , yPos )
+	term.write(string.rep(" " , lenght + size-1 )) 	 
+ end 
+end
+--x position
+--y position
+--box  height
+--box lenght 
+--box size is dinamic for  chagnging lenght
+--minVal for progress %
+--maxVal for total Progres 'lenght'
+--color_bar for progress
+--color_bg for background
+--name fore like lava or water
+--		     x,y name   Heig   len  size  min   max
+--exsaple: drawLoadBox( 2, 2,"Key" ,  2,  termX ,3 , 83 ,100 , colors.purple , colors.gray)
+
+drawLoadBox = function(x , y ,name, height , legth , size , minVal ,maxVal, color_bar, color_bg ) 
+	drawLine(x, y , height , legth , size, color_bg)
+	local barSize = math.floor((minVal/maxVal*termX)) -- looks like procentage
+	drawLine(x, y , height , barSize , size, color_bar)
+  	local text = name.." "..math.floor(minVal/maxVal*100).."%"
+	if barSize+4 > termX/2+#text/2 then 	
+	drawText (termX/2-#text/2 , y+height/2   ,text , colors.black, color_bar)
+	elseif barSize >= #text+1 then  		 
+	drawText( (x + barSize+2)-#text ,y+height/2 ,text , colors.black, color_bar)   	
+	else 
+	drawText( termX/2-#text/2+2 ,y+height/2 ,text , colors.black, color_bg) 
+	end 
+end
+
+--drawLoadBox( 2, 2,"Me Alone" ,  2,  38 ,3 , 83 ,100 , colors.red , colors.blue)
+

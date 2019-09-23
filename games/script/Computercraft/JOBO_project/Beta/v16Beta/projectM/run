@@ -1,0 +1,138 @@
+--Super Computer index
+local xTerm, yTerm = term.getSize()
+----BOOT.-------------------------------------------
+rednet.open ("right")
+shell.run("/programs/BOOT/BOOT_DEFOULT_TURTLE_COORD")
+
+os.loadAPI("/programs/BOOT/BOOT_TURTLE")
+
+--end--------------------------------------------------------------------- 
+
+--..Load.file.that.need.API.................................................................
+os.loadAPI("/programs/turtle_programs/JOBO/moreFile/GPS/refuelLib")
+os.loadAPI("config/DATA/GenerateJobCoord/JobCoordProgram")
+os.loadAPI("config/source/StatisticsProgram")
+os.loadAPI("/programs/Require_Items/source/requestAPI")
+os.loadAPI("config/DATA/GenerateHomeCoord/HomeCoordProgram")
+os.loadAPI("/config/source/ConfigProgram")
+os.loadAPI("/programs/turtleLib")
+os.loadAPI("/programs/comunicate")
+os.loadAPI("projectM/uttility")
+os.loadAPI("projectM/job")
+os.loadAPI("/programs/say")
+os.loadAPI("/config/source/LogProgram")
+
+
+--Junk API
+os.loadAPI ("/programs/GUI/Background/Animations/MatrixAnimation/MatrixProgram")
+-- Defolts
+if uttility.TurtlesUpdateDisk(  ) then -- place disk drive   
+    uttility.TurtlesKickStart( )
+end 
+--end..........................................................................
+-- Free space to create magic
+--Generator name
+local getGeneratorType = ConfigProgram.GET.GenerateJob()
+
+------ MANAGER 
+--StatisticsProgram.Costructor( "GenerateQuarry" )
+
+local tHistory = {"update","job","newJob","fun","place","coordinates","generate","wipeMemory","disk","disassemble","MissingItem","connect","sendNewJob"}
+function spitText(  )
+   local text = "" 
+    for k,v in pairs(tHistory) do
+       if k == 1 then 
+       text = text.." "..v
+       else 
+       text = text..", "..v
+       end 
+    end
+say.success (text)
+end
+
+while true do 
+term.setTextColor(colors.orange)
+shell.run("clear")
+spitText(  )
+command = read(nil, tHistory)
+
+  
+  if command== "place" then
+        uttility.TurtlesKickStart( )
+     if  job.countleftJob(  ) then  else print ">>>No More Job left.<<< "; end 
+     uttility.WaitEnter()
+    elseif command == "coordinates" then 
+      uttility.getCoord(  )
+      uttility.WaitEnter()
+    elseif command == "job" then 
+      while true do 
+        local about = job.sendNewJob(  )
+          say.alert ("About: "..tostring (about))
+          if about then say.success("Job complete+++++++++++") uttility.WaitEnter() break 
+          end 
+              job.sendSupport(  )  sleep(5)
+               uttility.TurtlesKickStart( )
+      end 
+    elseif command == "newJob" then
+      uttility.changeJobLocation(  )
+      StatisticsProgram.setAllfTime( true ) -- point to reset turtle memory 
+      sleep(.5)
+        job.JobGenerator(  )
+      uttility.WaitEnter()
+    elseif command == "MissingItem" then 
+     -- l=   LogProgram.takeFirstLog(  )
+    job.sendSupport(  )
+
+        uttility.WaitEnter()
+    elseif command == "generate" then
+          StatisticsProgram.setAllfTime( true ) -- point to reset turtle memory 
+         job.JobGenerator(  )
+        uttility.WaitEnter()
+    elseif command == "wipeMemory" then 
+        job.wipeMemory()
+        uttility.WaitEnter()
+    elseif command == "disk" then
+    BOOT_TURTLE.UpdateDisk () 
+    StatisticsProgram.Costructor( getGeneratorType )  -- GenerateQuarry -- get generator name from config
+         uttility.WaitEnter()
+   
+    elseif command == "disassemble" then
+           job.disassemble(  )
+            uttility.WaitEnter()
+
+    elseif command == "connect" then 
+                comunicate.sendConnected(  )   
+               uttility.WaitEnter()
+    elseif command =="sendNewJob" then
+    uttility.TurtlesKickStart( )
+    job.sendNewJob(  )
+    uttility.WaitEnter()
+    elseif command == "update" then 
+        job.disassemble()
+         uttility.TurtlesUpdateDisk( true )
+         shell.run("go","fd")
+         turtle.dig()
+         shell.run("go","bk")
+         uttility.TurtlesKickStart( )
+         -- uttility.WaitEnter()
+
+    elseif command=="fun" then 
+       while true do  
+   if  not StatisticsProgram.countleftJob(  ) then 
+        shell.run"clear"
+        job.JobGenerator(  )
+        print"Generateing"
+         
+         sleep(20)
+    end
+       
+    job.sendNewJob(  )
+  while not job.sendSupport(  ) do sleep(5) end 
+    sleep(20)
+    uttility.TurtlesKickStart( )
+    sleep(15)
+
+        end
+    end
+       
+end 

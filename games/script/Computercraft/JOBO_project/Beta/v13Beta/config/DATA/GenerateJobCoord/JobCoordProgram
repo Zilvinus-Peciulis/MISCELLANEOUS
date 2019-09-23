@@ -1,0 +1,156 @@
+os.loadAPI("config".."/source/FileLibrary/fLib")
+os.loadAPI("config/source/ConfigProgram")
+os.loadAPI("/config/DATA/GenerateJobCoord/GeneratorsPath")
+
+--where pat is stored 
+--)))))))))))))))))))))Data)))Values))))))))))))))))))))))))))))))))))))))))))))))))))))))))
+local pathDATA = "config/DATA/GenerateJobCoord/JobCoordDATA" ;
+--)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
+
+local pathGenerator = pathGenerateQuarry
+
+
+
+local function AlgoritmExists( GeneratorName ) -- chesk if exist Generator 
+   assert(GeneratorName,"AlgoritmExists:Requare Generator Name")
+   for name,path in pairs(GeneratorsPath.JobGenerators) do
+       if GeneratorName == name then 
+             return  path
+       end  
+   end
+return  false
+end
+
+ 
+
+
+
+local function toStringGeneratorsNames( )
+       local text = ""
+          for name,_ in pairs(GeneratorsPath.JobGenerators) do
+            text = text.." ".. name..","
+          end
+     return text 
+end 
+
+
+
+function isCorrectName( namePoint )
+    local Succses = toStringGeneratorsNames( )
+    for name,path in pairs(GeneratorsPath.JobGenerators) do
+         if namePoint == name then 
+            return true, true 
+         end 
+    end
+ return false , Succses
+end
+
+
+
+---------CONSTRUCTOR------CONSTRUCTOR------CONSTRUCTOR--------CONSTRUCTOR---------CONSTRUCTOR-------------------------------------------
+
+function ConstructorGenerators( GeneratorName ) --Constructor pouint to where it its argoritm if does 
+    assert (type(GeneratorName)=="string", "ConstructorGenerators:need generator string name\nExists:["..toStringGeneratorsNames( ).."] got:"..tostring(GeneratorName))
+  -- Return path where live Generator by name  
+  local PathGenerator = AlgoritmExists( GeneratorName )
+  -- afher that exstract from Generator path the name of API like "GenerateQuarry" from  "config/DATA/GenerateJobCoord/GenerateQuarry/GenerateQuarry"
+     if PathGenerator then  -- if name Found the fire 
+          if fs.exists(PathGenerator)then  
+                   --
+                    term.setTextColor(colors.orange)
+                    -- Load api from table path 
+                    os.loadAPI( PathGenerator)
+                    print ("Generating Jobs:"..GeneratorName..",coords.")
+                      -- Return Succses if was succesfuly Created Coords
+                      local success = Locations.Generate(  ) -- Name always soud Location.Generate
+                       local Jobs   = fLib.Lenght (pathDATA)
+                    os.unloadAPI( PathGenerator )
+                    term.setTextColor(colors.orange)
+               	    print (success and ("Complete generating "..Jobs.." Job Locations .") or "Generation Goes Wrong... :(")
+                    
+            --Set True was seccsesfuly found and louched constructor 
+                    return success 
+          else 
+             error ("ConstructorGenerators: Path not Found")
+          end        
+     else 
+        error "Generator name Not exists."
+     end  
+   return false 
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+--++++Check+Section+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+local function GetComplete( condition ) --return line value or false 
+  assert(type(condition)=="boolean", "GetComplete:Requare condition.")
+  return fLib.Inspect(pathDATA, "Complete",condition ) -- return true if find same index and value :D
+end
+
+
+
+local function JobCoordAdvanced(TakeOreGet ) --core-- Get Data and change in Complete
+ assert (type(TakeOreGet)=="boolean","Take Data?,Requare boolean.")
+ local JobAvailable = GetComplete( false ) -- if false then mean job Available return line where it is 
+         -- print (JobAvailable)
+       if   JobAvailable  then 
+          local getLine = fLib.GetLongLineValue( pathDATA, JobAvailable) 
+          local oldLine = fLib.GetLongLineValue( pathDATA, JobAvailable) 
+
+                         if TakeOreGet then 
+                               getLine.Complete = true
+                               fLib.ReplaceLongLineValue( pathDATA, JobAvailable ,getLine)
+                             return oldLine 
+                         end 
+                        return oldLine 
+       end 
+    return false 
+end
+
+function getLeftJobAvailabel(  )
+  local lenght = fLib.Lenght(pathDATA)
+    local count = 0
+   for lines=1,lenght do
+    local line =  fLib.GetLongLineValue( pathDATA, lines) 
+      if line.Complete == false then 
+        count = count + 1
+      end  
+   end
+   return count
+end
+
+function getJobAvailable(  )
+   return GetComplete( false )
+end
+
+function GetJobCoordAdvanced(  )
+  return JobCoordAdvanced(false )
+end
+
+function TakeJobCoordAdvanced( ... )
+   return JobCoordAdvanced(true )
+end
+
+function getJobGenerators(  )
+    return GeneratorsPath.JobGenerators
+end
+
+function DeleteContentData(  )
+   fLib.DeleteContent( "config/DATA/GenerateJobCoord/JobCoordDATA" )
+end
+
+--print (GetComplete( false ))
+
+os.unloadAPI("config".."/source/FileLibrary/fLib")
+os.unloadAPI("config/source/ConfigProgram")
+os.unloadAPI("/config/DATA/GenerateJobCoord/GeneratorsPath")

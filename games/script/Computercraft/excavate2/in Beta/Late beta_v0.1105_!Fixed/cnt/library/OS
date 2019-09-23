@@ -1,0 +1,24 @@
+function loadAPI( path,targetName )
+	if type (path) == "string" and  fs.exists(path) then 
+		 if os.loadAPI (path) then 
+		 	 -- print (fs.getName(path).." is loaded." )
+		 	else
+		 	 -- error (fs.getName(path).." not loaded! " )
+		 end 	
+	else 
+		if targetName == nil  then targetName = ""else targetName = "in <"..targetName.."> file!" end 
+		error ("File not found "..tostring(path).."\n"..targetName )
+	end 	
+end
+
+
+
+function unloadAPI( path,targetName )
+	if type (path) == "string" and  fs.exists(path) then 
+	 os.unloadAPI (path)
+	else 
+		if targetName == nil  then targetName = ""else targetName = "in <"..targetName.."> file!" end 
+		error ("File not found <unload< "..tostring(path).."\n"..targetName )
+	end 	
+end
+

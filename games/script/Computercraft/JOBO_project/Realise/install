@@ -1,0 +1,25 @@
+local pathFolder = "assert"
+
+local function install( pathFile)
+ local here = "/"
+ local pathFile = pathFolder.."/"..pathFile	
+ local file = fs.getName(pathFile)
+	if fs.exists(pathFile) then 
+		print ("Installing "..file)
+		if fs.exists(file) then fs.delete(file) end 
+		fs.copy(pathFile,file)
+	end 	
+end
+
+
+
+if fs.exists(pathFolder)  then 
+	print "Statting to install"
+	install("index")
+	install("config")
+	install("programs")
+	install("projectM")
+	print ("Complete!")
+else 
+	print "program not found"
+end 	

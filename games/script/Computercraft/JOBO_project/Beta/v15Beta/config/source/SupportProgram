@@ -1,0 +1,100 @@
+os.loadAPI ("config/source/StatisticsProgram")
+os.loadAPI ("programs/orientation")
+os.loadAPI ("config/DATA/GenerateSupportCoord/SupportCoordProgram")
+os.loadAPI("config/DATA/GenerateHomeCoord/HomeCoordProgram")
+
+local pathDATA = "config/support"
+local pathDATAStatistic = "config/statistics"
+local function checkID( isID )
+	 assert(type(isID)=="number", "checkID:Requare ID.")
+	return fLib.Inspect(pathDATA, "ID",isID ) -- return true if find same index and value :D
+end 
+
+
+
+-- print (SupportCoordProgram.isAvailable(  ))
+
+local function setContent( id )
+	assert (type(id)=="number","Need id to return :/")
+	local JobAvailable = SupportCoordProgram.isAvailable(  )  -- take job from generator memory 
+	 local content
+	if JobAvailable then -- if still job content do else return return somehing else
+				         
+				       return  {
+				  				    ID=id,
+				  				    Connected = "DontKnow",
+				  					ROLE = "SUPPORT",
+				  				}
+    				    else 
+				    	
+				    	
+				    	return {
+				    	           ID=id,
+				  				    Connected = "DontKnow",
+				  					ROLE = "SUPPORT",
+				                    }
+						
+    			end 
+end
+
+
+function setNew( newid ) -- Set newid id in here
+	local newid = tonumber(newid)
+	assert(type(newid)== "number" , "Requare newid id value.")
+
+	if not checkID( newid )  then 
+					 local isJobAvailable = setContent( newid ) -- get Data in here
+				       if isJobAvailable then say.success("Wrote \""..newid.."\" id in ".."\"support.\"")
+	    				         -- Write All in next pocsition if JobAvailable  
+	    				         fLib.AppendLoongLine( pathDATA , isJobAvailable )  
+    				   end       
+    				       
+    else                
+    	say.warning("ID["..newid.."] exists in \"Statistics\" memory.") 
+    	-- when turtle is booted/placed again , make shure return sum defoult option for more control
+    end
+
+end
+
+
+function getTargetHomeLocation( targetID )
+	local target = HomeCoordProgram.getContentbyID( targetID )
+	 -- for k,v in pairs(target) do
+	 -- 	print(k,v)
+	 -- end
+	  if target ~= false then 
+	  		-- orientation
+	  		local tb= {}
+	  		
+	  		tb.x=  target.x
+	  		tb.y=  target.y
+	  		tb.z=  target.z
+	  		tb.f=  target.f+1
+	  		
+	  		return tb
+	  end
+	  return false 
+end
+
+function getMissigItemsID(  )
+local data = fLib.GetAllLongLines( pathDATAStatistic )
+local tb = {}
+local index = 0;
+	 for k,info in pairs(data) do
+	 	index = index + 1 
+	 	if info.MissingItems == true  then 
+	 		say.danger("okey need something: "..info.ID)
+	 		tb[index] = info.ID 
+	 		else
+	 		say.success("bad no need enything right now: "..info.ID)
+
+	 	end 	
+	 end
+	 if #tb == 0 then return false else return tb end 
+end
+
+
+
+function Delete_support(  )
+ fLib.DeleteContent(pathDATA)
+end

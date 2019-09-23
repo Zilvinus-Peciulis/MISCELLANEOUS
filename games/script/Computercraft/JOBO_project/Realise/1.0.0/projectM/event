@@ -1,0 +1,29 @@
+-- Always run method when  selected event keys not triger
+function waitMehtod( tbEvents,... )
+	assert (type (tbEvents)=="table","Expected table with event keys.")
+	assert (type (arg)=="table" and #arg~=0,"Expected arguments with function.")
+local exec = true      
+function running( )
+	while exec do 
+		for selected=1,#arg do
+			if type (arg[selected])=='function' then
+			exec = arg[selected]()-- break if function return false or nil
+			end 
+		end
+		sleep(0)
+	end 	
+end
+
+ local function event ()  
+	while exec do 	
+    local par = {os.pullEvent()}
+		for _,key in pairs(tbEvents) do
+			-- print ( tostring(keys[key]).. " == ",par[2])
+			if keys[key] == par[2] then 
+				exec = false
+			end 	
+		end
+	 end 
+   end 
+	parallel.waitForAny (event,running)
+end

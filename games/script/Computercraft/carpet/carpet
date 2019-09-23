@@ -1,0 +1,18 @@
+term.setCursorPos(1,1);
+term.clear();
+print "What Lenght:"
+
+local arg = {...}
+
+
+ if arg[1] ~= nil then
+   print ("Prepare to place down [len]:"..tostring(arg[1]))
+   turtle.select(1)
+   for x = 1 , arg[1] do 
+     turtle.placeDown()
+     if turtle.getItemCount(1) == 0 then print ("Nohing left to place"); return end
+     while not turtle.forward() do sleep(1) end
+   end
+ else
+   print "Wrong Lenght"
+ end

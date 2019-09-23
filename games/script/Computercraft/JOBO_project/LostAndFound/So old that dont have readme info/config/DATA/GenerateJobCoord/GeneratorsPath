@@ -1,0 +1,3 @@
+JobGenerators = {
+ ["GenerateQuarry"] = "config/DATA/GenerateJobCoord/GenerateQuarry/Locations"
+}

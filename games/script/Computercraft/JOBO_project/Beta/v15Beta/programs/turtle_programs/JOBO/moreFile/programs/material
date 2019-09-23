@@ -1,0 +1,8 @@
+turtlefuel = {
+		[1] = {name = "minecraft:coal" , value = 80 };
+		[2] = {name = "minecraft:charcoal" , value = 80 } ;
+		[3] = {name = "minecraft:planks" , value = 15 };
+		[4] = {name = "minecraft:log" , value = 15 };
+		[5] = {name = "minecraft:coal_block" , value = 800 };
+}
+

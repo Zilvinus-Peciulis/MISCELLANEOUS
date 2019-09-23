@@ -1,0 +1,12 @@
+os.loadAPI("/programs/Require_Items/source/requestAPI")
+
+local chest1 = "minecraft:chest"
+local chest2= "minecraft:trapped_chest"
+
+function chestSide (side)	
+	if  requestAPI.inspectSide( side ) == chest1 or requestAPI.inspectSide( side ) == chest2 then 
+		return true 
+	end
+ return false 	
+end
+os.unloadAPI("/programs/Require_Items/source/requestAPI")

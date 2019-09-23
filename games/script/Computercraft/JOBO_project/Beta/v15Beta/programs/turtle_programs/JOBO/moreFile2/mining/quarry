@@ -1,0 +1,66 @@
+os.loadAPI("/moreFile/GPS/gps")
+os.loadAPI("/moreFile/programs/config/configProgramT")
+os.loadAPI("/moreFile/GPS/source/gps_Program")
+
+
+local yProgressEnd = configProgramT.GET.yProgressEnd()
+
+
+local square = 9
+
+local function forward( )
+	while turtle.detect() or not gps.forward() do turtle.dig( ) end 
+end 
+
+local function line(  )
+	for i=1,square-1 do
+	if turtle.detect() then print (" I saw somthing bad D:") end 
+	forward( )
+	end
+end
+
+
+
+
+function lines(  )
+	for rows=1,square do
+line(  )	
+		if rows%2 ==0 then 
+		 -- print "Right"
+		 gps.right()
+		 forward( )
+		 gps.right ()
+		 elseif rows%2 ==1 and rows ~= square  then   
+		 	-- print ("Left"..tostring(rows%2 ) )
+		 	gps.left()
+		 	forward ()
+		 	gps.left()
+		end 	
+	end
+end
+
+function quarryFull( ... )
+ 	 print ("Y yLocation: "..gps_Program.GET["yLocation"] ())
+
+ 	 print (gps_Program.GET["yLocation"] ().." .> "..yProgressEnd.." == "..tostring(gps_Program.GET["yLocation"] () > yProgressEnd))
+ while  gps_Program.GET["yLocation"] () > yProgressEnd do 
+ 	 print ("Y yLocation: "..gps_Program.GET["yLocation"] ())
+ 	 lines(  )
+ 	 gps.right()
+ 	 gps.right()
+ 	 turtle.digDown()
+ 	if not gps.down() then print "I reached beadrock" break end 
+ 	 print "Still Doing it "
+ end 
+end
+
+-- for i=1,4 do
+
+	-- turtle.turnRight()
+	-- turtle.turnRight()
+	-- if i ~= 4 then 
+	-- turtle.digDown(	)
+	-- turtle.down()
+	-- end 
+-- end
+

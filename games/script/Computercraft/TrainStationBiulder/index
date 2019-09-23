@@ -1,0 +1,381 @@
+os.loadAPI("StationLib/buttonAPI")
+os.loadAPI("StationLib/requestAPI")
+os.loadAPI("StationLib/loadingBoxAPI")
+os.loadAPI("StationLib/BuildStationAPI")
+
+local xTerm , yTerm = term.getSize()
+
+local sreenWidht = xTerm 
+local sreenHeight = yTerm
+ 
+--print "Running index file"
+
+
+
+--Varables
+--User/Read Write only 
+
+
+--User/Read only 'defoults'
+local maxTrainVal = 4 -- This varable tell all program Maxsismum reapet Train  cecurcuit 
+local maxStationVal = 1 -- Use to increase Station count betvean 1 ~ 4 . In this case we use just keep count
+
+local getTrainStationCnt = 1
+local runningGUI = true
+local StationTypeSelect = 1 -- Select simple rail , Advanced rails 
+
+local PlatfomLeft  = false -- User Select if neef build Left platform or right to complte full station with extra cercuit
+local PlatfomRight = false
+	
+local sreenWidht = xTerm 
+local sreenHeight = yTerm
+local ExpandRailPlatform = 1 -- User select betwen 1 ~ 4 and that use to do x times and multyply , request items  to turtle
+
+--1. 16 building block's+
+--2. 6 visualBlock's+
+--3. 4 redstone torh's+
+--4. 4 reapetor's+
+--5. 3 simple rail's+
+--6. 1 sticky piston's+
+--7. 5 redstonedust
+--8. 1 golder rail
+--9. 1 button
+
+
+
+
+Station1 = function ()
+--Create requament list of items 
+term.clear()
+--intro leyout  
+--+++ Only On Turle
+ if ExpandRailPlatform ~= 0 then 
+requestAPI.footer("Please insert items",128)
+requestAPI.loopItem (16*ExpandRailPlatform , 1 ,1, "1. "..(16*ExpandRailPlatform).."-building block's",minecraftDataNames[1] ,colors.white ,math.random(1 , 32768) , false)
+requestAPI.footer("Please insert items",128)
+requestAPI.loopItem (6*ExpandRailPlatform , 2 ,2, "2. "..(6*ExpandRailPlatform).."-visualBlock's",minecraftDataNames[1] ,colors.orange ,math.random(1 , 32768) , false)
+requestAPI.footer("Please insert items",128)
+requestAPI.loopItem (4*ExpandRailPlatform , 3 ,3, "3. "..(4*ExpandRailPlatform).."-redstone torh's",minecraftDataNames[1] ,colors.magenta ,math.random(1 , 32768), true)
+requestAPI.footer("Please insert items",128)
+requestAPI.loopItem (4*ExpandRailPlatform, 4 ,4, "4. "..(4*ExpandRailPlatform).."-reapetor's",minecraftDataNames[2] ,colors.lightBlue ,math.random(1 , 32768) , true)
+requestAPI.footer("Please insert items",128)
+requestAPI.loopItem (2*ExpandRailPlatform , 5 ,5, "5. "..(2*ExpandRailPlatform).."-simple rail's",minecraftDataNames[3] ,colors.yellow ,math.random(1 , 32768), true)
+requestAPI.footer("Please insert items",128)
+requestAPI.loopItem (1*ExpandRailPlatform , 6 ,6, "6. "..(1*ExpandRailPlatform).."-sticky piston's",minecraftDataNames[4] ,colors.lime ,math.random(1 , 32768),true)
+requestAPI.footer("Please insert items",128)
+requestAPI.loopItem (5*ExpandRailPlatform , 7 ,7, "7. "..(5*ExpandRailPlatform).."-redstone dust's",minecraftDataNames[5] ,colors.pink ,math.random(1 , 32768),true)
+requestAPI.footer("Please insert items",128)
+requestAPI.loopItem (1*ExpandRailPlatform , 8 ,8, "8. "..(1*ExpandRailPlatform).."-golden rail's ",minecraftDataNames[6] ,colors.blue ,math.random(1 , 32768),true)
+requestAPI.footer("Please insert items",128)
+requestAPI.loopItem (1*ExpandRailPlatform , 9 ,9, "9. "..(1*ExpandRailPlatform).."-wooden_button's" ,minecraftDataNames[9],colors.brown ,math.random(1 , 32768),true)
+
+end
+local buildBlock = 9
+local buildRail = 9
+
+		if PlatfomRight == true then 
+  			requestAPI.footer("Please insert items",1285)
+			requestAPI.loopItem (buildBlock+(2*ExpandRailPlatform) , 5 ,5, "5. "..(9+(2*ExpandRailPlatform)).."-simple rail's>" ,minecraftDataNames[3],colors.white ,math.random(1 , 32768),true)			
+  			requestAPI.footer("Please insert items",128)
+  			requestAPI.loopItem (9, 10 ,10, "10.  "..(9).."-building block's>" ,minecraftDataNames[1],colors.orange ,math.random(1 , 32768),false)
+  			buildBlock = buildBlock + 9 -- if right the add  9 to max value
+  		  	buildRail = buildRail + 9	
+  		 end
+              --                   if nthing to expend in main train cercuit does not exsecute this block          
+  		if PlatfomLeft == true  and ExpandRailPlatform ~= 0 then  -- build / complete travel rail roadd				
+			requestAPI.footer("Please insert items",1285)
+			requestAPI.loopItem (buildBlock+(2*ExpandRailPlatform) , 5 ,5, "5. "..(buildRail+(2*ExpandRailPlatform)).."-<simple rail's" ,minecraftDataNames[3],colors.white ,math.random(1 , 32768),true)			
+  			requestAPI.footer("Please insert items",128)
+  			requestAPI.loopItem (buildRail, 10 ,10, "10.  "..(buildRail).."-<building block's" ,minecraftDataNames[1],colors.orange ,math.random(1 , 32768),false)
+  		    
+  		end
+
+  		
+
+
+requestAPI.footer("thank you ^_^",colors.red)
+sleep(2.5)
+buttonAPI.clear()
+BuildStationAPI.simpleTrainStation(ExpandRailPlatform , PlatfomLeft , PlatfomRight) -- global unit
+
+end
+
+
+
+Station2 = function ()
+
+
+local lamp = 1
+local button = 1
+local golden_rail = 1
+local detecting_rail = 1
+local simple_rail = 3
+local redstone_torch = 5
+local reapetor = 10 
+local redstonedust_1 = 16
+local redstonedust_2 = 10
+local VisualBlock = 16
+local Pulse_limiter = 16
+local RS_latch = 12
+local Reset_line = 13
+
+
+-- all == one
+ if ExpandRailPlatform ~= 0 then
+requestAPI.footer("Please insert items",128)
+requestAPI.loopItem (lamp*ExpandRailPlatform , 1 ,1, "1.  "..(lamp*ExpandRailPlatform).."-redstone_lamp's",minecraftDataNames[8] ,colors.white ,math.random(1 , 32768) , true)
+requestAPI.footer("Please insert items",128)
+requestAPI.loopItem (button*ExpandRailPlatform , 2 ,2, "2.  "..(button*ExpandRailPlatform).."-wooden_button's",minecraftDataNames[9] ,colors.orange ,math.random(1 , 32768) , true)
+requestAPI.footer("Please insert items",128)
+requestAPI.loopItem (golden_rail*ExpandRailPlatform , 3 ,3, "3.  "..(golden_rail*ExpandRailPlatform).."-golden_rail's",minecraftDataNames[6] ,colors.magenta ,math.random(1 , 32768) , true)
+requestAPI.footer("Please insert items",128)
+requestAPI.loopItem (detecting_rail*ExpandRailPlatform , 4 ,4, "4.  "..(detecting_rail*ExpandRailPlatform).."-detecting_rail's",minecraftDataNames[7] ,colors.lightBlue ,math.random(1 , 32768) , true)
+
+requestAPI.footer("Please insert items",128)
+requestAPI.loopItem (simple_rail*ExpandRailPlatform , 5 ,5, "5.  "..(simple_rail*ExpandRailPlatform).."-simple_rail's",minecraftDataNames[3] ,colors.yellow ,math.random(1 , 32768) , true)
+requestAPI.footer("Please insert items",128)
+requestAPI.loopItem (redstone_torch*ExpandRailPlatform , 6 ,6, "6.  "..(redstone_torch*ExpandRailPlatform).."-redstone_torch's",minecraftDataNames[1] ,colors.lime ,math.random(1 , 32768) , true)
+requestAPI.footer("Please insert items",128)
+requestAPI.loopItem (reapetor*ExpandRailPlatform , 7 ,7, "7.  "..(reapetor*ExpandRailPlatform).."-repeator's",minecraftDataNames[2] ,colors.pink ,math.random(1 , 32768) , true)
+requestAPI.footer("Please insert items",128)
+requestAPI.loopItem (redstonedust_1*ExpandRailPlatform , 8 ,8, "8.  "..(redstonedust_1*ExpandRailPlatform).."-redstone1_dust's",minecraftDataNames[5] ,colors.blue ,math.random(1 , 32768) , true)
+
+requestAPI.footer("Please insert items",128)
+requestAPI.loopItem (redstonedust_2*ExpandRailPlatform , 9 ,9, "9.  "..(redstonedust_2*ExpandRailPlatform).."-redstone2_dust's",minecraftDataNames[5] ,colors.brown ,math.random(1 , 32768) , true)
+requestAPI.footer("Please insert items",128)
+requestAPI.loopItem (VisualBlock*ExpandRailPlatform , 10 ,10, "10. "..(VisualBlock*ExpandRailPlatform).."-[!Visual block's]",minecraftDataNames[8] ,colors.black ,math.random(1 , 32768) , false)
+requestAPI.footer("Please insert items",128)					
+requestAPI.loopItem (Pulse_limiter*ExpandRailPlatform , 11 ,1, "11. "..(Pulse_limiter*ExpandRailPlatform).."-[!Pulse-limiter block's]",minecraftDataNames[8] ,colors.red ,math.random(1 , 32768) , false)
+requestAPI.footer("Please insert items",128)								
+requestAPI.loopItem (RS_latch*ExpandRailPlatform , 12 ,2, "12. "..(RS_latch*ExpandRailPlatform).."-[!RS-latch block's]",minecraftDataNames[8] ,colors.yellow ,math.random(1 , 32768) , false)
+
+requestAPI.footer("Please insert items",128)
+requestAPI.loopItem (Reset_line*ExpandRailPlatform , 13 ,3, "13. "..(Reset_line*ExpandRailPlatform).."-[!Reset-line block's]",minecraftDataNames[8] ,colors.green ,math.random(1 , 32768) , false)
+end
+
+
+--[[Left Side]]
+local railsANDbuildBlock = 17
+local red_dust = 5
+local red_torh = 2
+local green_block = 7
+--[[Right side]]
+local RrailsANDbuildBlock = 17
+local Rred_dust = 4
+local Rred_torh = 2
+local Rgreen_block = 7
+local Rreapetor = 1
+
+		if PlatfomRight == true then 
+  			requestAPI.footer("Please insert items",1285)
+			requestAPI.loopItem (RrailsANDbuildBlock+(simple_rail*ExpandRailPlatform) , 5 ,4, "14>. "..(RrailsANDbuildBlock+(simple_rail*ExpandRailPlatform)).."-simple_rail's>" ,minecraftDataNames[3],colors.white ,math.random(1 , 32768),true)			
+  			requestAPI.footer("Please insert items",1285)
+			requestAPI.loopItem (Rred_dust+(redstonedust_2*ExpandRailPlatform) , 9 ,5, "15>. "..(Rred_dust+(redstonedust_2*ExpandRailPlatform)).."-redstone_dust2's>" ,minecraftDataNames[5],colors.white ,math.random(1 , 32768),true)			
+  			
+  			requestAPI.footer("Please insert items",1285)
+			requestAPI.loopItem (Rred_torh+(redstone_torch*ExpandRailPlatform) , 6 ,6, "16>. "..(Rred_torh+(redstone_torch*ExpandRailPlatform)).."-redstone_torch's>" ,minecraftDataNames[1],colors.white ,math.random(1 , 32768),true)			
+  			requestAPI.footer("Please insert items",1285)
+			requestAPI.loopItem (Rreapetor+(reapetor*ExpandRailPlatform) , 7 ,7, "17>. "..(Rreapetor+(reapetor*ExpandRailPlatform)).."-repeator's>" ,minecraftDataNames[2],colors.white ,math.random(1 , 32768),true)			
+  			
+  			requestAPI.footer("Please insert items",1285)
+			requestAPI.loopItem (Rgreen_block+(Reset_line*ExpandRailPlatform) , 13 ,8, "18>. "..(Rgreen_block+(Reset_line*ExpandRailPlatform)).."-!Reset-line block's>" ,minecraftDataNames[2],colors.white ,math.random(1 , 32768),false)			
+  		  	
+  		    requestAPI.footer("Please insert items",128)
+			requestAPI.loopItem (RrailsANDbuildBlock , 14 ,9, "19. "..(RrailsANDbuildBlock).."-!RailTrack/Visual-blok's>",minecraftDataNames[8] ,colors.orange ,math.random(1 , 32768) , false)
+
+		
+  		railsANDbuildBlock = railsANDbuildBlock + RrailsANDbuildBlock -- if platformLeft after this ^ then add values after this  lol
+  		red_dust = red_dust + Rred_dust   -- 
+  		red_torh = red_torh + Rred_torh
+  		green_block = green_block + Rgreen_block
+  		 end
+  		
+
+      if PlatfomLeft == true and ExpandRailPlatform ~= 0  then  -- build / complete travel rail road 						
+			-- something happen in  PlatformRight then values are increased sinifigent
+
+			requestAPI.footer("Please insert items",1285)
+			requestAPI.loopItem (railsANDbuildBlock+(simple_rail*ExpandRailPlatform) , 5 ,4, "14>. "..(railsANDbuildBlock+(simple_rail*ExpandRailPlatform)).."-simple_rail's<" ,minecraftDataNames[3],colors.white ,math.random(1 , 32768),true)			
+  			requestAPI.footer("Please insert items",1285)
+			requestAPI.loopItem (red_dust+(redstonedust_2*ExpandRailPlatform) , 9 ,5, "15>. "..(red_dust+(redstonedust_2*ExpandRailPlatform)).."-redstone_dust2's<" ,minecraftDataNames[5],colors.white ,math.random(1 , 32768),true)			
+  			
+  			requestAPI.footer("Please insert items",1285)
+			requestAPI.loopItem (red_torh+(redstone_torch*ExpandRailPlatform) , 6 ,6, "16>. "..(red_torh+(redstone_torch*ExpandRailPlatform)).."-redstone_torch's<" ,minecraftDataNames[1],colors.white ,math.random(1 , 32768),true)			
+  			
+  			requestAPI.footer("Please insert items",1285)
+			requestAPI.loopItem (green_block+(Reset_line*ExpandRailPlatform) , 13 ,8, "18>. "..(green_block+(Reset_line*ExpandRailPlatform)).."-Reset-line block's<" ,minecraftDataNames[2],colors.white ,math.random(1 , 32768),false)			
+  		  	
+  		    requestAPI.footer("Please insert items",128)
+			requestAPI.loopItem (railsANDbuildBlock , 14 ,9, "19. "..(railsANDbuildBlock).."-RailTrack/Visual-blok's<",minecraftDataNames[8] ,colors.orange ,math.random(1 , 32768) , false)
+
+  		    
+  		end
+
+
+
+requestAPI.footer("thank you ^_^",colors.red)
+sleep(2.5)
+buttonAPI.clear()
+
+BuildStationAPI.advancedTrainStation(ExpandRailPlatform , PlatfomLeft , PlatfomRight)
+end
+
+
+
+
+local station_array = {
+	[1]={ 	name =	"Simple Station" 	; func = Station1};
+	[2]={	name =	"Advanced Station"	; func = Station2}
+}
+
+-- lamp optional
+-- Detect rails
+
+--print (requestAPI.getDataName(2) ) alone is buggy
+
+minecraftDataNames = {
+[1]= 'minecraft:redstone_torch' ;
+[2]= 'minecraft:repeater';
+[3]= 'minecraft:rail' ;
+[4]= 'minecraft:sticky_piston' ;
+[5]= 'minecraft:redstone' ;
+[6]= 'minecraft:golden_rail' ;
+[7]= 'minecraft:detector_rail';
+[8]= 'minecraft:redstone_lamp';
+[9]= 'minecraft:wooden_button';
+}
+
+
+
+
+--[[GUI menu configuration!! ]]
+
+fillTable = function ()--name func xmin xmax ymin ymax
+ buttonAPI.setTable("-" ,MINUS ,1  , 7  ,yTerm-1,yTerm+1 ,colors.red , colors.green)
+ buttonAPI.setTable("+"  ,PLUS ,xTerm-5 , xTerm+1 ,yTerm-1,yTerm+1  ,colors.red , colors.green )
+ buttonAPI.setTable("done"  ,DONE ,xTerm/2-3 , xTerm/2+7 ,yTerm-1,yTerm+1 ,colors.red , colors.green  )
+ --																				Background   active_color 	text_color																			
+ buttonAPI.setTable("<<-" ,stationSelectMINUS ,xTerm/2-4-4  , xTerm/2+1-4  ,3,4 , colors.yellow , colors.green , colors.lightBlue)
+ buttonAPI.setTable("->>" ,stationSelectPLUS ,xTerm/2+2+4  , xTerm/2+7+4.  ,3,4 , colors.yellow , colors.green ,colors.lightBlue)
+ buttonAPI.setTable("<PlatfomLeft" ,EnablePlatfomLeft ,1  , xTerm/2+1  ,5,8 , colors.red , colors.green ,colors.lightBlue)
+ buttonAPI.setTable("PlatfomRight>" ,EnablePlatfomRight ,xTerm/2+2  , xTerm+2  ,5,8 , colors.red , colors.green ,colors.lightBlue)
+ buttonAPI.screen()
+end
+
+---"Menu functions"
+
+ EnablePlatfomLeft = function ()
+PlatfomLeft = buttonAPI.toggleButton "<PlatfomLeft" -- output toggle bolean value
+end
+
+EnablePlatfomRight = function ()
+PlatfomRight = buttonAPI.toggleButton "PlatfomRight>"
+end
+
+ stationSelectMINUS = function ()
+buttonAPI.flash("<<-")
+if StationTypeSelect > 1 then 
+ StationTypeSelect = StationTypeSelect - 1
+end
+end
+
+
+ stationSelectPLUS = function ()
+buttonAPI.flash("->>")
+if StationTypeSelect < #station_array then 
+ StationTypeSelect = StationTypeSelect + 1
+end
+end
+
+
+
+ MINUS = function ()
+buttonAPI.flash("-")
+if maxStationVal >= 1  then  
+maxStationVal = maxStationVal -1 
+end
+end
+
+ PLUS = function ()
+buttonAPI.flash("+")
+if maxStationVal < maxTrainVal then  
+maxStationVal = maxStationVal +1 
+end
+end
+
+
+ DONE = function ()
+buttonAPI.flash("done")
+runningGUI = false
+end
+
+ getClick = function ()
+ event, side,x,y = os.pullEvent("mouse_click")
+ buttonAPI.checkxy(x,y)
+end
+
+--"end Menu functio"
+
+
+drawProgressBar = function (x , y ,name, height   , minVal , color_bar, color_bg )
+--arrayExspample(x , y ,name, height , legth , size , minVal ,maxVal, color_bar, color_bg )
+local size = 3
+local maxVal = 100 -- %
+local minVal = minVal or 1
+
+loadingBoxAPI.drawLoadBox(x , y ,name, height , sreenWidht , size , minVal ,maxVal, color_bar, color_bg ) 
+--exsample: drawProgressBar(2 , 2 ,'pasta', 2   , 5 , colors.blue ,colors.red )
+end
+
+
+getInputGUI = function()
+fillTable()	-- draw all buttons
+while runningGUI do 
+	--Display station type
+	buttonAPI.heading(station_array[StationTypeSelect].name , colors.yellow , colors.yellow , colors.gray )
+		--Calculate like 1/4 shoud look like 
+		local intProcenCorner = 100/maxTrainVal -- Calculate in nice square number From user colected values
+		-- output station value 
+
+													--- Procent output
+		drawProgressBar(1 , yTerm/2+4 ,"", 0   , intProcenCorner*maxStationVal , colors.red ,colors.gray )
+
+	--Starting lissen event then compare in API button possition 
+	 event, side,x,y = os.pullEvent("mouse_click")
+ 	buttonAPI.checkxy(x,y)
+	end		
+	loadingBoxAPI.clear()
+	ExpandRailPlatform = maxStationVal
+
+
+end
+
+centerText = function(txt)
+ term.setCursorPos((xTerm-#txt)/2 , y/2+2)
+ print(txt)
+end
+
+
+
+
+
+exsecuteUserSelectedRequest = function ()
+ station_array[StationTypeSelect].func()
+end
+
+
+
+
+
+
+
+
+
+
+getInputGUI()-- geting x input from GUI
+exsecuteUserSelectedRequest() -- after user select what he want exsecute selection
+
+
+
+-- Stay cool
+--BuildStationAPI.advancedTrainStation(0 , true , false)

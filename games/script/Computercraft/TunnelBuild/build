@@ -1,0 +1,49 @@
+local tArg = {...};
+if tArg[1] == nil then
+ print "[arg1] is empty!";
+ return;
+end
+local function giveItem () 
+  for x = 1,16 do 
+    if turtle.getItemCount(x) > 0 then 
+        turtle.select(x);
+        return true;
+    end    
+  end
+  return false;
+end
+
+
+local function OneLayer()
+  local isAv = false;
+ isAv =  giveItem();
+  turtle.digDown();
+  turtle.placeDown();
+  turtle.turnLeft();
+ isAv = giveItem();
+  turtle.place();
+  while not turtle.up() do turtle.digUp(); end;
+  giveItem();
+  turtle.place();
+  isAv = giveItem();
+  turtle.digUp();
+  turtle.placeUp();
+  turtle.turnRight();
+  turtle.turnRight();
+  isAv = giveItem();
+  turtle.place();
+  isAv = giveItem();
+  while not turtle.down() do sleep(1); end;
+  turtle.place();
+  turtle.turnLeft();
+  turtle.dig();
+  return isAv;
+end
+
+--print (OneLayer());
+local loop1=0;
+while OneLayer() and tonumber(tArg[1]) >= loop1 do
+loop1 = loop1 + 1;
+while not turtle.forward() do turtle.dig();turtle.digUp();end;
+end
+print "Completed";

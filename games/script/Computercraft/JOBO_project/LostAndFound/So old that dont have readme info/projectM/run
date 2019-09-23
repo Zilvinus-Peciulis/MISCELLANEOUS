@@ -1,0 +1,89 @@
+--Super Computer index
+local xTerm, yTerm = term.getSize()
+----BOOT.-------------------------------------------
+
+shell.run("/programs/BOOT/BOOT_DEFOULT_TURTLE_COORD")
+
+os.loadAPI("/programs/BOOT/BOOT_TURTLE")
+
+--end--------------------------------------------------------------------- 
+
+--..Load.file.that.need.API.................................................................
+os.loadAPI("/programs/turtle_programs/JOBO/moreFile/GPS/refuelLib")
+os.loadAPI("config/DATA/GenerateJobCoord/JobCoordProgram")
+os.loadAPI("config/source/StatisticsProgram")
+os.loadAPI("/programs/Require_Items/source/requestAPI")
+os.loadAPI("config/DATA/GenerateHomeCoord/HomeCoordProgram")
+os.loadAPI("/config/source/ConfigProgram")
+os.loadAPI("/programs/turtleLib")
+os.loadAPI("projectM/uttility")
+
+--Junk API
+os.loadAPI ("/programs/GUI/Background/Animations/MatrixAnimation/MatrixProgram")
+-- Defolts
+BOOT_TURTLE.UpdateDisk ()  
+--end..........................................................................
+-- Free space to create magic
+local getGeneratorType = ConfigProgram.GET.GenerateJob()
+
+local function RunAll( )  -- lounth all turtles
+	BOOT_TURTLE.UpdateDisk ()  --Check if all in place, Update when disk drive and Floppy in inventory
+	while  turtleLib.Count()>0 or turtle.suckDown() do  
+          
+
+        if  not BOOT_TURTLE.RUN( )  then sleep(0);
+            return false;   
+        end 
+        sleep(0.5)
+        while turtle.detect () do sleep(1) end             
+    end
+	return  true -- Return status was secesfuly
+end
+------ MANAGER 
+--StatisticsProgram.Costructor( "GenerateQuarry" )
+
+ --RunAll( ) 
+    --sleep(15)
+    --StatisticsProgram.sendDataEveryone(  )
+-- StatisticsProgram.isJob(  )
+while true do 
+shell.run("clear")
+print ("job ,home, place, generate, disk, \ndisassemble,changeCoord,\nchangeJobLocation")
+command = read ()
+if command == "job" then 
+        StatisticsProgram.sendDataEveryone(  )
+    elseif command == "home" then 
+    StatisticsProgram.ProtocolGoHome(  )
+    sleep(1)
+    elseif command== "place" then
+        RunAll( )
+     if  StatisticsProgram.isJob(  ) then  else print ">>>No More Job left.<<< ";sleep(10) end 
+    sleep(2)
+    elseif command == "generate" then 
+        StatisticsProgram.Costructor( getGeneratorType )
+        StatisticsProgram.DeleteStatistic(  )
+        StatisticsProgram.GenerateHomeCoord(  )
+        sleep(2)
+    elseif command == "disk" then
+    BOOT_TURTLE.UpdateDisk () 
+    StatisticsProgram.Costructor( getGeneratorType )  -- GenerateQuarry -- get generator name from config
+    elseif command == "changeJobLocation" then 
+        uttility.changeJobLocation(  ) print "Complete"
+        sleep(1)
+    elseif command == "changeCoord" then 
+        uttility.changeCoord (  )  print "Complete"
+        sleep (1)
+    elseif command == "disassemble" then
+            print "Starting disassemble." 
+           while StatisticsProgram.isContent(  ) do  
+                
+                 StatisticsProgram.SendDisassembleProtocol( false )
+                while not turtle.detectUp() do 
+                    sleep(0)
+                 end 
+                StatisticsProgram.SendDisassembleProtocol( turtle.digUp() )
+            end 
+                print"Complete disassemble"
+                sleep (1)
+       end      
+end 

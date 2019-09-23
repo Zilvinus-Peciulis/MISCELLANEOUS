@@ -1,0 +1,265 @@
+
+
+local computerID;
+local DefoultProtocol
+function updateMangerID( ... )
+	-- body
+	if fs.exists ("programs/tbLib") then 
+	os.loadAPI("/programs/turtle_programs/JOBO/OS")
+	OS.loadAPI("programs/tbLib")
+	OS.loadAPI("config/source/ConfigProgram")
+	computerID = ConfigProgram.GET["SuperComputerID"]()
+		
+		DefoultProtocol = {
+				Manager = computerID;
+				TurtlesName = ConfigProgram.GET["TurtlesName"](),
+				DropJunkItem = ConfigProgram.GET["DropJunkItem"](),
+				DungeonChest = ConfigProgram.GET['DungeonChest'](),
+				yJobEnd = ConfigProgram.GET['yJobEnd']()
+
+}
+		else
+	os.loadAPI("OS")
+	OS.loadAPI("/moreFile/programs/tbLib")
+	OS.loadAPI("/moreFile/programs/config/source/defaultProgramT")
+	computerID = defaultProgramT.GET["ManagerID"]()
+	
+	DefoultProtocol = {
+				Manager = computerID;
+
+}
+
+	end 
+-- Update full inforamtion
+
+end
+	updateMangerID( ... )
+-- print ("MANAGER: "..tostring(computerID))
+-- sleep(30)
+
+
+
+local function ProtocolNew(  protocol,data  )--Constructor -- data if needet  
+	assert (type(protocol)=="table","Requare merge protocol")
+	local protocol =  tbLib.merge(protocol,DefoultProtocol)
+	return  tbLib.merge(data,protocol) 
+end
+
+
+
+function SET_GoHome(  ) -- Broadcast protocols about Go home 
+	return ProtocolNew(  {protocol="GoHome"}  ) -- send information to shutdown
+end
+
+function SET_StoreJob( Coordination )
+ 	assert (type(Coordination)=="table", "Requare Coordination to ExecuteJob")
+ 	return ProtocolNew({protocol="StoreJob"},  Coordination)
+end
+
+
+function SET_Disassemble(  )
+ 	 return ProtocolNew(  {protocol="Disassemble"}  )
+ end 
+
+ function SET_ExecuteJob( Coordination )
+ 	assert (type(Coordination)=="table", "Requare Coordination to ExecuteJob")
+ 	 return ProtocolNew(  {protocol="ExecuteJob"} , Coordination  )
+ end
+
+function SET_CompleteJob( Coordination ) -- if job not jomplete the execute not complete job 
+ 	 return ProtocolNew(  {protocol="CompleteJob"}   )
+ end
+
+function SET_ManagerGetStatus( Coordination ) -- just for more controlc and stability to check fuel
+	return  ProtocolNew(  {protocol="ManagerGetStatus"},Coordination  )
+end
+
+function SET_Connected(  )-- for update where is connected
+	return  ProtocolNew(  {protocol="Connected"}  )
+end
+
+function SET_SetJob( Coordination )
+	assert(type(Coordination)=="table", "SET_SetJob need Coordination.")
+	return ProtocolNew(  {protocol="SetJob"},Coordination  )
+end
+
+
+-- Check if same protocol
+
+function CHECK_GoHome( instruction,Manager )
+	if type (instruction)== "table" then  -- bug , random send whithout statement
+		  if  instruction.protocol == "GoHome" and Manager == instruction.Manager	 then 
+			     print (">>ProtocolGoHome<<")
+			     turtleLib.Broadcast( instruction ) -- send information to shutdown
+		         return true 
+		  end
+	    end 	   	  
+  return false
+end
+
+
+function CHECK_StoreJob( instruction,Manager )
+	 if type (instruction)== "table" then  -- bug , random send whithout statement
+		 if  instruction.protocol == "StoreJob" and Manager == instruction.Manager then 
+		         print (">>>>>>>>Protocol StoreJob<<<<<<<<<<")
+		         return true 
+		  end
+	    end 	 
+ return  false
+end 
+
+
+function CHECK_Disassemble( instruction,Manager ) -- Going to disasablling  
+	   if type (instruction)== "table" then  -- bug , random send whithout statement
+		  if  instruction.protocol == "Disassemble" and Manager == instruction.Manager then 
+			     print (">>ProtocolDisassemble<<")
+		         return true 
+		  end
+	    end 	   	  
+  return false  
+end
+
+
+
+function CHECK_ExecuteJob( instruction,Manager ) -- Going to disasablling  
+	   if type (instruction)== "table" then  -- bug , random send whithout statement
+		 if  instruction.protocol =="ExecuteJob"   and  Manager == instruction.Manager  then 			  
+		         print (">>>>>ProtocolExecuteJob<<<<< ")
+			         return true 
+   		 end 
+   	 end 	   	  
+  return false  
+end
+
+
+function CHECK_Connected( instruction,Manager )
+	if type(instruction)== "table" then 
+		if instruction.protocol=="Connected" and Manager == instruction.Manager then 
+			print (">>>ProtocolConnected<<<")
+ 		    
+			return true 
+		end 	
+	end 	
+end
+
+
+function CHECK_ManagerGetStatus( instruction,Manager )
+	  if type (instruction)== "table" then  -- bug , random send whithout statement
+		 if  instruction.protocol == "ManagerGetStatus" and  Manager == instruction.Manager then 
+		         return true 
+		  end
+	    end 	   	  
+end 
+
+
+
+
+-- just for dropping items 
+function SET_JunkAndFuelDissassemble( MovementTargetValue )
+	-- assert(type(MovementTargetValue)=="table", "SET_JunkAndFuelDissassemble need MissingItem value in table.")
+	return ProtocolNew(  {protocol="JunkAndFuelDissassemble"},MovementTargetValue  )
+end
+
+
+function CHECK_JunkAndFuelDissassemble( instruction,Manager )
+	  if type (instruction)== "table" then  -- bug , random send whithout statement
+		 if  instruction.protocol == "JunkAndFuelDissassemble" and  Manager == instruction.Manager then 
+		         print "Protocol JunkAndFuelDissassemble:"
+		         return true 
+		  end
+	    end 	   	  
+end 
+
+--- Specific
+function SET_dropJunk(  )
+	-- assert(type(MovementTargetValue)=="table", "SET_JunkAndFuelDissassemble need MissingItem value in table.")
+	return ProtocolNew(  {protocol="dropJunk"}  )
+end
+function CHECK_dropJunk( instruction,Manager )
+	  if type (instruction)== "table" then  -- bug , random send whithout statement
+		 if  instruction.protocol == "dropJunk" and  Manager == instruction.Manager then 
+		         print "Protocol dropJunk:"
+		         return true 
+		  end
+	    end 	   	  
+end 
+function SET_suckFuel( fuelValue )
+	-- assert(type(fuelValue)=="table", "SET_JunkAndFuelDissassemble need MissingItem value in table.")
+	return ProtocolNew(  {protocol="suckFuel"},fuelValue  )
+end
+function CHECK_suckFuel( instruction,Manager )
+	  if type (instruction)== "table" then  -- bug , random send whithout statement
+		 if  instruction.protocol == "suckFuel" and  Manager == instruction.Manager then 
+		         print "Protocol suckFuel:"
+		         return true 
+		  end
+	    end 	   	  
+end 
+
+function SET_DestroyHomeChest( fuelValue )
+	-- assert(type(fuelValue)=="table", "SET_JunkAndFuelDissassemble need MissingItem value in table.")
+	return ProtocolNew(  {protocol="DestroyHomeChest"},fuelValue  )
+end
+function CHECK_DestroyHomeChest( instruction,Manager )
+	  if type (instruction)== "table" then  -- bug , random send whithout statement
+		 if  instruction.protocol == "DestroyHomeChest" and  Manager == instruction.Manager then 
+		         print "Protocol DestroyHomeChest:"
+		         return true 
+		  end
+	    end 	   	  
+end 
+-----
+
+
+
+
+
+
+function SET_Support_TakeJunk( MovementTargetValue )
+	assert(type(MovementTargetValue)=="table", "SET_MissingItem need MissingItem value in table.")
+	return ProtocolNew(  {protocol="TakeJunk"},MovementTargetValue  )
+end
+
+
+function CHECK_Support_TakeJunk( instruction,Manager )
+	  if type (instruction)== "table" then  -- bug , random send whithout statement
+		 if  instruction.protocol == "TakeJunk" and  Manager == instruction.Manager then 
+		         print ">>>>>>Protocol ::TakeJunk:: <<<<<<<<"
+		         return true 
+		  end
+	    end 	   	  
+end 
+
+
+-- Workd only support 
+
+function SET_Support_Movement( MovementTargetValue )
+	assert(type(MovementTargetValue)=="table", "SET_MissingItem need MissingItem value in table.")
+	return ProtocolNew(  {protocol="Movement"},MovementTargetValue  )
+end
+
+
+function CHECK_Support_Movement( instruction,Manager )
+	  if type (instruction)== "table" then  -- bug , random send whithout statement
+		 if  instruction.protocol == "Movement" and  Manager == instruction.Manager then 
+		         print ">>>>>>Protocol ::Movement:: <<<<<<<<"
+		         return true 
+		  end
+	    end 	   	  
+end 
+
+
+function SET_Support_MultypleItem( MultypleItemMaterial )
+	assert(type(MultypleItemMaterial)=="table", "SET_MissingItem need MissingItem value in table.")
+	return ProtocolNew(  {protocol="MultypleItem"},MultypleItemMaterial  )
+end
+
+
+function CHECK_Support_MultypleItem( instruction,Manager )
+	  if type (instruction)== "table" then  -- bug , random send whithout statement
+		 if  instruction.protocol == "MultypleItem" and  Manager == instruction.Manager then 
+		         print ">>>>>>Protocol MultypleItem <<<<<<<<"
+		         return true 
+		  end
+	    end 	   	  
+end 

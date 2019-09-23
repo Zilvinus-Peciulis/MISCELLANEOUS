@@ -1,0 +1,10 @@
+Turtle name: "Kakadu"
+ManagerID: 0
+yProgressEnd: 5
+DropJunkItem: false
+ROLE:
+xManager: 98
+yManager: 18
+zManager: 237
+fManager: "NORTH"
+DungeonChest: false

@@ -1,0 +1,209 @@
+
+
+--Recoppy backup files
+
+os.loadAPI("/moreFile/programs/perip")
+os.loadAPI("/moreFile/programs/requestAPI") --
+os.loadAPI("/moreFile/programs/config/HomeCoord/HomeCoordProgram")
+os.loadAPI("/moreFile/GPS/gps")
+os.loadAPI("/moreFile/programs/config/configProgramT")
+os.loadAPI("/moreFile/programs/config/source/defaultProgramT")
+os.loadAPI("/moreFile/programs/turtleLib")
+os.loadAPI("moreFile/programs/config/source/FileLibrary/fLib")
+os.loadAPI("/moreFile/programs/calculate")
+os.loadAPI("/moreFile/programs/say")
+os.loadAPI("/moreFile/programs/protocol")
+os.loadAPI("/moreFile/programs/refuel")
+os.loadAPI("/moreFile/programs/travel")
+os.loadAPI("/moreFile2/mining/quarry")
+
+
+-- print ("In home?:",calculate.inHomeLocation(  ))
+local Manager = defaultProgramT.GET.ManagerID()
+
+
+
+local xHome = HomeCoordProgram.GET.xHome()
+local yHome = HomeCoordProgram.GET.yHome()
+local zHome = HomeCoordProgram.GET.zHome()
+local fHome = HomeCoordProgram.GET.fHome() 
+
+local xJob = configProgramT.GET.xJob()
+local yJob = configProgramT.GET.yJob()
+local zJob = configProgramT.GET.zJob() 
+local fJob = configProgramT.GET.fJob() 
+
+local yProgressEnd = configProgramT.GET.yProgressEnd()
+local yProgress = configProgramT.GET.yProgress()
+local Progress = configProgramT.GET.Progress() 
+local JobComplete = configProgramT.GET.JobComplete()
+local JobType = configProgramT.GET.JobType()
+
+-- travel.checkFuelLevel(   )
+
+--Alway when booting try go home, best way right now to manage unstack
+	 		if not calculate.inHomeLocation(  ) then -- if not in the home when come back home after startup.	
+ 				  term.clear() 			
+ 				  term.setCursorPos(1,1) 			
+	 			 print "I will come back home soon."	 
+	 			 sleep(20)
+	 			 travel.Home()
+			 end
+--print (BOOT_HOMECOORD.status and "I was sececcfuly booted" or "I cannot boot for some reason." )
+print "INDEX COMPLETE..."
+
+function update(  )
+ xJob = configProgramT.GET.xJob()
+ yJob = configProgramT.GET.yJob()
+ zJob = configProgramT.GET.zJob() 
+ fJob = configProgramT.GET.fJob() 
+
+ yProgressEnd = configProgramT.GET.yProgressEnd()
+ yProgress = configProgramT.GET.yProgress()
+ Progress = configProgramT.GET.Progress() 
+ JobComplete = configProgramT.GET.JobComplete()
+end
+
+function tellJob( ... )
+	print ()
+end
+
+
+
+
+-- TURTLES
+	gps.Global:setCondition(true)
+					term.clear() 			
+ 				  term.setCursorPos(1,1) 			
+print "Waiting order"
+while true do 
+
+	 local sender ,  instruction = turtleLib.Receive( )
+
+	 if instruction ~= nil  then 
+
+	 	if  protocol.CHECK_ExecuteJob( instruction,Manager )  then 
+			 	print"+++++++++++++++++++++++++++"
+			 	print ("JobComplete >>>>",configProgramT.GET.JobComplete(  ))
+			 	 update(  )
+			 	 travel.xJob( xJob , yJob , zJob  )
+
+			 	 if JobType == 'GenerateQuarry' then
+			 	 say.special ("Working on quarry!")
+			 	 quarry.quarryFull(  )
+ 				 end 
+			 	 sleep(5)
+			 	 -- job Complete Go home
+			 	 configProgramT.SET.JobComplete( true )
+			 	print ("JobComplete NOW:",configProgramT.GET.JobComplete(  ))
+
+			 	 travel.Home()
+
+		elseif protocol.CHECK_StoreJob( instruction,Manager ) then 
+		         
+			    for k,v in pairs(instruction) do
+		         	-- print("key:",k," val:",v)
+		         end
+		         -- defouklteverything
+		          configProgramT.SET.xJob(instruction.x)
+		          configProgramT.SET.yJob(instruction.y)
+		          configProgramT.SET.zJob(instruction.z)
+		          configProgramT.SET.fJob(instruction.f)
+		          configProgramT.SET.yProgress(instruction.y)
+		          configProgramT.SET.Progress(true)
+		          configProgramT.SET.JobComplete( false )--type(Progress) == "boolean" and Progress or false)
+		          configProgramT.SET.JobType( instruction.JobType )
+
+		         for k,v in pairs(instruction) do
+		         	-- print(k.." :>>"..tostring(v))
+		         end
+
+		         print ("StoreJob? : "..tostring(instruction.fTime))
+		          if instruction.fTime == true then
+		          	print "I got secret information about my job."
+		          	print("that is new")
+		          -- configProgramT.SET.JobComplete( true )--type(Progress) == "boolean" and Progress or false)
+		          end	
+		           -- xJob = configProgramT.GET.xJob()
+			       -- yJob = configProgramT.GET.yJob()
+			       -- zJob = configProgramT.GET.zJob() 
+				   -- fJob = configProgramT.GET.fJob() 
+
+				   -- yProgress = configProgramT.GET.yProgress() 
+				   -- Progress = configProgramT.GET.Progress() or configProgramT.SET.Progress(false) or false
+				   -- JobComplete = configProgramT.GET.JobComplete() or configProgramT.SET.JobComplete(false) or false
+		         -- ]]
+			print "What sup nigga"
+	 	elseif protocol.CHECK_ManagerGetStatus( instruction,Manager ) then
+	 	  -- print (">>ProtocolManagerGetStatus<<")
+			     -- print ('JobComplete '..tostring(configProgramT.GET.JobComplete()))
+			     -- print ( "yProgress "..tostring (configProgramT.GET.yProgress()))
+			     -- print ("Progress "..tostring(configProgramT.GET.Progress()))
+			    	 say.alert("xJob : "..tostring(configProgramT.GET.xJob))
+			    	 say.alert ("yJob : "..tostring(configProgramT.GET.yJob))
+			    	 say.alert ("zJob : "..tostring(configProgramT.GET.zJob))
+			     -- send back to manager the status 
+			     -- update(  ) -- update values
+			     -- print ("//////////////////////////")
+			     -- print ("Status x: ",instruction.x)
+			     -- print ("Status y: ",instruction.y)
+			     -- print ("Status z: ",instruction.z)
+			     local cachMissing , Fuelvalue = travel.checkFuelLevel( )
+			     if type(cachMissing) == "number" then cachMissing = true end 
+
+			     turtleLib.Send(Manager,{
+ 					 JobComplete = configProgramT.GET.JobComplete();
+ 				   	 MissingItems = cachMissing; 
+ 				   	 material = {fuel = Fuelvalue; };
+ 				   	 -- Where goes in log 
+			     	}) 
+			            
+
+	 	elseif protocol.CHECK_Connected( instruction,Manager ) then 	
+	 		local JobCompleteT = configProgramT.GET.JobComplete()
+			turtleLib.Send(Manager, {text = " I Connected with manager."; JobComplete = JobCompleteT;})
+	 		print "Talking :D"
+	 	
+	 	elseif protocol.CHECK_GoHome( instruction,Manager )then  -- if Receive from manager and if Go Home  
+		 		print "Going Home "
+	 			 travel.Home()
+	 	elseif protocol.CHECK_Disassemble( instruction,Manager ) then 
+	 			 travel.xDissassemble( instruction.x , instruction.y , instruction.z  )
+	 			
+	 		--break
+	 	elseif protocol.CHECK_Support_MissingItem( instruction,Manager  ) then 
+	 	      say.danger ("Hello I wil set this shit okey ?")	
+	 	      local material = instruction.material
+			  for k,v in pairs(instruction) do
+			  	say.special (k.." : "..tostring(v))
+			  end
+print ("instruction.x : "..instruction.x)
+print ("instruction.y : "..instruction.y)
+print ("instruction.z : "..instruction.z) 	
+print ("material.fuel : "..material.fuel) 
+			  
+			  -- for k,v in pairs(instruction.material) do
+			  -- 	say.alert (k.." : "..tostring(v))
+			  -- end
+			 	  if material.fuel  then
+			 	  	if travel.checkFuelxTarget( instruction.x,instruction.y,instruction.z ) and calculate.fuelCompare( material.fuel ) then 
+				 	  	
+				 	  	say.success("I got request about fuel: "..tostring(material.fuel ).." missing.")
+			  	  		 travel.supTurtle( instruction.x , instruction.y , instruction.z, instruction.f, instruction.fObject  )
+				 	  	 refuel.valueObject( material.fuel  , "Front") -- refuel by
+			 	 		 travel.supHome(   )
+			 	  		
+			 	  	else
+			 	  		say.danger("fuel not enouth!")
+			 	  	end 
+			 	  end 	
+
+	 	elseif Manager ~= instruction.Manager  then 
+	 		print ("Expected manager "..tostring(Manager).." got "..tostring(sender).." uknown.")
+	 	
+	 	end  
+	 
+	 else 
+	 	print "Message equal nil ??"
+	 end 
+end 

@@ -1,0 +1,57 @@
+-- use to calculate total fuel value in inentory and check
+turtlefuel = {
+		[1] = {name = "minecraft:coal" , value = 80 };
+		[2] = {name = "minecraft:charcoal" , value = 80 } ;
+		[3] = {name = "minecraft:planks" , value = 15 };
+		[4] = {name = "minecraft:log" , value = 15 };
+		[5] = {name = "minecraft:coal_block" , value = 800 };
+}
+
+--- look when digging
+junk = {
+		[1] = {name = "minecraft:gravel"};
+		[2] = {name = "minecraft:stone"};
+		[3] = {name = "minecraft:dirt"};
+		[4] = {name = "minecraft:grass"};
+		[5] = {name = "minecraft:sand"}; 
+		[6] = {name = "minecraft:netherrack"};
+}
+-- look then serching in inventory as junk
+junkInventory = {
+		[1] = {name = "minecraft:gravel"};
+		[2] = {name = "minecraft:stone"};
+		[3] = {name = "minecraft:dirt"};
+		[4] = {name = "minecraft:grass"};
+		[5] = {name = "minecraft:cobblestone"};
+		[6] = {name = "minecraft:sand"};
+		[7] = {name = "minecraft:netherrack"};
+
+}
+
+--No use in of this eny code!
+turtleName = { [1] = {name = "ComputerCraft:CC-Turtle"} ,
+			   [2] = {name = "ComputerCraft:CC-TurtleAdvanced"},
+			   [3] = {name = "ComputerCraft:CC-TurtleExpanded"},
+			 } 
+
+
+solidBlock = {
+"minecraft:stone","minecraft:grass","minecraft:grass",
+"minecraft:dirt","minecraft:sand","minecraft:gravel",
+"minecraft:gold_ore","minecraft:iron_ore","minecraft:coal_ore",
+"minecraft:log",'minecraft:leaves','minecraft:lapis_ore',
+'minecraft:sandstone','minecraft:diamond_ore','minecraft:redstone_ore',
+'minecraft:ice','minecraft:snow','minecraft:clay','minecraft:pumpkin',
+'minecraft:brown_mushroom_block','minecraft:red_mushroom_block','minecraft:melon_block',
+'minecraft:mycelium','minecraft:emerald_ore','minecraft:stained_hardened_clay',
+'minecraft:leaves2','minecraft:log2','minecraft:hardened_clay','minecraft:packed_ice',
+'minecraft:stone','minecraft:grass','minecraft:dirt',
+'minecraft:cobblestone','minecraft:obsidian','minecraft:planks',
+'minecraft:log','minecraft:dispenser','minecraft:sandstone',
+'minecraft:sticky_piston','minecraft:wool','minecraft:gold_block',
+'minecraft:bookshelf','minecraft:mossy_cobblestone',
+'minecraft:crafting_table','minecraft:stonebrick','minecraft:soul_sand',
+'minecraft:netherrack','minecraft:nether_brick','minecraft:end_stone',
+
+
+}

@@ -1,0 +1,641 @@
+local Filename = "comunicate"
+ os.loadAPI("/programs/turtle_programs/JOBO/OS")
+
+OS.loadAPI("programs/turtleLib",Filename)
+OS.loadAPI("programs/say",Filename)
+OS.loadAPI("config".."/source/FileLibrary/fLib",Filename)
+OS.loadAPI("config/source/StatisticsProgram",Filename)
+OS.loadAPI("projectM/uttility",Filename)
+OS.loadAPI('programs/protocol',Filename)
+OS.loadAPI('programs/orientation',Filename)
+OS.loadAPI("/config/source/ConfigProgram",Filename)
+OS.loadAPI("/config/source/LogProgram",Filename)
+OS.loadAPI("/config/source/SupportProgram",Filename)
+local errorTime = 1
+
+local ManagerX = ConfigProgram.GET.xPos()
+local ManagerY = ConfigProgram.GET.yPos()
+local ManagerZ = ConfigProgram.GET.zPos()
+local ManagerF = ConfigProgram.GET.fPos()
+local yProgress = ConfigProgram.GET.yJob()
+local yJob =  ConfigProgram.GET.yJob()
+local GenerateJob =  ConfigProgram.GET.GenerateJob()
+local DropJunkItem = ConfigProgram.GET.DropJunkItem()
+
+local pathDATA = "config/statistics"
+local pathDATASupport = "config/support"
+local pathDATALog = "config/log"
+
+local function sleepMethod (sTime)
+     -- sleep (sTime)
+end 
+
+local  function cashTime(  )
+	local lenght = fLib.Lenght(pathDATA)
+	return (lenght/100)
+end
+
+function logic( info )
+	assert (type(info)=="table", "logic: expected table got "..tostring(info))
+		if  info.JobAvailable == true and info.JobComplete == true  and info.MissingItems == false  and info.Connected == true and info.JobAvailable == true  then 
+	        return true 
+	    end 
+	    return false     
+end
+
+--1. 
+function sendConnected( silence ) --check connecttion , save rezult
+	 protocol.updateMangerID(  )
+	 local data = fLib.GetAllLongLines( pathDATA )
+	 local xWait = cashTime(  )+.1
+	 for k,info in pairs(data) do
+	 	local line = StatisticsProgram.inspect_ID( info.ID)
+	 	 turtleLib.Send(info.ID,protocol.SET_Connected () )
+	 	 local sender,rec=  turtleLib.Receive(xWait)	 	 
+	 	     if sender == info.ID then 
+	 	     	say.success ("The "..info.ID.." is connected",silence)
+	 	     	-- set posityve default
+	 	     	info.Connected = true
+	 	     	info.Disassemble = false -- if connected , then is mean is okey -- false == true ;D
+	 	     	info.MissingItems = false  -- to triger first time when is
+-- 		set extra informaciont about turtle in statistic file
+	 	     	info.JobComplete = rec.JobComplete
+	 	       	fLib.ReplaceLongLineValue(pathDATA,line,info)
+	 	     elseif sender ~= info.ID then 
+	 	       -- this guy it not connectet with manager 
+	 	        -- print("Not connectet God dammit:",info.ID)
+	 	       	info.Connected = false
+	 	     	info.Disassemble = true -- if connected , then is mean is okey -- false == true ;D
+	 	       	info.MissingItems = "DontKnow"
+	 	       	fLib.ReplaceLongLineValue(pathDATA,line,info)
+	 	       	-- sleep(0.3)
+	 	     end 
+	 		 -- sleep(0)
+	 end
+end
+
+--2.
+-- This method shoud flag about how much left jobs
+-- Do nothing dramatics just keep all in place.
+function checkJob(  )
+	local line = 0; 
+	local data = fLib.GetAllLongLines(pathDATA)
+	local Jobleft = StatisticsProgram.isLeftJobAvailabel(  )
+		for k,info in pairs (data) do 
+		    line = line + 1  -- StatisticsProgram.inspect_ID(info.ID)
+		    -- tigger when is connected
+		    -- say.special ( "LeftJob "..Jobleft)sleep(5)
+			if logic( info ) and Jobleft > 0 or info.fTime ==true and Jobleft > 0 and info.Connected  then --while job value is higher
+				Jobleft = Jobleft -1 -- keep count in place
+			say.success ("Job available to:"..info.ID..", jobLeft:"..Jobleft)		
+				info.JobAvailable = true;
+				fLib.ReplaceLongLineValue (pathDATA,line,info)
+				sleepMethod (5)
+			elseif  info.jobError == true then 
+				say.warning ("WOWOW this dude gave up "..info.ID)
+			elseif info.Connected == true  and  info.JobComplete ==false and  info.JobAvailable == true  then 
+			 	say.success("|/".. info.ID.."/ alredy have the job." )
+				info.JobAvailable = true;
+			-- elseif info.Connected == true and Jobleft <= 0 then 
+			--      say.danger ("Jobs is out : "..line.." id "..info.ID) 
+			--      sleep(5)	
+			-- 	fLib.ReplaceLongLineValue (pathDATA,line,info)
+			elseif info.Connected == false and Jobleft > 0  and info.JobComplete == true and info.MissingItems == false  then 
+			say.warning ("JobAvailable but is not connected:"..info.ID)
+				info.JobAvailable = "?";
+				fLib.ReplaceLongLineValue (pathDATA,line,info)		
+			
+			elseif info.Connected and  Jobleft <= 0 then -- mark over shit : info.Connected == true and info.mark == false or
+			say.danger ("Job breaking "..info.ID.." !" )
+			-- say.warning("jobLeft: "..tostring(Jobleft) )
+			-- say.warning("Connected: "..tostring (info.Connected == true) )
+			-- say.warning("jobsTurtle: "..tostring(info.JobAvailable))
+			-- say.warning("MissingItems: "..tostring(info.MissingItems) )
+			-- say.warning("Connected: "..tostring(info.Connected))
+			-- say.warning("JobComplete: "..tostring(info.JobComplete))
+			-- say.warning("a: "..tostring(info.Connected == true  and  info.JobComplete ==false))
+			-- say.warning("b: "..tostring(info.Connected == true and info.JobAvailable == true  and info.JobComplete ==true and info.MissingItems == true ))
+			-- -- say.danger ("Job not available to:"..info.ID..tostring( not info.Connected == false and ", not Connected."))		
+				-- print "WOWOW"
+				info.JobAvailable = false; -- mark thad shit 
+				-- info.jobError = true -- say about error when job is less then turtles after booting 
+				fLib.ReplaceLongLineValue (pathDATA,line,info)
+				sleepMethod (1)
+			end
+		  -- sleep(5)
+		  end 	
+end
+-- sendConnected(  )
+-- checkJob(  )
+--3.
+--Trigger when something is connected and if job available and store in Statistic
+function nextJob(  ) -- 
+	local data = fLib.GetAllLongLines(pathDATA)
+ 	for k,info in pairs(data) do
+		if  info.JobAvailable == true and info.JobComplete == true  and info.MissingItems == false or info.fTime ==true and info.Connected == true and info.JobAvailable == true  then 
+ 	  
+ 	  local Iline = StatisticsProgram.inspect_ID( info.ID )		
+ 	  	say.alert ("Taking Job:"..info.ID) sleepMethod (1)
+
+ 		local new = StatisticsProgram.TakeJob(  ) 
+ 		 if new then 
+ 			-- say.success "Writing new job" sleep (3)
+ 			info.x = new.x;
+ 			info.y = new.y;
+ 			info.z = new.z;
+ 			info.f = new.f;
+ 			info.ID = info.ID;
+ 		 	fLib.ReplaceLongLineValue (pathDATA,Iline,info)
+ 			-- sleep(0) 
+ 			 else 
+ 			  say.success "Job run out!"
+ 			  checkJob(  ) --error "Job run out!"
+ 		 	  break
+ 		 end 	
+ 	 
+ 	 end 	
+
+ 	end
+
+end
+
+
+--4.
+-- send data where turtle shoud receive using protocol.SET_StoreJob protocol on bouth
+function storeJob(  )
+	local data = fLib.GetAllLongLines(pathDATA)
+
+	for k,info in pairs(data) do
+		if  logic (info) or info.fTime == true and info.JobAvailable == true then 
+			if  info.x ~= nil and info.z ~= nil and info.y ~= nil and info.f ~= nil then 
+			  
+			  if info.JobAvailable == true  then 	
+			   if info.Connected ==true  then
+			   	-- say.alert ("Connected>? :"..tostring(info.Connected ))
+				say.success ("-----------Next "..info.ID.." Job--------------")
+				sleepMethod (5)
+					local xNew = protocol.SET_StoreJob( {
+						x = info.x,
+						y = info.y,
+						z = info.z,
+						f = info.f,
+						fTime = info.fTime,
+						JobType =ConfigProgram.GET["GenerateJob"]() ,
+						yJob =ConfigProgram.GET["yJob"]() ,
+
+						-- DropJunkItem = ConfigProgram.GET["DropJunkItem"](),
+						})
+					StatisticsProgram.set_fTime (info.ID, false) -- very inportant. fTime shoud be here forever.
+					turtleLib.Send(info.ID,protocol.SET_StoreJob( xNew ))
+					-- sleep(0.1)
+			  	else say.warning("Job "..info.ID.." not stored.")
+			  	end 
+			   end 
+
+			elseif info.Connected ==false then say.warning ("StoreJob cannot give job non connected.."..info.ID..".. turtle")
+			else  error "Error, Coord fail to find correct value got nil"
+	  	   end  
+	    end 
+   
+
+	end
+end
+
+--5.
+-- Special
+function sendManagerGetStatus( forceStatus ) -- get turtle progress status 
+	 local data = fLib.GetAllLongLines( pathDATA )
+	 for k,info in pairs(data) do
+	 	if info.Connected == true and info.JobAvailable or info.Connected == true and forceStatus == true  then  -- cockblock here   
+	 	 turtleLib.Send(info.ID,protocol.SET_ManagerGetStatus( {x = info.x, y = info.y, z = info.z,} )) -- give job location to deside how much fuel needs
+	 	 say.alert ("/Update "..info.ID.." status..")
+	 	 local sender, rec =  turtleLib.Receive(5)-- to low just break everything :(/ keep hight -- Receive turtle made progress 
+	 		-- print ("sender: ",sender)
+	 	 --Try to save in here if okey 
+	 	    if sender ~= nil and sender == info.ID then 
+	 	    local ILine = StatisticsProgram.inspect_ID( info.ID )
+	 	      -- all cool 
+	 	       
+	 	       -- info.Progress = rec.Progress
+	 	       -- info.JobComplete = rec.JobComplete
+	 	       info.MissingItems = rec.MissingItems	
+	 	        -- for k,v in pairs(rec) do
+	 	        -- 	say.danger(k.." : "..tostring(v))
+	 	        -- end
+	 	         if  info.MissingItems == true  then  -- was: or info.fTime == true
+	 	         	 LogProgram.addLog(info.ID ,rec.material )
+	 	         	 -- print (" Log:Add Missing: "..info.ID)
+	 	         	 -- sleepMethod (5)
+	 	         	else 
+	 	         	LogProgram.removeLog(info.ID )
+	 	         end 	
+	 	    	fLib.ReplaceLongLineValue (pathDATA,ILine,info) -- update updated values 
+	 	    	
+	 	    	-- print ("Progress: ",info.Progress)
+	 	    	-- print ("Connected: ",info.Complete)
+	 	    	-- print ("MissingItems: ",info.MissingItems)
+	 	    	-- sleepMethod (5)
+		 		 else say.danger (info.ID.." no responde.")
+	 		end --else not save at all 
+	 	elseif info.Connected == false then   say.warning ("Not Connected with: "..info.ID.." to get status" ) --cock block working :D
+	 	end 	
+	 end
+end
+
+
+
+--6.
+function sendExecuteJob(  ) -- Only trigger when needet
+    local data = fLib.GetAllLongLines( pathDATA )
+	 for k,info in pairs(data) do
+	 	if  info.Connected == true and info.JobAvailable == true and info.MissingItems ==false  then   
+		 yProgress = ConfigProgram.GET.yJob()
+	 	 say.success ("Execute:Job Set to "..info.ID)
+	 	 turtleLib.Send(info.ID,protocol.SET_ExecuteJob( { -- Need table alway defolt 
+	 	 	   x = info.x;
+	 	 	   y = info.y;
+	 	 	   z = info.z;
+	 	 	   f = info.f;
+	 	 	   yProgress = yProgress;
+	 	 	} ))
+	 	 -- else print ("Not Connected "..info.ID);return false -- look in statistic where is connected . If not then come here
+		elseif info.JobAvailable == false then 
+			
+		elseif info.Connected == false then
+		-- say.warning (info.ID.." Not connected.")	
+		elseif info.MissingItems ~=false then 
+	 	 say.danger (info.ID.."-MissingItems:  droped" )
+		elseif info.JobComplete ~= true or info.fTime == true then
+			say.success( "This "..info.ID.." have a job." )
+		end  	 	 
+	 end
+end
+
+
+-- -- Alway send next job for available turtles
+-- function sendNewJob(  )
+-- 	sendConnected(  ) --1.Connect
+-- 	sleep(0)
+-- 	checkJob(  ) -- 2. Mark jobs
+-- 	sleep(0)
+-- 	nextJob(  ) -- 3.Set jobs to statistic
+-- 	sleep(0)
+-- 	storeJob(  ) -- 4.Send new jobs
+-- 	sleep(0)
+-- 	sendManagerGetStatus(  ) -- 5. Check fuelLevel with given new job
+-- 	sleep(0)
+-- 	sendExecuteJob()--6. -- execute job or continue old
+--     if not StatisticsProgram.isJob(  ) then  say.danger ("All job's is complete") end 
+-- end
+
+
+
+function sendGoHome(  ) -- broadcast everyone go home 
+	 local data = fLib.GetAllLongLines( pathDATA )
+	 for _,info in pairs(data) do
+	 	 turtleLib.Send(info.ID,SET_GoHome(  ))
+	 end
+end
+
+
+function sendDisassembleSingle( success,path ) -- Wait while not turtle arrive afther then turlte.digUp()
+	assert (type(success)=="boolean", "Disassemble Protocol requare success.")
+	 local data = fLib.GetAllLongLines( path )
+	 local line = 0
+	 for _,info in pairs(data) do
+line = line + 1 
+	 	 if info.Disassemble == false and info.Connected == true then 
+	 	  local xfront ,zfront = orientation.Front( ManagerF+1,1 )-- orientation.byValue( ManagerF+1,1 ) -- return in font turtle where shid be
+       turtleLib.Send(info.ID, protocol.SET_Disassemble())
+
+	 	 -- user Flag
+	 	 	if success then -- when fired up digUp
+	    	 		info.Disassemble = true 
+	 	       	fLib.ReplaceLongLineValue(path,line,info)
+
+
+			end 
+	 	  return info.ID 
+	 	 end 
+	 end
+ return false 
+end
+
+
+
+function sendDisassemble(  ) -- send All turtles disassemble
+	 say.alert "Starting disassemble" 
+     -- sendConnected( "silence" )
+      local success = true     
+           while success  do  
+                uttility.dropTurtleChest(  )
+                success= sendDisassembleSingle( false,pathDATA )
+     			 if success then 
+     			 	say.warning ("Waiting  #"..tostring(success).." to arrive!")
+          		 end 
+          local successKeep = success -- for print function 
+                while not turtle.detect() and success do -- all good just wait while turtle arrive
+                    sleep(0)
+                 end 
+                sleep(.2)
+                success=sendDisassembleSingle( turtle.dig(),pathDATA )
+            end 
+                sleep (.5)
+end
+
+
+
+-- Specific
+function dropJunkInChestSlave(  )
+	local tagets = fLib.GetAllLongLines( pathDATA )
+	
+	for k,target in pairs(tagets) do
+		if target.Connected then 
+		turtleLib.Send(target.ID,protocol.SET_dropJunk(  ))
+		end 
+	end
+end
+
+function suckFuelInChest(  )
+	local tagets = fLib.GetAllLongLines( pathDATA )
+	for k,target in pairs(tagets) do
+		if target.Connected then 
+			turtleLib.Send(target.ID,protocol.SET_suckFuel(  ))
+		end 
+	end
+end
+
+
+function destroyHomeChest(  )
+	local tagets = fLib.GetAllLongLines( pathDATA )
+	for k,target in pairs(tagets) do
+		if target.Connected then 
+			turtleLib.Send(target.ID,protocol.SET_DestroyHomeChest(  ))
+		end
+	end
+end
+
+function NotConnectedMissing(  )
+	local tagets = fLib.GetAllLongLines( pathDATA )
+	local tb = {}
+	local tb = {}
+	local i = 1
+	for k,target in pairs(tagets) do
+		if not target.Connected then 
+			  tb[i]= {}
+			
+			tb[i].x = target.x
+			tb[i].z = target.z
+			tb[i].ID= target.ID
+			i=i+1
+		end
+	end
+	return tb
+end
+
+
+-----Support turlte--------------------------------------------------------------
+
+function isSupportRequests(  )
+	return fLib.Lenght (pathDATALog)
+end
+
+function ForceMarkSupportSlave( )
+	local tagets = fLib.GetAllLongLines( pathDATA )
+	local line = 0
+	for k,target in pairs(tagets) do
+	 	  	line = line + 1
+	 	  	fLib.ReplaceLongLineValue(pathDATALog,line,{ID=target.ID})
+
+	end
+end
+
+
+
+-- Mark log to disassemble 
+function  MarkDisassembleSlave(  )
+    local tagets = fLib.GetAllLongLines( pathDATA )
+	local line = 0
+	say.alert"Marking slaves!"
+	for k,target in pairs(tagets) do
+	 	  	if target.Connected then 
+	 	  		turtleLib.Send (target.ID,protocol.SET_JunkAndFuelDissassemble() )
+	 	  		
+	 	  		local sender , data =  turtleLib.Receive (5)
+	 	  		if type (data.material) =="table" then 
+	 	  			-- print (target.ID.." " .. tostring( data.material.fuel))
+	 	  			 if type( data.material.fuel ) =="boolean" then data.material.fuel = 0 end 
+	 	  			if data.material.fuel > 0 or data.material.full == true  then 
+	 	  				 line = line + 1
+		 	  			data.material.command = "JunkSlave"
+		 	  			data.material.ID = target.ID
+		 	  			--if fuel equal boolen then covert to number
+		 	  			fLib.ReplaceLongLineValue(pathDATALog,line,data.material)
+	 	  		    end 
+	 	  		end 
+	 	  	end 
+	end
+	say.alert ("Slaves "..line.." not prepare to continue!")
+end
+
+-- Mark log to disassemble 
+function  MarkJunk(  )
+    local tagets = fLib.GetAllLongLines( pathDATA )
+	local line = 0
+	say.alert"Mark Junk!"
+	for k,target in pairs(tagets) do
+	 	  	if target.Connected then 
+	 	  		turtleLib.Send (target.ID,protocol.SET_JunkAndFuelDissassemble() )
+	 	  		
+	 	  		local sender , data =  turtleLib.Receive (5)
+	 	  		if type (data.material) =="table" then 
+	 	  			-- print (target.ID.." " .. tostring( data.material.fuel))
+	 	  			 if type( data.material.fuel ) =="boolean" then data.material.fuel = 0 end 
+	 	  			if   data.material.full == true  then 
+	 	  				 line = line + 1
+		 	  			data.material.ID = target.ID
+		 	  			--if fuel equal boolen then covert to number
+		 	  			fLib.ReplaceLongLineValue(pathDATALog,line,data.material)
+	 	  		    end 
+	 	  		end 
+	 	  	end 
+	end
+	say.alert ("Slaves "..line.." have junk!")
+end
+
+function sendSupportDisassemble(  )
+	 say.writeAlert "Starting disassemble support " 
+        -- sendSupportConnected(  )
+      local success = true     
+           while success  do  
+                uttility.dropTurtleChest(  )
+                success= sendDisassembleSingle( false,pathDATASupport )
+          local successKeep = success -- for print function 
+                while not turtle.detect() and success do -- all good just wait while turtle arrive
+                    sleep(0)
+                 end 
+                sleep(.2)
+                success=sendDisassembleSingle( turtle.dig(),pathDATASupport )
+            end 
+                say.success("complete!")
+                sleep (1)	
+end 
+--1
+function sendSupportConnected( silence )
+	local data = fLib.GetAllLongLines( pathDATASupport )
+	 local xWait = .2
+	 local line = 0;
+	 for k,info in pairs(data) do
+	 	 line = line + 1
+	 	 turtleLib.Send(info.ID,protocol.SET_Connected () )
+	 	 local sender,rec=  turtleLib.Receive(xWait)	 	 
+	 	     if sender == info.ID then 
+	 	     	say.success ("The support "..info.ID.." is connected",silence)
+	 	     	-- set posityve default
+	 	     	info.Connected = true
+	 	 		info.Disassemble = false 
+	 	       	fLib.ReplaceLongLineValue(pathDATASupport,line,info)
+	 	     elseif sender ~= info.ID then 
+	 	       -- this guy it not connectet with manager 
+	 	     	say.warning ("Support "..info.ID.." not connectet!",silence)
+	 	       	info.Connected = false
+	 	       	fLib.ReplaceLongLineValue(pathDATASupport,line,info)
+	 	     end 
+	 		 -- sleep(0)
+	 end
+end
+
+-- sendSupportConnected(  )
+--2x
+function sendSupportMovement( supID, targetID )
+	assert (SupportProgram.checkSupport( supID ), "sendSupportMovement expected support id got wrong!" )
+	assert (LogProgram.checkLog( targetID ),"sendSupportMovement expected taget id got  wrong!") 
+	 local supports = fLib.GetAllLongLines( pathDATASupport )
+	 local missings = LogProgram.getMissigItemsID(  )
+	 local line = LogProgram.checkLog( id ) 
+	 
+			local target = SupportProgram.getTargetHomeLocation( targetID )
+				turtleLib.Send (supID , protocol.SET_Support_Movement( {
+					turtleID = supID;
+					x= target.x;
+					y= target.y;
+					z= target.z;
+					f= orientation.toNameOrientation(  target.f ); -- convert in undertan use
+					material = LogProgram.readLog( targetID )
+			 	} ))
+					local sender, message = turtleLib.Receive (1)
+					if type (message)== "table" then 
+						return message.Movement
+					end 
+
+end
+
+-- sendSupportMovement(  )
+-- print (sendSupportMovement( 143,167 ))
+
+--X
+local function sendSupportTargetLocation( supID,targetID,protocolHere )
+	assert (SupportProgram.checkSupport( supID ), "sendSupportTargetLocation expected support id got wrong!" )
+	assert (LogProgram.checkLog( targetID ),"sendSupportTargetLocation expected taget id got "..tostring(targetID).." wrong!") 
+	assert (type(protocolHere)=="function","sendSupportTargetLocation expected protocol got "..tostring(protocolHere))
+	 local supports = fLib.GetAllLongLines( pathDATASupport )
+	 local missings = LogProgram.getMissigItemsID(  )
+	 
+						local target = SupportProgram.getTargetHomeLocation( targetID )
+					
+
+				turtleLib.Send (supID , protocolHere( {
+					turtleID = targetID;
+					x= target.x;
+					y= target.y;
+					z= target.z;
+					f= orientation.toNameOrientation(  target.f ); -- convert in undertan use
+			 	} ))
+					 	
+end 
+
+local function sendSupportRequest( supID,targetID )
+	assert (SupportProgram.checkSupport( supID ), "sendSupportMovement expected support id got wrong!" )
+	assert (LogProgram.checkLog( targetID ),"sendSupportMovement expected taget id got "..tostring(targetID).." wrong!") 
+	 local supports = fLib.GetAllLongLines( pathDATASupport )
+	 local missings = LogProgram.getMissigItemsID(  )
+	 
+
+					
+						local target = SupportProgram.getTargetHomeLocation( targetID )
+					
+
+				turtleLib.Send (supID , protocol.SET_Support_MultypleItem( {
+					turtleID = targetID;
+					x= target.x;
+					y= target.y;
+					z= target.z;
+					f= orientation.toNameOrientation(  target.f ); -- convert in undertan use
+					material = LogProgram.readLog( targetID )
+			 	} ))
+			    	
+end
+
+--3
+-- full delivery/retryve method for suppots
+function sendSupport_Multiple_Item_Request ( silence )
+	local supports = fLib.GetAllLongLines( pathDATASupport )
+	 local count = 0
+	 local suppotAccepted = 0
+	 local supportinProgress = 0
+	 local notConnected = 0
+	 for ln,support in pairs(supports) do
+	 	 	count = count + 1
+	 	 	supportinProgress = supportinProgress + 1
+	 	 
+	 	 if support.Connected == false then 
+	 	 	notConnected = notConnected -1
+	 	  end
+	 	 
+	 	if support.Connected == true then 
+	 		local Target = LogProgram.readFirstLog(  )
+	 	    suppotAccepted = suppotAccepted + 1
+	 	    if Target and sendSupportMovement( support.ID, Target.ID ) then
+	 	    	-- print ("WOHOHO+++ "..ln)
+	 	--     	-- 
+	 		say.success (" Support "..support.ID.." works on "..Target.ID.." turtle!",silence)
+
+	 		sendSupportRequest( support.ID,Target.ID )
+						LogProgram.removeLog( Target.ID ) -- remove to continue parsing
+             else 
+             	-- if send support posability to continue request failed!
+             	supportinProgress = ( supportinProgress - 1 ) + notConnected
+	 	    end  
+	 	end 
+	 end
+	 --  if >0 that mean is support can do request and is connected
+	 return supportinProgress>0, suppotAccepted>0
+end
+
+
+
+
+function sendSupportTakeJunk(  )
+	local tagets = fLib.GetAllLongLines( pathDATA )
+	local supports = fLib.GetAllLongLines( pathDATASupport )
+	for k,support in pairs(supports) do 
+			 	 sendSupportConnected(  )
+			 local target = LogProgram.readFirstLog(  )
+			if  support.Connected == true then 
+			 	print ("target "..target.ID.." support "..support.ID)
+			 	sendSupportTargetLocation( support.ID,target.ID,protocol.SET_Support_TakeJunk )
+			 	LogProgram.removeLog( target.ID )
+			 	 sendSupportConnected(  )
+				return LogProgram.logLenght(  ) > 0 
+		    end 	
+	end
+
+return LogProgram.logLenght(  ) > 0 
+end
+
+-- sendSupportMultipleItem (  )
+
+function supportRequests(  )
+	return LogProgram.countLogs(  )
+end
+

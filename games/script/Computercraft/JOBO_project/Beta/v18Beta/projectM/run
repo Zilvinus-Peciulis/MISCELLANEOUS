@@ -1,0 +1,172 @@
+--Super Computer index
+local xTerm, yTerm = term.getSize()
+----BOOT.-------------------------------------------
+shell.run("/programs/BOOT/BOOT_DEFOULT_TURTLE_COORD") 
+os.loadAPI("/programs/BOOT/BOOT_TURTLE")
+
+-- uttility.changeCoord ( command )  
+--end--------------------------------------------------------------------- 
+
+--..Load.file.that.need.API.................................................................
+os.loadAPI("/programs/turtle_programs/JOBO/moreFile/GPS/refuelLib")
+os.loadAPI("config/DATA/GenerateJobCoord/JobCoordProgram")
+os.loadAPI("config/source/StatisticsProgram")
+os.loadAPI("/programs/Require_Items/source/requestAPI")
+os.loadAPI("config/DATA/GenerateHomeCoord/HomeCoordProgram")
+os.loadAPI("/config/source/ConfigProgram")
+os.loadAPI("/programs/turtleLib")
+os.loadAPI("/programs/comunicate")
+os.loadAPI("projectM/uttility")
+os.loadAPI("projectM/job")
+os.loadAPI("/programs/say")
+os.loadAPI("/config/source/LogProgram")
+OS.loadAPI("config/DATA/GenerateSupportCoord/SupportCoordProgram")
+OS.loadAPI("config/source/SupportProgram")
+os.loadAPI("/programs/Require_Items/source/requestAPI")
+os.loadAPI("config/source/StatisticsProgram")
+os.loadAPI("programs/inventory")
+os.loadAPI("/programs/BOOT/BOOT_TURTLE")
+os.loadAPI("programs/chestLib")
+os.loadAPI("programs/orientation")
+
+-- --Junk API
+os.loadAPI ("/programs/GUI/Background/Animations/MatrixAnimation/MatrixProgram")
+
+----- MANAGER 
+--StatisticsProgram.Costructor( "GenerateQuarry" )
+
+local tHistory = {"job","newJob","lost","option","newCoordinates","moveOut","jobLeft","place","disk","takeJunk","status","connect","sendSupport","sendNewJob","exit"}
+function spitText(  )
+   local text = "" 
+    for k,v in pairs(tHistory) do
+       if k == 1 then 
+       text = text.." "..v
+       else 
+       text = text..", "..v
+       end 
+    end
+say.success (text)
+end
+-- HomeCoordProgram.GenerateHomeCoord(  )
+-- uttility.CHANGE_yJobEnd(  )
+-- uttility. CHANGE_DungeonChest(  )
+while  uttility.ManagerReady(  ) and BOOT_TURTLE.WakeModem(  )    do 
+shell.run("clear")
+spitText(  )
+command = read(nil, tHistory)
+-- destroyHomeChest(  )/
+  
+  if command== "place" then
+  if not BOOT_TURTLE.ResetIfFloppy(  ) then 
+    say.alert ( turtleLib.isTurtle() and "Turtle's are placed!" or "No turtle" )
+     uttility.TurtlesKickStart( )
+     else say.danger "I have floppy and drive!"
+   end   
+     uttility.WaitEnter()
+   elseif command == "lost" then 
+    uttility.clear()
+    uttility.getNotConnectedSlaves(  )
+    uttility.WaitEnter()
+   elseif command =="option" then 
+    uttility.clear()
+    say.special ("Here can change sum of default!")
+        if uttility.acceptedUser( text ) then 
+          uttility.CHANGE_TurtlesNames(  )
+          uttility.CHANGE_yJobStart(  )
+          uttility.CHANGE_yJobEnd(  )
+          uttility.CHANGE_DropJunkItem(  )
+          uttility. CHANGE_DungeonChest(  )
+          say.success "Options changed!"
+        else say.warning "Options not changed!"
+        end 
+    uttility.WaitEnter()
+   elseif command == "jobLeft" then 
+
+    if uttility. jobAlert( "silence" ) then 
+        say.writeAlert ("Wait feed back ")
+        comunicate.sendConnected( 'silence' ) --1.Connect
+        say.success (" complete!")
+        say.special "Updating status!"
+        comunicate.sendManagerGetStatus(  )
+    end  
+    uttility. jobAlert(  )
+    uttility.WaitEnter()
+    elseif command == "moveOut" then 
+      if uttility.moveOut(  ) then
+         uttility.WaitEnter()
+         uttility.clear()
+         say.alert "Bye"
+         sleep (1.9)
+        os.shutdown()
+      end 
+      uttility.WaitEnter()
+    elseif command ==  "exit" then 
+      if uttility.acceptedUser(  ) then 
+        term.clear( )
+        term.setCursorPos(1,1)
+      break 
+      end 
+    elseif command == "takeJunk" then 
+     if job.sendSupportTakeLastJunk(  ) then 
+        sleep(1)
+        comunicate.suckFuelInChest(  ) 
+     end    
+      uttility.WaitEnter()
+    elseif command == "newCoordinates" then 
+       uttility.changeCoord ( "clearCamp" ) 
+      uttility.WaitEnter ()
+    elseif command == "status" then 
+      uttility.getCoord(  )
+      uttility.WaitEnter()
+      uttility.getMoreOption(  )
+      uttility.WaitEnter()
+    elseif command == "job" then 
+      if uttility. jobAlert(  ) then 
+          while true  do 
+            local about = job.sendNewJob(  )
+             local jobs = job.countleftJob(  )     
+                  job.sendSupport(  )  
+                   uttility.TurtlesKickStart( )
+                   if about then say.warning "All jobs is complete!"
+                   else 
+                        if jobs then  say.writeSuccess ("Job left #"..jobs.." ") say.alert ("complete "..job.Procent(  ).."%" ) end 
+                        say.super ("Job in progress!")
+                   end 
+                   sleep(10)
+                   if  about then break end 
+          end
+       end  
+       uttility.WaitEnter()  
+    elseif command == "newJob" then
+          uttility.changeJobLocation(  )
+          uttility.WaitEnter()
+    elseif command == "sendSupport" then 
+        job.sendSupport(  )
+        uttility.WaitEnter()
+    elseif command == "generate" then
+         -- job.MarkToResetTurtleJobs(  )-- point to reset turtle memory
+         -- job.JobGenerator(  )
+         uttility.WaitEnter()
+    elseif command == "disk" then
+    if  BOOT_TURTLE.ResetIfFloppy(  ) then 
+        if uttility.acceptedUser ("Warinig:Lose all progress") then 
+            local status, mark = BOOT_TURTLE.UpdateDisk ()  
+        end 
+        else say.warning "I canno't continue no tow floppy and no two drive!"
+    end      
+   
+             uttility.WaitEnter()
+    
+
+    elseif command == "connect" then 
+                comunicate.sendConnected(  )
+                comunicate.sendSupportConnected(  ) 
+               uttility.WaitEnter()
+    elseif command =="sendNewJob" then
+   if   uttility. jobAlert(  ) then
+      job.sendNewJob(  )
+   end  
+    uttility.WaitEnter()
+    end
+       
+end 

@@ -1,0 +1,150 @@
+term.clear()
+term.setCursorPos(1,1)
+
+local tArg = {...}
+local length = tonumber(tArg[1]);
+
+assert(type(length)=="number" or type(height)=="number","Require [length]")
+
+ 
+
+print "Starting program"
+
+function placeBlock(side,cmd)
+local side = side or ""
+assert(side == "Down" or side == "Up" or side =="", "placeBlock require 'Down','Up'") 
+ if not turtle.detectDown() or cmd =="notDetect" then  
+    for slt = 1,16 do 
+      if turtle.getItemCount(slt)>0 then 
+        turtle.select(slt)
+        if turtle["place"..side] ()then 
+        break
+        end
+      end
+    end
+   turtle.select(1)
+  end 
+end 
+
+function refuel()
+ if turtle.getFuelLevel() < 10 then 
+   if turtle.getItemCount(16) >0 then  
+      turtle.select(16)
+      local refuel = turtle.refuel(2)
+      turtle.select(1)
+      return refuel
+   end 
+      return false
+ else return true 
+ end  
+end
+
+local m = 0
+function mined (rtn)
+ if rtn ~= "return" then 
+   m  = m + 1
+   else return m
+ end
+end
+
+function up()
+  while refuel() and not turtle.up() do 
+   if turtle.digUp() then mined() end
+    end
+end
+
+
+function down() 
+  while refuel() and not turtle.down() do 
+   if turtle.digDown() then mined() end
+  end
+end
+
+function fd()
+  while refuel() and not turtle.forward() do
+   if turtle.dig()   then mined() end
+  end
+end
+
+function bk()
+ while not turtle.back() do 
+ sleep(1)
+ end
+end
+
+function dig(side)
+local side = side or ""
+assert(side=="Up" or side =="Down" or side=="","dig require side 'Up' 'Down'")
+  while turtle["detect"..side]() do 
+     if turtle["dig"..side]()  then mined() end
+  end
+end
+
+function move()
+fd()
+dig("Up")
+end
+
+function torch (crnt)
+  local trcRad = 8;
+  if crnt%trcRad == 0 then 
+    for slt = 1,16 do 
+      if turtle.getItemCount(slt)>0 then
+        local itm = turtle.getItemDetail(slt)
+        print(itm.name)
+        if itm.name == "minecraft:torch" then
+          turtle.select(slt)
+           local pl =  turtle.place()
+           turtle.select(1) 
+           return pl
+        end      
+      end
+    end 
+  end
+return true -- while no torch or torch is placed correctly
+end
+
+function layer (crnt)
+
+turtle.turnRight()
+   placeBlock("Down")
+    dig() 
+    up()
+    dig()
+     if not torch(crnt) then fd() placeBlock(nil,"notDetect") bk() torch(crnt) end
+    turtle.turnLeft();turtle.turnLeft()
+    dig()
+    down()
+    dig()
+    turtle.turnRight() 
+end 
+
+function annonce (crnt)
+ local proc = crnt;
+ local about = 7;
+ if about%crnt == 0  then 
+  print ("Mined "..mined("return").." block's, "..math.floor(proc/length*100).."%")
+ end
+end
+
+--annonce (length)
+
+--layer(length)
+
+--placeBlock(nil,"notDetect")
+
+--print(torch(length))
+
+
+
+for exec = 1, length do 
+  annonce(exec)
+  layer(exec)
+  if length > exec then move() end
+end
+term.clear()
+term.setCursorPos(1,1)
+print "Program complete!"
+print ("Mined "..mined("return").." block's")
+
+

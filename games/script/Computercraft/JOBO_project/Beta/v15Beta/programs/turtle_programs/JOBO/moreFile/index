@@ -1,0 +1,7 @@
+-- Turtle index
+print "INDEX FILE IS LOADING..."
+
+-- Core Statup Data---------------------------------------------------
+os.loadAPI("/moreFile/programs/BOOT/BOOT_HOMECOORD") -- Booting first time 
+---end-----------------------------------------------------------------
+os.loadAPI ( "moreFile2/projectT/transition")

@@ -1,0 +1,14 @@
+os.loadAPI ("/programs/BOOT/BOOT_MODEM")
+shell.run "clear"
+-- Point to project files
+  if BOOT_MODEM.condition then 
+    if os.getComputerLabel() == nil then os.setComputerLabel('['..os.getComputerID()..']Manager') 
+    elseif not string.find(os.getComputerLabel(),"]") then   os.setComputerLabel('['..os.getComputerID()..']'..os.getComputerLabel())  
+    end 
+       print "Launching Program";
+	   shell.run ("projectM/run")
+  else error "Modem not found"  
+  end 	
+			
+
+

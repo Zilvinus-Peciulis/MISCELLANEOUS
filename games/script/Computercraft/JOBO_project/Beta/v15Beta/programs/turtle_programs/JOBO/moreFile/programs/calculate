@@ -1,0 +1,123 @@
+--  Works on turtle only
+os.loadAPI("/moreFile/programs/config/HomeCoord/HomeCoordProgram")
+os.loadAPI("/moreFile/GPS/source/gps_Program")
+os.loadAPI("/moreFile/programs/refuel")
+os.loadAPI("/moreFile/programs/config/configProgramT")
+
+
+ -- orientations = {['SOUTH'] = 1 , ['WEST'] = 2 , ['NORTH'] =3  , ['EAST']=4 };
+
+-- always same 
+local xHome = HomeCoordProgram.GET["xHome"] ()
+local yHome = HomeCoordProgram.GET["yHome"] ()
+local zHome = HomeCoordProgram.GET["zHome"] ()
+
+function inHomeLocation(  ) -- cheking where are home location or false
+	
+ if xHome ==  gps_Program.GET["xLocation"] () and 
+ 	zHome == gps_Program.GET["zLocation"] () then return true end
+  return false
+end
+
+-- Rule.1 From Home
+-- Rule.2 To Home
+
+--- Fix Coords
+--fix Home to xTravel  while going From Home 
+function crossTravelFrom(orientation, xDis , zDis   ) -- desid where to move to look good. DONT DERP METHOD
+assert ( orientation == "SOUTH" or orientation == "WEST" or orientation == "NORTH" or orientation == "EAST", "crossTravel:Requare,SOUTH,WEST,NORTH,EAST." )	
+assert (type (xDis)== "number", "xDis requare number")	
+assert (type (zDis)== "number", "zDis requare number")	
+	-- - 48
+	-- - -185
+	local xLoc =  gps_Program.GET["xLocation"] () 
+	local zLoc =  gps_Program.GET["zLocation"] ()
+	local xCor;
+	local zCor;
+
+	if orientation == "WEST" or orientation == "EAST" then 
+			-- print "HAHA"
+			-- Magic happend
+			-- Cach curretn location to prevent not going that location first for style.
+			xCor = xDis;
+			zCor = zLoc;
+	else 
+			-- print ("xDis: ",xDis," zDis:",zDis)
+			xCor = xLoc;
+			zCor = zDis;
+
+	end 	
+-- print ("HomexCor: ",xCor," HomezCor: ",zCor)
+return xCor , zCor
+end
+
+--fix xTravel when going home 
+-- orentate to more friendly traveling to xDistination
+function crossTravelTo(orientation, xDis , zDis   ) -- desid where to move to look good. DONT DERP METHOD
+assert ( orientation == "SOUTH" or orientation == "WEST" or orientation == "NORTH" or orientation == "EAST", "crossTravel:Requare,SOUTH,WEST,NORTH,EAST." )	
+assert (type (xDis)== "number", "xDis requare number")	
+assert (type (zDis)== "number", "zDis requare number")	
+	-- - 48
+	-- - -185
+	local xLoc =  gps_Program.GET["xLocation"] () 
+	local zLoc =  gps_Program.GET["zLocation"] ()
+	local xCor;
+	local zCor;
+
+	if orientation == "WEST" or orientation == "EAST" then 
+			-- print "HAHA"
+			xCor = xLoc;
+			zCor = zDis;
+	else 
+			-- print ("xDis: ",xDis," zDis:",zDis)
+			xCor = xDis;
+			zCor = zLoc;
+
+	end 	
+-- print ("JobxCor: ",xCor," JobzCor: ",zCor)
+return xCor , zCor
+end
+
+---
+
+
+-- Calcule home much path will face in.
+function TravelTotalBlocks( )
+
+local xJob = configProgramT.GET["xJob"]()
+local yJob = configProgramT.GET["yJob"]()
+local zJob = configProgramT.GET["zJob"]()
+
+local upDownTravel = (2 + 1) * 2 
+assert (xJob and yJob and zJob , "TravelTotalBlocks: requare xJob , yJob , zJob got:"..tostring("x:",xJob," y:",yJob," z:",zJob))	
+
+-- print ("xJob "..tostring(xJob)..", xHome "..tostring(xHome))
+-- print ("yJob "..tostring(yJob)..", yHome "..tostring(yHome))
+-- print ("zJob "..tostring(zJob)..", zHome "..tostring(yHome))
+-- print ("upDownTravel ",upDownTravel)
+
+
+ local total = (   math.abs(xHome - xJob)  + math.abs(yHome - yJob) + math.abs(zHome - zJob) ) *2 + upDownTravel
+ -- print ("Total Calcule: ",total)
+return total  -- go to, back from 
+ end
+
+ function TravelTotal(xTarget,yTarget,zTarget )
+assert(type(xTarget)== "number" or type(yTarget)== "number" or type(zTarget)== "number", "TravelTotal expected xTarget,yTarget,zTarget numbers got x "..tostring(xTarget).." y "..tostring(yTarget).." z "..tostring(zTarget))
+local xJob = xTarget
+local yJob = yTarget
+local zJob = zTarget
+
+assert (xJob and yJob and zJob , "TravelTotalBlocks: requare xJob , yJob , zJob got:"..tostring("x:",xJob," y:",yJob," z:",zJob))	
+ local total = (   math.abs(xHome - xJob)  + math.abs(yHome - yJob) + math.abs(zHome - zJob) ) *2 
+ -- print ("Total Calcule: ",total)
+return total  -- go to, back from 
+ end
+
+
+ function fuelCompare( value )
+ 	assert (type(value)== "number", "fuelCompare expected number got "..tostring(value))
+	local sub = value < ( refuel.fuelTotal(  ))
+	 print ("fuelCompare: "..tostring(sub)..", ".. value .." value < ".. refuel.fuelTotal(  ))
+	 return sub
+ end

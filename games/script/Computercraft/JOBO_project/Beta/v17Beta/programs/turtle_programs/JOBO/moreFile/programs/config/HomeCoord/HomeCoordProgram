@@ -1,0 +1,113 @@
+--print (shell.dir())
+os.loadAPI("OS")
+OS.loadAPI("/moreFile/programs/config/source/FileLibrary/fLib","HomeCoordProgram")
+
+local path = "/moreFile/programs/config/HomeCoord/HomeCoord"
+    assert ( fs.exists(path) , "Path not found, please write correct one") -- firewall if not exist path
+
+
+SET = {
+	POST  = function ( line , text )
+		assert(line, "Requare initial line")
+		assert(text~=nil, "Requare initial text")
+	    fLib.replaceLineValue( path , line ,text , ":" )
+	end;
+   
+   xHome = function (this)
+      assert (type(this)=="number" , "Requare initial number xHome.")
+	  SET.POST(1, this)
+   end;
+
+    yHome = function (this)
+      assert (type(this)=="number" , "Requare initial number yHome.")
+	  SET.POST(2, this)
+   end;
+
+    zHome = function (this)
+      assert (type(this)=="number" , "Requare initial number zHome.")
+	  SET.POST(3, this)
+   end;
+
+    fHome = function (this)  
+      assert (this=='SOUTH' or this =='WEST' or this == 'NORTH' or this == 'EAST'  , "Requare  side:SOUTH,WEST,NORTH,EAST, error: "..tostring(this)..".")
+	  SET.POST(4, this)
+   end;
+
+	CoordComplete = function (this)
+      assert (type(this)=="boolean" , "Requare initial boolean CoordComplete.")
+	  SET.POST(5, this)
+   end;
+   PlacedChests = function (this)
+      assert (type(this)=="boolean" , "Requare initial boolean PlacedChests.")
+	  SET.POST(6, this)
+   end;
+  
+  orArrive = function (this)
+      assert (type(this)=="boolean" , "Requare initial boolean orArrive.")
+	  SET.POST(7, this)
+   end;
+
+   HomeCoordData = function (this)
+      assert (type(this)=="boolean" , "Requare initial boolean HomeArrivedFirstTime.")
+    SET.POST(8, this)
+   end;
+	
+}
+
+
+GET ={
+	 GETPOST = function( line )
+	 	assert(type(line)=="number", "Requare initial line")	 	 
+	 	return fLib.getLineValue( path , line ,":")
+	 end; 
+
+	xHome = function ()
+	  return  GET.GETPOST(1)
+    end;
+
+    yHome = function ()
+	  return  GET.GETPOST(2)
+    end;
+
+    zHome = function ()
+	  return  GET.GETPOST(3)
+    end;
+
+    fHome = function ()
+	  return  GET.GETPOST(4)
+    end;
+
+    CoordComplete = function ()
+	  return  GET.GETPOST(5)
+   end;
+
+    PlacedChests = function ()
+	  return  GET.GETPOST(6)
+   end;
+
+   orArrive = function ()
+	  return  GET.GETPOST(7)
+   end;
+   HomeCoordData = function ()
+    return  GET.GETPOST(8)
+   end;
+     
+}
+
+os.unloadAPI("/moreFile/programs/config/source/FileLibrary/fLib")
+
+--[[
+SET.isDisk(false)
+SET.xPos(55)
+print(GET.xPos())
+
+	print(GET.isDisk())
+	print(GET.xPos())
+	print(GET.yPos())
+	print(GET.zPos())
+	print(GET.fPos())
+print ( type(GET.isDisk()))
+
+--os.unloadAPI(shell.dir().."/source/FileLibrary/fLib")
+]]
+

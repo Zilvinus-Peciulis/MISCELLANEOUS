@@ -1,0 +1,75 @@
+
+
+
+os.loadAPI("/programs/comunicate")
+os.loadAPI("config/source/StatisticsProgram")
+os.loadAPI("/config/source/ConfigProgram")
+
+
+
+function JobGenerator(  )
+local getGeneratorType = ConfigProgram.GET.GenerateJob()
+      StatisticsProgram.Costructor( getGeneratorType )
+end
+
+function wipeMemory( ... )
+		 -- JobGenerator(  )
+         StatisticsProgram.DeleteStatistic(  )
+         -- StatisticsProgram.GenerateHomeCoord(  )
+end
+
+function countleftJob(  )
+	local xJLeft = 	StatisticsProgram.isLeftJobAvailabel(  )
+	return xJLeft > 0 and xJLeft 
+end
+
+function completeJobs(  )
+return StatisticsProgram.completeJobs(  )
+end
+
+function isEmpty(  )
+	return StatisticsProgram.isEmpty(  )
+end
+
+function leftJob(  )
+	return StatisticsProgram.isLeftJobAvailabel(  )
+end
+
+
+-- Alway send next job for available turtles
+function sendNewJob(  )
+	comunicate.sendConnected(  ) --1.Connect
+	sleep(0)
+	comunicate.checkJob(  ) -- 2. Mark jobs
+	sleep(0)
+	comunicate.nextJob(  ) -- 3.Set jobs to statistic
+	sleep(0)
+	comunicate.storeJob(  ) -- 4.Send new jobs
+	sleep(0)
+	comunicate.sendManagerGetStatus(  ) -- 5. Check fuelLevel with given new job
+	sleep(0)
+	comunicate.sendExecuteJob()--6. -- execute job or continue old
+	print ("job Complete: "..tostring( completeJobs(  )) )
+	print ("Job left: "..tostring ( countleftJob(  ) ) )
+    if  completeJobs(  ) and not countleftJob(  )  then  say.danger ("All job's is complete!") return true else return false end 
+end
+function disassemble(  )
+	 comunicate.sendDisassemble(  )
+end
+
+
+
+function sendSupport(  )
+local wasRequests = comunicate.supportRequests(  )
+
+    comunicate.sendSupportConnected(  )	
+	comunicate.sendWHereMissingItems(  )
+local Requests = comunicate.supportRequests(  )
+say.alert ( "Requests left  "..Requests.." , was: "..wasRequests..".")
+-- return about job is comple
+if Requests > 0 then return false else return true end 
+end
+
+
+
+

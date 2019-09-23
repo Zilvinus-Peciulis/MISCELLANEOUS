@@ -1,0 +1,511 @@
+--{program="bHalfTimberHouse",version="1.01",date="2013-12-01",basicFunc="0.11",basicFuncDate="2013-09-26",addFunc="0.00"",addFuncDate="n.a."}
+---------------------------------------
+-- 2013-12-01, v1.01   info corrected
+-- 2013-11-30, v1.00   initial
+---------------------------------------
+-- basic functions: v1.11, 2013-09-26
+-- additional func: n.a.
+---------------------------------------
+
+---------------------------------------
+---- VARIABLES ------------------------ 
+---------------------------------------
+local blnSkipWait=false
+local blnFullHouse=true
+local blnDigEntrance=true
+
+---------------------------------------
+---- tArgs ----------------------------
+---------------------------------------
+local tArgs = {...}
+if #tArgs == 1 then -- no error check
+  blnSkipWait=tArgs[1]
+end
+
+
+function FuelRequare(  )
+  return 1656
+end
+
+
+
+---------------------------------------
+-- basic functions for turtle control -
+---------------------------------------
+local function gf()  while not turtle.forward()   do end end
+local function gb()  while not turtle.back()      do end end
+local function gu()  while not turtle.up()        do end end
+local function gd()  while not turtle.down()      do end end
+local function gl()  while not turtle.turnLeft()  do end end
+local function gr()  while not turtle.turnRight() do end end
+local function df()  turtle.dig()       end
+local function du()  turtle.digUp()     end
+local function dd()  turtle.digDown()   end
+local function pf()  turtle.place()     end
+local function pu()  turtle.placeUp()   end
+local function pd()  turtle.placeDown() end
+local function sf()  turtle.suck()      end
+local function su()  turtle.suckUp()    end
+local function sd()  turtle.suckDown()  end
+local function Df()  turtle.drop()      end
+local function Du()  turtle.dropUp()    end
+local function Dd()  turtle.dropDown()  end
+local function ss(s) turtle.select(s)   end
+
+local function waitKey(strText)
+  local event, scancode
+  write(strText) 
+ local read = read()
+  print()
+end
+
+
+function Listed_Item( silence )
+---------------------------------------
+-- builder program --------------------
+---------------------------------------
+   if  silence ~= "silence" then 
+  ---------------------------------------
+-- builder program --------------------
+---------------------------------------
+term.clear() term.setCursorPos(1,1)
+ print("+-------------------------------------+")
+ print("| Put in slot no. listed materials:   |")
+ print("|  1-3: wall1(64,64,19) 4: wall2(61)  |")
+ print("|    5: fences(8+8)  6: stairs(4)     |")
+ print("|    7: slabs1(62)   8: slabs2(59)    |")
+ print("| 9+10: logs/planks(64,43)            |")
+ print("|   11: glass(42)   12: torches(10)   |")
+ print("|   13: pressure plate(1)             |")
+ print("|   14: door(1)(opt.B)   16:(opt.A)   |")
+ print("+-------------------------------------+")
+ if not blnSkipWait then 
+   waitKey("Put in materials + press key!")
+ end
+ term.clear() term.setCursorPos(1,1)
+ print("+-------------------------------------+")
+ print("| Option A:                           |")
+ print("|  Put block(s) in slot 16  to only   |")
+ print("|  build ground floor (less mats req).|")
+ print("| Option B:                           |")
+ print("|  If you put no item in slot 14(door)|")
+ print("|  then turtle won't dig an entrance. |")
+ print("|  Use this for multi-story houses.   |")
+ print("|  This may need 16 fences in slot 5. |")
+ print("+-------------------------------------+")
+ if not blnSkipWait then 
+   waitKey("Put in materials + enter!")
+ end
+  end 
+        --1  2  3  4  5  6  7  8  9  10 11 12 13 14 15
+  local slot = {64,64,19,61,16,4,62,59,64,43,42,10}
+
+  local  solidBlocksValue = 315
+  return solidBlocksValue , {
+  {"minecraft:fence",value = 16},
+  {"minecraft:glass_pane",'minecraft:glass',value = 42}, 
+  {"minecraft:stone_stairs","minecraft:oak_stairs","minecraft:sandstone_stairs",'minecraft:nether_brick_stairs',value = 4},
+  {"minecraft:stone_slab",'minecraft:wooden_slab',value = 121}, 
+  {"minecraft:fence",value = 16},
+  {"minecraft:glass_pane",'minecraft:glass',value = 26}, 
+  {"minecraft:torch",value = 10},   
+},slot
+end
+
+function run () 
+ -- check options
+ if turtle.getItemCount(16)>0  then blnFullHouse  =false end
+ if turtle.getItemCount(14)==0 then blnDigEntrance=false end
+ 
+ term.clear() term.setCursorPos(1,1)
+ print("Let's build something nice:")
+ print("  working on layer 1 ...") gl()
+ gl() gb() gb() ss(10) pf() gb() ss(1)
+ pf() gb() ss(2) pf() gb() ss(2) pf()
+ gb() ss(2) pf() gb() ss(10) pf() gb()
+ ss(2) pf() gb() ss(2) pf() gb() ss(2)
+ pf() gb() ss(2) pf() gr() gb() ss(10)
+ pf() gr() gb() ss(2) pf() gb() gb()
+ gb() gb() gb() gb() gb() gb() gb()
+ gl() gb() ss(2) pf() gl() gb() ss(2)
+ pf() gb() gb() gb() gb() gb() gb()
+ gb() gb() gb() gr() gb() ss(2) pf()
+ gr() gb() ss(1) pf() gb() gb() gb()
+ ss(2) pf() gb() ss(6) pf() gb() gb()
+ gb() gb() gb() gl() gb() ss(3) pf()
+ gl() gb() ss(10) pf() gb() gb() gb()
+ gb() gb() gb() gb() gb() gb() gr()
+ gb() ss(10) pf() gr() gb() ss(3) pf()
+ 
+ -- no fences on ground level
+ if blnDigEntrance then
+   -- no fences
+   gb() gb() gb() gb() gb() ss(10) pf()
+   gb() gb() gb() gb()  
+ else
+   -- no door=>not gorund level=>put fences
+   ss(5) gb() pf() gb() pf() gb() pf() gb() pf() 
+   gb() ss(10) pf() ss(5) gb() pf() gb() pf() 
+   gb() pf() gb() pf() 
+ end
+  
+ gl() gb() ss(3)
+ pf() gl() gb() ss(10) pf() gb() gb()
+ gb() gb() gb() gb() gb() gb() gb()
+ gr() gb() ss(10) pf() gr() gb() ss(3)
+ pf() gb() gb() gb() gb() gb() gb()
+ gb() gb() gb() gl() gb() ss(3) pf()
+ gl() gb() ss(3) pf() gb() gb() gb()
+ gb() gb() gb() gb() gb() gb() gr()
+ gb() ss(3) pf() gr() gb() ss(3) pf()
+ gb() gb() gb() gb() gb() gb() gb()
+ gb() gb() gl() gb() ss(3) pf() gl()
+ gb() gb() gb() gb() gb() gb() gb()
+ gb() gb() gb() gr() gr() gb() ss(10)
+ pf() gb() ss(3) pf() gb() ss(3) pf()
+ gb() ss(3) pf() gb() ss(3) pf() gb()
+ ss(10) pf() gb() ss(3) pf() gb() ss(3)
+ pf() gb() ss(3) pf() gb() ss(3) pf()
+ gb() ss(10) pf() gr() gb() gb() gb()
+ gb() gb() gb() gb() gb() gb() gb()
+ gl() gu()
+ print("  working on layer 2 ...") gl()
+ gl() gb() gb() ss(10) pf() gb() ss(2)
+ pf() gb() ss(11) pf() gb() ss(11) pf()
+ gb() ss(2) pf() gb() ss(10) pf() gb()
+ ss(2) pf() gb() ss(11) pf() gb()
+ ss(11) pf() gb() ss(2) pf() gr() gb()
+ ss(10) pf() gr() gb() ss(2) pf() gb()
+ gb() gb() gb() gb() gb() gb() gb()
+ gb() gl() gb() ss(2) pf() gl() gb()
+ ss(11) pf() gb() gb() gb() gb() gb()
+ gb() gb() gb() gb() gr() gb() ss(11)
+ pf() gr() gb() ss(11) pf() gb() gb()
+ ss(2) pf() gb() ss(6) pf() gb() gb()
+ gb() gb() gb() gb() gl() gb() ss(11)
+ pf() gl() gb() ss(10) pf() gb() gb()
+ gb() gb() gb() gb() gb() gb() gb()
+ gr() gb() ss(10) pf() gr() gb() ss(2)
+ pf() gb() gb() gb() gb() gb() ss(10)
+ pf() gb() gb() gb() gb() gl() gb()
+ ss(3) pf() gl() gb() ss(10) pf() gb()
+ gb() gb() gb() gb() gb() gb() gb()
+ gb() gr() gb() ss(10) pf() gr() gb()
+ ss(11) pf() gb() gb() gb() gb() gb()
+ gb() gb() gb() gb() gl() gb() ss(11)
+ pf() gl() gb() ss(11) pf() gb() gb()
+ gb() gb() gb() gb() gb() gb() gb()
+ gr() gb() ss(11) pf() gr() gb() ss(2)
+ pf() gb() gb() gb() gb() gb() gb()
+ gb() gb() gb() gl() gb() ss(2) pf()
+ gl() gb() gb() gb() gb() gb() gb()
+ gb() gb() gb() gb() gr() gr() gb()
+ ss(10) pf() gb() ss(2) pf() gb()
+ ss(11) pf() gb() ss(11) pf() gb()
+ ss(2) pf() gb() ss(10) pf() gb() ss(2)
+ pf() gb() ss(11) pf() gb() ss(11) pf()
+ gb() ss(2) pf() gb() ss(10) pf() gr()
+ gb() gb() gb() gb() gb() gb() gb()
+ gb() gb() gb() gl() gu()
+ print("  working on layer 3 ...") gl()
+ gl() gb() gb() ss(10) pf() gb() ss(2)
+ pf() gb() ss(11) pf() gb() ss(11) pf()
+ gb() ss(2) pf() gb() ss(10) pf() gb()
+ ss(2) pf() gb() ss(11) pf() gb()
+ ss(11) pf() gb() ss(2) pf() gr() gb()
+ ss(10) pf() gr() gb() ss(2) pf() gb()
+ ss(12) pf() gb() gb() gb() gb() gb()
+ gb() gb() gb() gl() gb() ss(2) pf()
+ gl() gb() ss(11) pf() gb() gb() gb()
+ gb() gb() gb() gb() gb() gb() gr()
+ gb() ss(11) pf() gr() gb() ss(11) pf()
+ gb() gb() ss(6) pf() gb() gb() gb()
+ gb() gb() gb() gb() gl() gb() ss(11)
+ pf() gl() gb() ss(10) pf() gb() gb()
+ gb() gb() gb() gb() gb() gb() gb()
+ gr() gb() ss(10) pf() gr() gb() ss(2)
+ pf() gb() ss(12) pf() gb() gb() gb()
+ gb() ss(10) pf() gb() gb() gb() gb()
+ gl() gb() ss(2) pf() gl() gb() ss(10)
+ pf() gb() gb() gb() gb() gb() ss(12)
+ pf() gb() gb() gb() gb() gr() gb()
+ ss(10) pf() gr() gb() ss(11) pf() gb()
+ gb() gb() gb() gb() gb() gb() gb()
+ gb() gl() gb() ss(11) pf() gl() gb()
+ ss(11) pf() gb() gb() gb() gb() gb()
+ gb() gb() gb() gb() gr() gb() ss(11)
+ pf() gr() gb() ss(2) pf() gb() ss(12)
+ pf() gb() gb() gb() gb() gb() gb()
+ gb() gb() gl() gb() ss(2) pf() gl()
+ gb() gb() gb() gb() gb() gb() gb()
+ gb() gb() gb() gr() gr() gb() ss(10)
+ pf() gb() ss(2) pf() gb() ss(11) pf()
+ gb() ss(11) pf() gb() ss(2) pf() gb()
+ ss(9) pf() gb() ss(2) pf() gb()
+ ss(11) pf() gb() ss(11) pf() gb()
+ ss(2) pf() gb() ss(9) pf() gr() gb()
+ gb() gb() gb() gb() gb() gb() gb()
+ gb() gb() gl() gu()
+ print("  working on layer 4 ...") gl()
+ gl() gb() gb() ss(9) pf() gb() ss(9)
+ pf() gb() ss(9) pf() gb() ss(9) pf()
+ gb() ss(9) pf() gb() ss(9) pf() gb()
+ ss(9) pf() gb() ss(9) pf() gb() ss(9)
+ pf() gb() ss(9) pf() gr() gb() ss(9)
+ pf() gr() gb() ss(9) pf() gb() ss(4)
+ pf() gb() ss(2) pf() gb() ss(4) pf()
+ gb() ss(2) pf() gb() ss(4) pf() gb()
+ ss(12) pf() gb() gb() gb() gl() gb()
+ ss(9) pf() gl() gb() ss(9) pf() gb()
+ ss(12) pf() gb() gb() gb() gb() ss(4)
+ pf() gb() ss(2) pf() gb() ss(4) pf()
+ gb() ss(2) pf() gb() ss(4) pf() gr()
+ gb() ss(9) pf() gr() gb() ss(9) pf()
+ gb() ss(6) pf() gb() gb() gb() gb()
+ ss(4) pf() gb() gb() gb() gb() gl()
+ gb() ss(9) pf() gl() gb() ss(9) pf()
+ gb() gb() gb() gb() gb() ss(4) pf()
+ gb() ss(2) pf() gb() ss(4) pf() gb()
+ ss(2) pf() gb() ss(4) pf() gr() gb()
+ ss(9) pf() gr() gb() ss(9) pf() gb()
+ ss(4) pf() gb() ss(2) pf() gb() ss(4)
+ pf() gb() ss(2) pf() gb() ss(9) pf()
+ gb() gb() gb() gb() gl() gb() ss(9)
+ pf() gl() gb() ss(9) pf() gb() gb()
+ gb() gb() gb() ss(4) pf() gb() ss(2)
+ pf() gb() ss(4) pf() gb() ss(2) pf()
+ gb() ss(4) pf() gr() gb() ss(9) pf()
+ gr() gb() ss(9) pf() gb() ss(4) pf()
+ gb() ss(2) pf() gb() ss(4) pf() gb()
+ ss(2) pf() gb() ss(4) pf() gb() gb()
+ gb() gb() gl() gb() ss(9) pf() gl()
+ gb() ss(9) pf() gb() ss(12) pf() gb()
+ gb() gb() gb() ss(4) pf() gb() ss(2)
+ pf() gb() ss(4) pf() gb() ss(2) pf()
+ gb() ss(4) pf() gr() gb() ss(9) pf()
+ gr() gb() ss(9) pf() gb() ss(4) pf()
+ gb() ss(2) pf() gb() ss(4) pf() gb()
+ ss(2) pf() gb() ss(4) pf() gb() ss(12)
+ pf() gb() gb() gb() gl() gb() ss(10)
+ pf() gl() gb() gb() gb() gb() gb()
+ gb() gb() gb() gb() gb() gr() gr()
+ gb() ss(10) pf() gb() ss(10) pf() gb()
+ ss(10) pf() gb() ss(10) pf() gb()
+ ss(10) pf() gb() ss(10) pf() gb()
+ ss(10) pf() gb() ss(10) pf() gb()
+ ss(10) pf() gb() ss(10) pf() gb()
+ ss(10) pf() gr() gb() gb() gb() gb()
+ gb() gb() gb() gb() gb() gb() gl()
+ 
+ if blnFullHouse then
+ gu() print("  working on layer 5 ...")
+ gl() gl() gb() gb() ss(7) pf() gb()
+ ss(8) pf() gb() ss(7) pf() gb() ss(8)
+ pf() gb() ss(7) pf() gb() ss(8) pf()
+ gb() ss(7) pf() gb() ss(8) pf() gb()
+ ss(7) pf() gb() ss(8) pf() gr() gb()
+ ss(7) pf() gr() gb() ss(1) pf() gb()
+ ss(4) pf() gb() ss(1) pf() gb() ss(4)
+ pf() gb() ss(1) pf() gb() ss(4) pf()
+ gb() ss(1) pf() gb() ss(4) pf() gb()
+ ss(1) pf() gb() ss(4) pf() gl() gb()
+ ss(1) pf() gl() gb() ss(1) pf() gb()
+ gb() gb() gb() gb() ss(5) pf() gb()
+ gb() gb() gb() gr() gb() ss(1) pf()
+ gr() gb() ss(1) pf() gb() gb() gb()
+ gb() gb() ss(5) pf() gb() gb() gb()
+ gb() gl() gb() ss(1) pf() gl() gb()
+ ss(9) pf() gb() gb() gb() gb() gb()
+ ss(5) pf() gb() gb() gb() gb() gr()
+ gb() ss(1) pf() gr() gb() ss(9) pf()
+ gb() gb() gb() gb() gb() ss(5) pf()
+ gb() gb() gb() gb() gl() gb() ss(1)
+ pf() gl() gb() ss(9) pf() gb() gb()
+ gb() gb() gb() ss(5) pf() gb() gb()
+ gb() gb() gr() gb() ss(1) pf() gr()
+ gb() ss(1) pf() gb() gb() gb() gb()
+ gb() ss(5) pf() gb() gb() gb() gb()
+ gl() gb() ss(1) pf() gl() gb() ss(1)
+ pf() gb() gb() gb() gb() gb() ss(5)
+ pf() gb() gb() gb() gb() gr() gb()
+ ss(1) pf() gr() gb() ss(1) pf() gb()
+ gb() gb() gb() gb() ss(5) pf() gb()
+ ss(2) pf() gb() ss(4) pf() gb() ss(2)
+ pf() gb() ss(4) pf() gl() gb() ss(2)
+ pf() gl() gb() gb() gb() gb() gb()
+ gb() gb() gb() gb() gb() gr() gr()
+ gb() ss(9) pf() gb() ss(2) pf() gb()
+ ss(2) pf() gb() ss(2) pf() gb() ss(2)
+ pf() gb() ss(9) pf() gb() ss(7) pf()
+ gb() ss(8) pf() gb() ss(7) pf() gb()
+ ss(8) pf() gb() ss(7) pf() gr() gb()
+ gb() gb() gb() gb() gb() gb() gb()
+ gb() gb() gl() gu()
+ print("  working on layer 6 ...") gl()
+ gl() gb() gr() gb() gl() gb() ss(7)
+ pf() gb() ss(8) pf() gb() ss(7) pf()
+ gb() ss(8) pf() gb() ss(7) pf() gb()
+ ss(8) pf() gb() ss(7) pf() gb() ss(8)
+ pf() gb() ss(7) pf() gb() ss(8) pf()
+ gr() gb() ss(7) pf() gr() gb() ss(1)
+ pf() gb() ss(4) pf() gb() ss(1) pf()
+ gb() ss(4) pf() gb() ss(1) pf() gb()
+ ss(4) pf() gb() ss(1) pf() gb() ss(4)
+ pf() gb() ss(1) pf() gb() ss(4) pf()
+ gl() gb() ss(1) pf() gl() gb() ss(1)
+ pf() gb() gb() gb() gb() gb() gb()
+ gb() gb() gb() gr() gb() ss(1) pf()
+ gr() gb() ss(1) pf() gb() gb() gb()
+ gb() gb() gb() gb() gb() gb() gl()
+ gb() ss(9) pf() gl() gb() ss(11) pf()
+ gb() gb() gb() gb() gb() gb() gb()
+ gb() gb() gr() gb() ss(9) pf() gr()
+ gb() ss(1) pf() gb() gb() gb() gb()
+ gb() gb() gb() gb() gb() gl() gb()
+ ss(9) pf() gl() gb() ss(1) pf() gb()
+ gb() gb() gb() gb() gb() gb() gb()
+ gb() gr() gb() ss(11) pf() gr() gb()
+ ss(11) pf() gb() gb() gb() gb() gb()
+ gb() ss(1) pf() gb() ss(4) pf() gb()
+ ss(1) pf() gb() ss(4) pf() gl() gb()
+ ss(1) pf() gl() gb() ss(7) pf() gb()
+ ss(8) pf() gb() ss(7) pf() gb() ss(8)
+ pf() gb() ss(7) pf() gb() ss(4) pf()
+ gb() gb() gb() gb() gr() gb() ss(1)
+ pf() gr() gb() ss(9) pf() gb() ss(1)
+ pf() gb() ss(11) pf() gb() ss(11) pf()
+ gb() ss(1) pf() gb() ss(9) pf() gb()
+ gb() gb() gb() gb() gr() gb() gb()
+ gb() gb() gb() gb() gb() gb() gb()
+ gb() gl() gu()
+ print("  working on layer 7 ...") gl()
+ gl() gb() gr() gb() gb() gl() gb()
+ ss(7) pf() gb() ss(8) pf() gb() ss(7)
+ pf() gb() ss(8) pf() gb() ss(7) pf()
+ gb() ss(8) pf() gb() ss(7) pf() gb()
+ ss(8) pf() gb() ss(7) pf() gb() ss(8)
+ pf() gr() gb() ss(7) pf() gr() gb()
+ ss(1) pf() gb() ss(4) pf() gb() ss(1)
+ pf() gb() ss(4) pf() gb() ss(1) pf()
+ gb() ss(4) pf() gb() ss(1) pf() gb()
+ ss(4) pf() gb() ss(1) pf() gb() ss(4)
+ pf() gl() gb() ss(2) pf() gl() gb()
+ ss(9) pf() gb() gb() gb() gb() gb()
+ gb() gb() gb() gb() gr() gb() ss(1)
+ pf() gr() gb() ss(9) pf() gb() ss(12)
+ pf() gb() gb() gb() gb() gb() gb()
+ gb() gb() gl() gb() ss(11) pf() gl()
+ gb() ss(9) pf() gb() gb() gb() gb()
+ gb() gb() gb() gb() gb() gr() gb()
+ ss(1) pf() gr() gb() ss(11) pf() gb()
+ gb() gb() gb() gb() gb() ss(1) pf()
+ gb() ss(4) pf() gb() ss(1) pf() gb()
+ ss(4) pf() gl() gb() ss(1) pf() gl()
+ gb() ss(7) pf() gb() ss(8) pf() gb()
+ ss(7) pf() gb() ss(8) pf() gb() ss(7)
+ pf() gb() ss(4) pf() gb() gb() gb()
+ gb() gr() gb() ss(11) pf() gr() gb()
+ ss(1) pf() gb() ss(12) pf() gb() gb()
+ gb() gb() ss(4) pf() gl() gb() gl()
+ gb() gb() gb() gb() gb() gb() gr()
+ gr() gb() ss(9) pf() gb() ss(1) pf()
+ gb() ss(11) pf() gb() ss(11) pf() gb()
+ ss(1) pf() gb() ss(9) pf() gb() gb()
+ gb() gb() gb() gr() gb() gb() gb()
+ gb() gb() gb() gb() gb() gb() gb()
+ gl() gu()
+ print("  working on layer 8 ...") gl()
+ gl() gb() gr() gb() gb() gb() gl()
+ gb() ss(7) pf() gb() ss(8) pf() gb()
+ ss(7) pf() gb() ss(8) pf() gb() ss(7)
+ pf() gb() ss(8) pf() gb() ss(7) pf()
+ gb() ss(8) pf() gb() ss(7) pf() gb()
+ ss(8) pf() gr() gb() ss(7) pf() gr()
+ gb() ss(1) pf() gb() ss(4) pf() gb()
+ ss(1) pf() gb() ss(4) pf() gb() ss(1)
+ pf() gb() ss(4) pf() gb() ss(1) pf()
+ gb() ss(4) pf() gb() ss(1) pf() gb()
+ ss(4) pf() gl() gb() ss(1) pf() gl()
+ gb() ss(9) pf() gb() gb() gb() gb()
+ gb() gb() gb() gb() gb() gr() gb()
+ ss(9) pf() gr() gb() ss(1) pf() gb()
+ ss(4) pf() gb() gb() gb() gb() ss(4)
+ pf() gb() ss(1) pf() gb() ss(4) pf()
+ gb() ss(1) pf() gb() ss(4) pf() gl()
+ gb() ss(3) pf() gl() gb() ss(7) pf()
+ gb() ss(8) pf() gb() ss(7) pf() gb()
+ ss(8) pf() gb() ss(7) pf() gb() ss(8)
+ pf() gb() ss(4) pf() gb() gb() ss(4)
+ pf() gb() ss(8) pf() gr() gb() ss(7)
+ pf() gr() gb() ss(7) pf() gb() ss(8)
+ pf() gb() ss(1) pf() gb() gb() ss(1)
+ pf() gb() ss(8) pf() gl() gb() gl()
+ gb() gb() ss(8) pf() gb() ss(4) pf()
+ gb() gb() ss(4) pf() gb() ss(8) pf()
+ gr() gb() ss(7) pf() gr() gb() ss(7)
+ pf() gb() ss(8) pf() gb() ss(1) pf()
+ gb() ss(1) pf() gb() ss(1) pf() gb()
+ ss(8) pf() gb() gb() gb() gb() gb()
+ gr() gb() gb() gb() gb() gb() gb()
+ gb() gb() gb() gb() gl() gu()
+ print("  working on layer 9 ...") gl()
+ gl() gb() gr() gb() gb() gb() gb()
+ gl() gb() ss(7) pf() gb() ss(8) pf()
+ gb() ss(7) pf() gb() ss(8) pf() gb()
+ ss(7) pf() gb() ss(8) pf() gb() ss(7)
+ pf() gb() ss(8) pf() gb() ss(7) pf()
+ gb() ss(8) pf() gr() gb() ss(7) pf()
+ gr() gb() ss(9) pf() gb() ss(9) pf()
+ gb() ss(9) pf() gb() ss(9) pf() gb()
+ ss(9) pf() gb() ss(9) pf() gb() ss(9)
+ pf() gb() ss(9) pf() gb() ss(9) pf()
+ gb() ss(9) pf() gl() gb() ss(9) pf()
+ gl() gb() ss(7) pf() gb() ss(8) pf()
+ gb() ss(7) pf() gb() ss(8) pf() gb()
+ ss(7) pf() gb() ss(8) pf() gb() ss(7)
+ pf() gb() ss(9) pf() gb() ss(7) pf()
+ gb() ss(8) pf() gr() gb() ss(7) pf()
+ gr() gb() gb() gb() ss(8) pf() gb()
+ ss(9) pf() gb() ss(8) pf() gl() gb()
+ gl() gb() gb() ss(7) pf() gb() ss(9)
+ pf() gb() ss(7) pf() gr() gb() gr()
+ gb() gb() ss(8) pf() gb() ss(9) pf()
+ gb() ss(8) pf() gl() gb() gl() gb()
+ gb() gb() gb() gr() gr() gb() gb()
+ ss(7) pf() gb() ss(9) pf() gb() ss(7)
+ pf() gb() gb() gb() gb() gb() gb()
+ gr() gb() gb() gb() gb() gb() gb()
+ gb() gb() gb() gb() gl() gu()
+ print("  working on layer 10 ...")
+ gl() gl() gb() gr() gb() gb() gb()
+ gb() gb() gl() gb() ss(7) pf() gb()
+ ss(8) pf() gb() ss(7) pf() gb() ss(8)
+ pf() gb() ss(7) pf() gb() ss(8) pf()
+ gb() ss(7) pf() gb() ss(8) pf() gb()
+ ss(7) pf() gb() ss(8) pf() gr() gb()
+ ss(7) pf() gr() gb() gb() gb() gb()
+ ss(8) pf() gl() gb() gl() gb() gb()
+ ss(8) pf() gr() gb() gr() gb() gb()
+ ss(8) pf() gl() gb() gl() gb() gb()
+ ss(8) pf() gr() gb() gr() gb() gb()
+ ss(8) pf() gb() gb() gb() gb() gb()
+ gb() gb() gr() gb() gb() gb() gb()
+ gb() gb() gb() gb() gb() gb() gl()
+ gd() gd() gd() gd() gd() gd()
+end -- if blnFullHouse
+ 
+ gd() gd() gd()
+ print("Done. Looks nice to me ;)")
+ 
+if blnDigEntrance then
+print("Hm, some finishing touch...")
+ gr() gf() gf() gf() gf() gf() gl()
+ ss(2) df() gf() du() ss(13) pf() gb()
+ ss(14) pf() gr() gb() gb() gb() gb()
+ gb() gl()
+ print("That looks much better!")
+end 
+  
+ os.sleep(0.4)
+ print("***************************************")
+ end

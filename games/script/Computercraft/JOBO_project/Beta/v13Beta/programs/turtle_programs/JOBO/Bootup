@@ -1,0 +1,86 @@
+print "Boot all program from Disk Drive"
+Boot = "/JOBO/" --"/JOBO/"
+local tArg = {...}
+local sDir =  "disk"..Boot or shell.dir()..Boot
+
+
+--- BOOTING BACKUP MAGIC LOL
+if fs.exists("moreFile") then
+if term.isColor() then  term.setTextColor(colors.green)  end 
+  print "Coppying backup"
+    fs.delete("BACKUP") 
+    fs.copy ("moreFile/programs/config/configT", "BACKUP/configT")
+end 
+
+function newFile( file  )
+ if fs.exists(file) then fs.delete(file) end -- Void FILE EXIST nononono FILE DELETEED BITH
+	fs.copy(sDir..file, file) 
+end
+
+local IGNORE = {"rom"}
+ function IGNORE:inList( iT )
+    for i = 1 , #self do  
+        if self[i] == iT then return false end -- whem detect void item return bad thing :?
+    end
+    return true 
+end 
+
+
+local tAll = fs.list(sDir)
+-- Transfer all files and folders to computer/turtle
+
+for index  , sItem in pairs (tAll) do 
+  if string.sub(sItem , 1,1)  ~="," then 
+                         local sPATH = fs.combine(sDir , sItem);
+         if fs.isDir(sPATH) and  IGNORE:inList( sItem )  then 
+                         -- print ("This "..sItem.. " is folder ")
+              	          newFile( sItem  )
+         elseif IGNORE:inList( sItem ) then 
+            	          --print ("Tis '"..sItem .."' is text file")
+  				          newFile( sItem  )
+         end   
+  end 
+end 
+
+
+----------------------------------------------------------------------------------------------------------------
+--        File is loadet 
+----------------------------------------------------------------------------------------------------------------
+
+--/programs/turtle_programs/JOBO/moreFile/programs/config/source
+
+
+-- always updtae content in BACKAUP when booted from disk!
+-- MAGIC ? in disk drive livig fil boor smarter
+print "Returning backup file.."
+if fs.exists("moreFile") then 
+os.loadAPI("moreFile/programs/config/source/FileLibrary/fLib")
+if term.isColor() then term.setTextColor(colors.green) end 
+local aV = fLib.Lenght ("moreFile/programs/config/configT")
+local  bV = fLib.Lenght("BACKUP/configT")
+print (aV .. " == "..bV.." ="..tostring(aV == bV))
+
+    if fLib.Lenght ("moreFile/programs/config/configT") == fLib.Lenght("BACKUP/configT") then 
+    print "Loading backup file where shoud be"
+     
+
+     fs.delete("moreFile/programs/config/configT")
+     fs.copy ("BACKUP/configT","moreFile/programs/config/configT")
+     sleep(0)
+    else
+      if fs.exists("BACKUP") then  fs.delete("BACKUP") end 
+         fs.copy ("moreFile/programs/config/configT", "BACKUP/configT")
+        if term.isColor() then  term.setTextColor(colors.red) end 
+         print ("Missinbg file created backup.")
+            
+       sleep(0)
+    end 
+if term.isColor() then  term.setTextColor(colors.white) end 
+end 
+
+
+
+print ".....Complete booting Disk Drive......"
+shell.run("startup") -- RUN Renamed TurtleStartup file
+
+

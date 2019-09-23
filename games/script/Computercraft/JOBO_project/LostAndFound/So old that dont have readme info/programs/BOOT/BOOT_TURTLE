@@ -1,0 +1,453 @@
+-- Super Computer
+
+os.loadAPI("programs/perip") 
+os.loadAPI("/programs/Require_Items/source/requestAPI")
+os.loadAPI("config".."/source/StatisticsProgram")
+os.loadAPI("/config/source/ConfigProgram")
+os.loadAPI("config/DATA/GenerateHomeCoord/HomeCoordProgram")
+os.loadAPI("programs/turtle_programs/JOBO/moreFile/GPS/refuelLib")
+os.loadAPI("config".."/source/FileLibrary/fLib")
+
+local status = true -- Global condition
+
+
+local orientations = {'SOUTH' , 'WEST' , 'NORTH' , 'EAST' };
+local rootFiles = "programs/turtle_programs/JOBO/" --"cp","programs/turtle_programs/JOBO/text" , "disk/text"
+--local FtoDisk  = "JOBO/"
+  
+	--perip.inspectObject() -- look up all shit
+--/home/zick/.minecraft/saves/Suit_All/computer/135/programs/GETCoord
+--Variables Read only
+ --print(fs.exists (rootFiles.."text" ))
+ --print(fs.exists ("disk/startup" ))
+
+local fuelArray = {-- Fuel in invetory to check
+"minecraft:coal","minecraft:charcoal","minecraft:planks","minecraft:log","minecraft:coal_block"; 
+value = ConfigProgram.GET.GiveFuelLevel()>0 and ConfigProgram.GET.GiveFuelLevel()<1024 and ConfigProgram.GET.GiveFuelLevel()  or  ConfigProgram.SET.GiveFuelLevel(10) or 10;
+}  
+
+local chestArray =  {"minecraft:chest", "minecraft:trapped_chest", value = 2}
+local turtleArray = {"ComputerCraft:CC-Turtle","ComputerCraft:CC-TurtleAdvanced","ComputerCraft:CC-TurtleExpanded"}
+local ResetItems = {-- item in invetory that yeld to reset all thing, replacing disk and floppy , removing config DATA leaving emty
+{"ComputerCraft:disk","ComputerCraft:diskExpanded", value = 1};
+{"ComputerCraft:CC-Peripheral", value = 1}
+}
+
+
+
+-- Refuel attetmpt
+if turtle.getFuelLevel() < 10 then print"Requare fuel to move" end 
+while turtle.getFuelLevel() < 10 do 
+print"Requare fuel to move"
+refuelLib.RefuelByValue( 1 ) sleep(3) term.clear();term.setCursorPos(1,1) sleep(0.5)
+end
+--
+
+
+local DiskInDriveMAN = true
+
+local ManagerDisk = {
+  isLoad = function ( ... ) -- connect to drive in all posible side leaving  object in  perip api
+local r =  perip.setPointObjet ("drive")
+			perip.forceConnectPeripheral()
+			perip.setLabel( ConfigProgram.GET.FloppyName() or ConfigProgram.SET.FloppyName("\"JOBO\"") or "JOBO" ) --set floppy name in config file "JOBO"
+    return r
+  end;
+
+ fileTransfer = function (  file ,fileTo ) -- core. Coppy and transfer to selected location from ,to  
+	local isDisk = perip.inspectThisObject("drive") 
+	local isFiles = fs.exists ("disk/"..fileTo )-- return file exsistens
+    	  if isDisk then 
+      	         --print(tostring(isFiles)..("disk/"..fileTo)) 
+             if  isFiles then -- if exsist then return to remove
+      	       fs.delete ( "disk/"..fileTo) print"REMOVING"
+      	    end       print("Creating disk/"..fileTo)
+      	              fs.copy ("programs/turtle_programs/JOBO/"..file , "disk/"..fileTo)
+      	              print("Comlete")
+      else    
+      	 	            error "No disk in disk drive man."; DiskInDriveMAN = false
+      end
+end
+  
+}
+
+
+
+local ManagerTurtle = {
+
+ isLoad = function ( ... ) -- force to connect to turtle in all sides, if found one then connect 
+ 	perip.setPointObjet ("turtle")
+ 	perip.forceConnectPeripheral()
+ end;
+
+ isBooted = function () -- if if inspected in fron turtle/computer then turn on/wake up
+    local isTurtle = perip.inspectThisObject("turtle") 
+    	  if isTurtle then 
+               print "Turning On turtle first time."
+               perip.turnOn() -- Fail simetime
+               term.setTextColor(colors.green)
+               print"Turtle was launched!"
+               print"Complete"
+          end
+ end;
+
+ isID = function () -- if inspected in fron turtle/computer then return id
+      if  perip.inspectThisObject("turtle")  then
+        return perip.getID()
+       else term.setTextColor(colors.green)
+       print "No turtle found in front to get data." 
+      end  
+ end;
+}
+
+
+local   function inspect(name )
+local lol,data = turtle.inspect() 
+      if  data.name == name then 
+          return true 
+      end 
+   return false
+end
+
+local function fd ()
+   while not turtle.forward() do sleep(0)end 
+end 
+
+local function bk ()
+   while not turtle.back() do sleep(0)end 
+end
+
+
+
+-- REQUEST
+local function isModem(  )-- if inspect modem in eny side return boolean
+ return perip.inspectThisObject("modem")
+end 
+---------------------------------------------------------------------------
+--FUEL
+
+
+local function fuelCount(  ) --Count fuel in inventory 
+     return requestAPI["CountThis"](fuelArray)
+end 
+
+
+
+local function giveFuel(  ) -- refuel by count given from fuelArray
+  requestAPI["giveItemsFrom"]("front",fuelArray.value, fuelArray  )
+end
+
+
+local function requestFuel(  )-- force request fuel from user, if is low. 
+  local slot = 16
+    requestAPI["requestByCountFrom"]( slot,"NAME", fuelArray )--NAME is show pure materials names from minecraft:coal to coal
+end
+---CHEST
+
+
+local function chestCount ()
+     return requestAPI["CountThis"](chestArray)
+end
+
+local function giveChest()
+  requestAPI["giveItemsFrom"]("front",chestArray.value, chestArray  )
+end
+
+local function requestChestAndGive ()
+    local slot = 16
+
+
+    if (  inspect(turtleArray[1]) or inspect(turtleArray[2]) or inspect(turtleArray[3])  )  then     
+      
+              perip.setPointObjet ("turtle") -- set object to turtle
+              perip.forceConnectPeripheral()  -- connect to turtle  
+         if not  HomeCoordProgram.isID( perip.getID() )  then   -- check in memory id  from given perip
+              term.setTextColor(colors.red)                      
+              requestAPI.requestByCountFrom( slot,"NAME", chestArray  )    -- Asking chest             
+               print "Turtle need a chest."        
+              if isModem() then giveChest() else  print "Not today bro." end     -- give turtle       
+         end 
+    end
+end 
+
+
+
+----------------------------------------------------------------------------
+
+
+
+
+
+
+local function WakeModem(  ) -- if found modem , force to connect it.
+ if  isModem(  ) then   rednet.open(perip.connectThisObject( "modem" )) else error "I dont have modem" end 
+end
+
+--print(fuelCount(  ))
+local function askTurtleType(  ) -- check if user in config was enabled to forse ask about turtle type
+          if  ConfigProgram.GET.askTurtleType() == true then 
+                  term.setTextColor(colors.blue);print ("Are you shore this is turtle with modem and tool like pickaxe y/n ?") ;
+                  return   read() 
+          else
+                  ConfigProgram.SET.askTurtleType(false)
+                  return "y"
+          end
+end
+
+local function placeTurtle(  ) -- find and place turtle from invetory 
+           local yn;
+           local isTurtleInvetory = false
+           for x = 1 , 16 do 
+              if requestAPI.isListedRequest( requestAPI.getDataName (x) , {"ComputerCraft:CC-Turtle" ,"ComputerCraft:CC-TurtleAdvanced","ComputerCraft:CC-TurtleExpanded"} ) then 
+                yn = askTurtleType(  )
+                  if not turtle.detect() and yn=="y"  then turtle.select(x); 
+                       if turtle.place() then 
+                            --fuel
+                           requestFuel(  );  
+                           giveFuel(  ); 
+                           -- chest
+                           requestChestAndGive ()
+
+                            isTurtleInvetory =true break 
+                       else status = false; term.setTextColor(colors.orange) print "You standing in front please go away.";isTurtleInvetory =true;  break   
+                       end 
+                  end               
+                 -- if yn=="y" and turtle.detect() and not HomeCoordProgram.isAvailable() then 
+                   --status = false; term.setTextColor(colors.pink)print ("Cannot place turtle becucle  someone in front!.")  break 
+                  --end
+              end
+           end
+                --print"Okey" term.setTextColor(colors.red)
+ return isTurtleInvetory
+end
+--placeTurtle(  )
+--print(requestAPI.getDataName (3))
+
+
+
+
+
+
+local function setNewTurtleInConfig( new ) --chekc in front the turtle , take that turtle id then try to register in configID
+   if isModem(  ) then  --if masterServer/turtle have modem       
+          StatisticsProgram.setNew(new)  -- then register new id to cash memory 'configID' 
+   end
+end
+
+
+
+local function DiskinDrive(  ) -- check disk drive was placed
+     return  ConfigProgram.GET.isDisk() == true or false
+end
+
+local function EqualComputerID(  ) -- check id is same with this computer/turtle. Return boolean 
+     return   ConfigProgram.GET.SuperComputerID() == os.getComputerID() or false -- not equal this id and config  id
+end
+
+local function Accepted(  ) -- was acepted when execute
+            ConfigProgram.SET.isDisk(true) -- set true if is id equal to this computer 
+            ConfigProgram.SET.SuperComputerID(os.getComputerID()) --save id in Maser server 
+            HomeCoordProgram.GenerateHomeCoord(  ) -- Generate Home coord DATA
+            StatisticsProgram.DeleteJobData(  )
+            StatisticsProgram.DeleteStatistic(  )
+            StatisticsProgram.Costructor( ConfigProgram.GET.GenerateJob() ) -- generate job By generator type
+ 
+end
+
+
+local function Denied(  ) -- if was denied when execurte
+      ConfigProgram.SET.isDisk(false)
+      ConfigProgram.SET.SuperComputerID(-1)
+      status = false
+end
+
+local function Status(  ) -- Check status where was placed disk drive or if the same id with
+  if not DiskinDrive(  ) or not EqualComputerID () then return false end -- if false or false then 
+   return true -- return if not true
+end
+
+
+local function requareItemsForBootup(  )-- Force user to give Floppy and disk drive when place where is needet.
+ local l = true
+  os.loadAPI("/programs/Require_Items/FloppyAndDiskDrive");os.unloadAPI("/programs/Require_Items/FloppyAndDiskDrive")
+  turtle.digDown()
+  turtle.select(1) -- select Disk Drive
+  while not turtle.placeDown() do if l then print"Cannot place down Disk drive!";l=false end sleep(1) end 
+  turtle.select(2)-- Floppy
+  turtle.dropDown()
+end
+
+local  function TurtleConfiguration(  )-- Leave in JOBO defoult Status for new turtles.
+--trasfer data
+os.loadAPI("/config/DATA/Move/toChildTurtle")
+os.unloadAPI("/config/DATA/Move/toChildTurtle")
+-- transfer Lib/update always.
+os.loadAPI("/config/DATA/Move/toChildTurtleLib") 
+os.unloadAPI("/config/DATA/Move/toChildTurtleLib") 
+end
+
+
+
+
+local function getHomeCoord(  ) -- Return Coord Deleting from data("that was taked sorry dude") 
+   return HomeCoordProgram.getHomeCoord(  )
+end
+
+
+
+local  function isHomeCoordAvailable(  ) -- Status in data
+    return HomeCoordProgram.isAvailable()
+end
+
+local function isHomeCoordID( id )
+  return  HomeCoordProgram.isID( id )
+end 
+
+local function sendHomeCoord( tid ) -- check if same turtle exsist else give new home location
+  
+   if isHomeCoordID( tid ) or isHomeCoordAvailable(  ) then  
+       local Home = HomeCoordProgram.getHomeCoordAdvanced( tid  ) -- check if id same else register ID and update status=true
+       local string = textutils.serialize({ -- Serialize  to long string
+        x = Home.x,
+        y = Home.y,
+        z = Home.z,
+        f = orientations[ConfigProgram.GET.fPos()+1], -- Table suck/translate where looking
+        CoordComplete = true, -- turtle know was first time louhed  
+        PlacedChests = Home.STATUS, -- status about chest and turtle basicly
+        orArrive    = false, -- While Not Arrive Go Home until Reached.
+        })
+        return string
+   else
+       status = false 
+       return "No more Home Location left :9("
+  end     
+end
+
+local function isSendHomeCoord( tid ) -- return home status
+     if isHomeCoordID( tid ) or isHomeCoordAvailable(  ) then
+         return true
+     else 
+         return "No more Home Location left :9(" 
+    end   
+end
+
+local function ForceChangeCoords(  )  
+local function getNInput(  txt ) print ("Requare:"..txt..".")
+local                      n = tonumber(read())
+ while n == nil do         n = tonumber(read())    end
+ return n
+  end
+
+    ConfigProgram.SET.xPos( getNInput("X") ) 
+    ConfigProgram.SET.yPos( getNInput("Y") ) 
+    ConfigProgram.SET.zPos( getNInput("Z") ) 
+    ConfigProgram.SET.fPos( getNInput("F") )
+    ConfigProgram.SET.SuperComputerID(os.getComputerID()) --set becucle dont ask again
+
+end
+
+local function RESET(  ) -- return boolean . reset if disk and Floppy drive in inventory
+      local resetitems = requestAPI.checkAll( ResetItems ) -- check in inventoy floppy and disk drive then return true
+      local askCoord = ConfigProgram.GET.askCoord() -- get from config coord activation
+      if resetitems and askCoord then
+         ForceChangeCoords(  )  -- create new coord
+      elseif askCoord ~= true then 
+        ConfigProgram.SET.askCoord(false) -- leave false if nil, just make defoult
+      end 
+      
+      return resetitems
+end
+
+
+
+--Place Disk drive in for booting all tutrles from them 
+--Transfaer all files to disk and then go to turtle memory
+--always check what happening
+function UpdateDisk ()  
+       if  ( not Status(  ) or RESET( ) )  then -- Void moving like a boss 
+      print"Prepare for boot. Moving forward"
+      turtle.dig()
+      fd () 
+
+      requareItemsForBootup(  ) -- Start items request like Disk drive Floppy
+        if ManagerDisk.isLoad() ~= false then  -- Do not Change enyrhing or will be painfull later
+             TurtleConfiguration(  )
+             ManagerDisk.fileTransfer("text","JOBO/text") -- Launhing text the files
+             ManagerDisk.fileTransfer("TurtleStartup" , "JOBO/startup") -- Launhing TurtleStartup the files
+             ManagerDisk.fileTransfer("Bootup" , "startup") ---- Launhing Bootup the files manager
+             ManagerDisk.fileTransfer("moreFile" , "JOBO/moreFile")  ---- Launhing moreFile the folder exstra
+             bk()
+             Accepted(  )
+         else 
+             Denied(  )
+             bk() print":("
+        end
+      end
+ end 
+
+
+function RUN()--Core   
+      if DiskinDrive(  )   then -- if place disk drive then 
+         requestFuel(  ) -- First Chect fuel in inventory 
+         if  isModem(  )  then -- and placed turtle  then 
+               --print "Modem found "
+                   if   placeTurtle(  )  then
+                   -- print "placed turtle."
+                   -- print ("My Status: "..tostring(status))
+                    if not status then sleep (20) end 
+                        if status then 
+
+                             ManagerTurtle.isLoad() -- connect peripheral to turtle         
+                             ManagerTurtle.isBooted()-- after that send singal to wake up . Shoud return message with sender DiskInDriveMAN
+                             WakeModem(  )
+                              --for x = 1 , 4 do 
+                                -- Receive fitst attempt fron new turle
+                                        local isID =  ManagerTurtle.isID()
+                                        local isSendetCoords = isSendHomeCoord( isID )
+                                        term.setTextColor(colors.orange)
+                                        print "Startimg net feedback"
+                                        print ("Waiting turtle "..isID.." singnal...")
+                                        sender,_,_ = rednet.receive(5) -- wait singnal -- first attemtp
+                                  if tostring(sender) == tostring(isID) then 
+                                        print "Received."                          
+                                -- Save new turle  id In ID file        
+                                        if isSendetCoords==true then setNewTurtleInConfig( isID ) end  -- to regiter in memory 
+                                --Send Home Coord to turtle in front of you
+                                --If Home cord left return true else if no more Home Cord then error string.
+                                        term.setTextColor(colors.orange)
+                                        print("Sending Home Coord to turtle "..isID..".")      
+                                           rednet.send(isID , sendHomeCoord(isID) ) 
+                                        term.setTextColor(colors.red)
+                                         if  type(isSendetCoords)=="string" then print( isSendetCoords )  end 
+                                        print ( isSendetCoords==true and (term.setTextColor(colors.green) or "Complete.") or (term.setTextColor(colors.red) or "Failed to send Home Coord." ) )      
+                                        --sleep(1)
+                                       -- break
+                                  elseif tostring(sender) ~= tostring(isID)  then 
+                                         print ("sender "..tostring(sender).." is id ? "..tostring(isID).." equal ? "..tostring(sender== isID) )
+                                         status = false
+                                  else 
+                                          
+                                          status = false  term.setTextColor(colors.cyan) print("Cannot register non Wireless turtle in front "..tostring(status)) sleep(3.5)
+                                  end
+                              --end    
+                        else --print ("Something goes wrong.") sleep(1) 
+                        end 
+                    else --print "NOT PLACED"
+                  end       
+              else term.setTextColor(colors.green);status = false; print( "Modem not found in enny side, please fix this problem to continue.")      
+         end
+   end
+return status -- return status in function 
+end
+
+
+
+
+
+os.unloadAPI("programs/perip") 
+os.unloadAPI("/programs/Require_Items/source/requestAPI")
+os.unloadAPI("config".."/source/StatisticsProgram")
+os.unloadAPI("/config/source/ConfigProgram")
+os.unloadAPI("config/DATA/GenerateHomeCoord/HomeCoordProgram")
+os.unloadAPI("programs/turtle_programs/JOBO/moreFile/GPS/refuelLib")
+os.unloadAPI("config".."/source/FileLibrary/fLib")

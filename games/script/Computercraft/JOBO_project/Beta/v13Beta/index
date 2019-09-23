@@ -1,0 +1,18 @@
+os.loadAPI ("/programs/GUI/Background/Animations/MatrixAnimation/MatrixProgram")
+os.loadAPI ("/programs/BOOT/BOOT_MODEM")
+shell.run "clear"
+-- Point to project files
+
+if term.isColor() then
+  if BOOT_MODEM.condition then 
+       print "Launching Program";sleep (1)
+	   shell.run ("projectM/run")
+  else error "Modem not found"  
+  end 	
+			
+else 
+	 MatrixProgram.Matrix(  )
+	-- error "This Computer Cannot Handle Colors.Terminated"
+end 			
+
+

@@ -1,0 +1,88 @@
+local fuelArray = {
+"minecraft:coal","minecraft:charcoal","minecraft:planks",
+"minecraft:log","minecraft:coal_block";}  
+
+--[[Taked From ]]-- Do not destribute! :D
+
+local function getDataName  (slot)
+local data = "ErrorData"
+if  turtle.getItemCount(slot or nil) > 0 then 
+  t = turtle.getItemDetail(slot or nil) 
+   data = t.name
+   end
+  return data
+end
+
+local function isListedRequest(compare , arg ) -- check name if true in all invetory
+  assert(type(compare)=="string", "isListedRequest: compare item.")
+  assert (type(arg)=="table", "isListedRequest:Requare table.")
+   for i , sItem in pairs (arg) do 
+         if sItem == compare then 
+          return sItem 
+         end 
+   end
+   return false
+end
+
+--New--
+--Compare if fuel return boolean
+local function ComapreFuel( slot ) 
+assert (type(slot)=="number", "ComapreFuel:Requare slot.") 
+   return isListedRequest(getDataName  (slot) , fuelArray )
+end
+
+------ [[REFUEL Methods]]
+
+function RefuelByValue( fuelvalue )
+  assert(type(fuelvalue)=="number", "RefuelByValue:Requare fuel value.")
+  local Max_c =  fuelvalue;
+  local Cur_c = 0;
+  local answer;
+  local stack = 0
+   for slot = 1 , 16 do 
+       if isListedRequest( getDataName (slot), fuelArray)  then 
+            
+            answer = (Max_c - Cur_c) > 0 and  Max_c - Cur_c or 0
+            stack = (answer>64) and turtle.getItemCount(slot) or answer
+            turtle.select(slot)
+            Cur_c = turtle.getItemCount(slot) + Cur_c
+            turtle.refuel(stack )
+            if  Cur_c >= Max_c then break end 
+       end
+   end
+end
+
+--"[ Sort/Transfer ]"-----------------------------------------------
+
+-- transfer fuel from selected slot to new slot or fill exsisting one
+local function TranferFuelfrom  (slt  ) 
+     assert (type(slt)== "number", "TranferFuelfrom:Requare slot")
+    -- turtle.transferTo (1 , 64)
+     turtle.select(slt)
+     local isTo = isListedRequest( getDataName (slot), fuelArray)
+     for slot = 1,16 do 
+           local value = turtle.getItemCount(16)
+          if isTo==isListedRequest( getDataName (slot), fuelArray) then 
+                     turtle.transferTo(slot, value)
+                    if turtle.getItemCount(16) ==0 then break end 
+          end 
+     end
+     
+     for slot = 1,16 do 
+          if turtle.getItemCount(slot)==0 then 
+              turtle.transferTo(slot,64)
+               if turtle.getItemCount(16) == 0 then break end 
+          end
+     end
+end
+
+
+function getFuelCount(  )
+  local c = 0
+  for slot = 1, 16 do 
+      if ComapreFuel( slot ) then 
+          c = c + turtle.getItemCount(slot)
+      end  
+  end 
+return c
+end

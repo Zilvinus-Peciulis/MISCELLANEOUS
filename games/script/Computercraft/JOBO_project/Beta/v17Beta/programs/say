@@ -1,0 +1,103 @@
+local DefaultColor = colors.orange
+
+-- --white
+-- orange
+-- magenta
+-- lightBlue
+-- yellow
+-- lime
+-- pink
+-- gray
+-- lightGray
+-- cyan
+-- purple
+-- blue
+-- brown
+-- green
+-- red
+
+local function TheNewColor(text,newColor,silence)
+assert (type(newColor) == "number", "TheNewColor expected number value got "..type(newColor))
+ if silence ~= "silence" then 
+		 if term.isColor() then 	
+		  term.setTextColor(newColor)	
+			print (text)
+		  term.setTextColor(DefaultColor)	
+		  else 
+	  print (text) 
+	 end 
+	end  	
+end 
+
+local function TheNewColorWrite(text,newColor,silence)
+assert (type(newColor) == "number", "TheNewColor expected number value got "..type(newColor))
+ if silence ~= "silence" then 
+		 if term.isColor() then 	
+		  term.setTextColor(newColor)	
+			term.write (text)
+		  term.setTextColor(DefaultColor)	
+		  else 
+	  term.write (text) 
+	 end 
+	end  	
+end 
+
+function alert( text,silence )
+	 TheNewColor(text,colors.yellow,silence)
+end
+
+function warning( text,silence )
+ TheNewColor(text,colors.lime,silence)
+end
+
+function danger( text,silence )
+ TheNewColor(text,colors.red,silence)
+end
+
+
+function success( text,silence )
+ TheNewColor(text,colors.green,silence)
+end
+
+function special( text,silence )
+ TheNewColor(text,colors.cyan,silence)
+end
+
+function super( text,silence )
+ TheNewColor(text,colors.lightGray,silence)
+end
+
+function question( text,silence )
+ 		TheNewColor(text,colors.brown,silence)
+end
+
+--- Write 
+function writeAlert( text,silence )
+	 TheNewColorWrite(text,colors.yellow,silence)
+end
+
+
+function writeWarning( text,silence )
+ TheNewColorWrite(text,colors.lime,silence)
+end
+
+function writeDanger( text,silence )
+ TheNewColorWrite(text,colors.red,silence)
+end
+
+
+function writeSuccess( text,silence )
+ TheNewColorWrite(text,colors.green,silence)
+end
+
+function writeSpecial( text,silence )
+ TheNewColorWrite(text,colors.cyan,silence)
+end
+
+function writeSuper( text,silence )
+ TheNewColorWrite(text,colors.lightGray,silence)
+end
+
+function writeQuestion( text,silence )
+	 TheNewColorWrite(text,colors.brown,silence)
+end

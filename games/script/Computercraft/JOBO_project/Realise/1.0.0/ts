@@ -1,0 +1,99 @@
+ term.clear()
+term.setCursorPos(1,1)
+
+
+ os.loadAPI("/programs/turtle_programs/JOBO/OS","WOWOW")
+
+
+ OS.loadAPI ("programs/say","ts")
+OS.loadAPI("config".."/source/FileLibrary/fLib","ts")
+OS.loadAPI("/config/source/ConfigProgram")
+OS.loadAPI("/programs/Require_Items/source/requestAPI")
+OS.loadAPI("/programs/turtle_programs/JOBO/moreFile/GPS/refuelLib")
+OS.loadAPI("/programs/turtle_programs/JOBO/moreFile2/programs/refuel")
+OS.loadAPI("/programs/perip")
+OS.loadAPI("config/DATA/GenerateHomeCoord/HomeCoordProgram")
+OS.loadAPI ("/programs/GUI/Background/Animations/MatrixAnimation/MatrixProgram")
+OS.loadAPI("programs/turtleLib")
+OS.loadAPI("config".."/source/StatisticsProgram")
+OS.loadAPI("programs/tbLib")
+OS.loadAPI("projectM/uttility")
+OS.loadAPI("/config/DATA/GenerateJobCoord/JobCoordProgram")
+OS.loadAPI("programs/BOOT/BOOT_TURTLE")
+OS.loadAPI("programs/inventory")
+OS.loadAPI("programs/say")
+OS.loadAPI("programs/protocol")
+OS.loadAPI("programs/comunicate")
+OS.loadAPI("programs/material")
+OS.loadAPI("programs/turtleLib")
+OS.loadAPI ("programs/orientation")
+print "Mom get camera"
+-- print (requestAPI.selectThis( {"minecraft:chest","minecraft:trapped_chest"} ))
+-- OS.loadAPI("config/source/StatisticsProgram")
+
+OS.loadAPI("/config/source/ConfigProgram")
+
+print (orientation.Front("SOUTH",5))
+
+-- print (refuel.valuesTotal( 18 ))
+-- print (perip.inspectThisObject("modem"))
+-- OS.loadAPI ("programs/turtleLib")
+-- OS.loadAPI("/config/DATA/GenerateJobCoord/JobCoordProgram")
+-- refuel.values( 0 )
+-- print ("fuel value "..turtle.getFuelLevel())
+-- print (refuel.valuesTotal( 16 ))
+
+
+-- refuel.valueDrop( 0	  , "Front")
+-- print "Asnwer:"
+-- x,z = orientation.Ceil_FloorAuto( "NORTH",225.5,225.5 )
+-- print ("x "..x)
+-- print ("z "..z)
+	-- print (refuel. valuesTotal( 22450 ))
+	-- print (refuel.values(30) )
+	-- refuel.valuesDrop( 960	 , "front")
+	-- refuel.valuesTotal( 13020 )
+-- refuel.valueDrop( 1922,"front" )
+-- refuel.valueDrop( 100  , "front")
+-- refuel.FindFuel( 5 )
+-- fLib.replaceLineValue( "text" , 1 ,"HELLOWORLD","poitras")
+-- fLib.ConfigLineAuto( "text" , 8 ,45,45)
+-- print (fLib.getLineValue( "text" , 8 ))
+-- print ( fLib.Lenght("text") )
+
+-- print (  fLib.getLineValue( "text" , 1 ).." type "..type(fLib.getLineValue( "text" , 1 )) )
+
+
+
+
+-- OS.loadAPI("/programs/turtle_programs/JOBO/moreFile/programs/calculate")
+
+-- local pathDATA = "config/statistics"
+-- local xPath = "/programs/turtle_programs/JOBO/moreFile/GPS/x"
+-- local yPath = "/programs/turtle_programs/JOBO/moreFile/GPS/y"
+-- local zPath = "/programs/turtle_programs/JOBO/moreFile/GPS/z"
+-- local fPath = "/programs/turtle_programs/JOBO/moreFile/GPS/f"
+
+-- lol = "FUCK"
+-- local orientations = {'SOUTH' , 'WEST' , 'NORTH' , 'EAST' };
+-- local fuelArray = {"minecraft:coal","minecraft:planks","minecraft:chest", value = 100}
+-- local chestArray =  {"minecraft:chest", "minecraft:trapped_chest"}
+print (requestAPI.inspectThis("front", {"minecraft:netherrack"} )) 
+
+-- print "WOWO"
+
+--  requestAPI.sortSlotsFromThis  ( 16,{requestAPI.getDataName  (16)} )
+
+-- for i=16,1,-1 do
+-- 	print ("slot "..i)
+-- 	turtle.select(i)
+-- end
+
+-- turtle.select(1)
+	
+-- 	print ( requestAPI.inspectSide( "front" ) )
+
+
+
+
+

@@ -1,0 +1,1 @@
+Added: readTimeDelays(delay,historyArr), readTimeDelays(delay,historyArr) that capable read user input while not reached time out

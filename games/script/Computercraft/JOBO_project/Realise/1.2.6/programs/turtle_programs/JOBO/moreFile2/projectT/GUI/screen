@@ -1,0 +1,28 @@
+local xSize,zSize = term.getSize()
+
+function ShowProgressBar(  )
+	local yProgressEnd = defaultProgramT.GET["yProgressEnd"]()
+	local x,z = term.getCursorPos()
+	term.setCursorPos (1,1)
+	term.clearLine() 
+		local Done = configProgramT.GET.JobComplete(  )
+	   if Done then Done = "Yes" else Done= "No" end 
+		
+		local chest = defaultProgramT.GET.DungeonChest()
+		if chest then chest = "Y" else chest = "N" end 
+
+		local junk =   defaultProgramT.GET.DropJunkItem()
+		if junk then junk="Y"else junk="N" end 
+
+	local text2 = ""..calculate.JobProcent(  ).."%"
+	--text
+	-- say.writeAlert ("Done:"..Done.." Chest:"..chest.." Junk:"..junk)
+	say.writeAlert ("Done:"..Done)
+	say.writeWarning (" yPrgress: "..configProgramT.GET.yProgress())
+	say.writeSpecial (" End:"..yProgressEnd)
+	--text2
+	term.setCursorPos (xSize - #text2,1)
+    say.writeSuccess (text2)
+    term.setCursorPos(x,z)
+
+end

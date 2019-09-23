@@ -1,0 +1,267 @@
+os.loadAPI("cnt/doc")
+  local app = doc.getLibrary(  ) -- get current library 
+app.setCondition (true) --enable gps 
+
+local seed_inLen = 7;
+local seed_inWid = 11;
+local sleep_time = 600 --seconds
+
+local seed_ = {"minecraft:wheat_seeds"}
+local wheat = {"minecraft:wheat"}
+local water = {"minecraft:flowing_water","minecraft:water"}
+local chest = {
+"minecraft:chest",
+"minecraft:trapped_chest"
+};
+
+local dirt = {"minecraft:dirt"}
+
+local fuel = app.Fuel_MaterialNames(  ) -- return known fuel
+
+
+---------------Objests-----------
+
+local function up ()
+while not  app.up()  do turtle.digUp() end 
+end
+local function down()
+while not  app.down() do turtle.digDown() sleep(.3) end 
+end
+local function forward()
+    while not app.forward() do turtle.dig()  sleep (0) end 
+end
+local function left(  )
+  app.left()
+end
+function right(  )
+  app.right()
+end
+
+
+
+--Checkers 
+local function home(  )
+  if  app.get_x(  ) == 0 and  app.get_y(  ) == 0 and  app.get_z(  ) == 0 then 
+     return true
+  end  
+end
+
+local function proceed_home(  )
+   if  ( app.get_x(  ) + app.get_z(  ) ) > (app.fuelTotal(  ) + turtle.getFuelLevel()) then 
+      app.danger "To going back requare more fuel ..."
+         return false
+   end 
+   return true
+end
+
+
+local function proceed_wheatfarm (more)
+  local asn = (seed_inLen*seed_inWid) + (more or 0)
+  local tt = app.fuelTotal(  ) + turtle.getFuelLevel()
+    if asn > tt then 
+        say.danger ("Missinng "..(asn - tt ).." fuel to continue ...") return false
+    end  
+   return true
+end
+
+local function size_treefarm(  )
+   app.alert ("Wheat farm Wid: "..(seed_inWid).. ", Len: "..(seed_inLen)  )
+end
+----
+local function reset(  )
+  app.set_x (0)
+  app.set_y (0)
+  app.set_z (0)
+  app.set_f (1)
+  app.success ">Reset applied "
+end
+
+local function inportChest ()
+
+local isChest =  app.inspectThis ("bottom",chest);
+  
+  if not isChest then 
+      app.warning "No inport chest in bottom !"
+      app.alert "Cheking ... " sleep(0.4)
+      local where_chest = app.selectThis(chest)
+        
+        if where_chest then 
+           app.success ("Chest found ..")sleep(0.4)
+           app.alert "Prepare place inport chest" sleep(0.5)           
+           turtle.digDown() 
+           turtle.select(where_chest)
+             if turtle.placeDown() then 
+               app.success " Complete ! "
+               else say.danger "Unaible to place chest "; return false  end
+             
+         else app.danger "No chest in invetory" return false  end   
+    end
+  turtle.select(1)
+  while turtle.suckDown() do end -- suck all items from inport chest
+  return true
+end
+
+
+
+local function seed(  )
+ 
+  -- Chech if wheat is gown 
+  local _,data = turtle.inspectDown()
+  if data.metadata and data.metadata >=7 then app.success ("Fully gown at "..data.metadata.." ..") turtle.digDown() end
+
+  local where_seed = app.selectThis (seed_)
+   local where_dirt = app.selectThis (dirt)
+  
+   local isWheat = app.inspectThis("bottom", wheat )  
+     if not where_seed and not isWheat then 
+          app.warning "Unable to  find seed .." return false
+     end 
+
+
+     if where_seed and not isWheat then 
+        turtle.select (where_seed)
+        if not turtle.placeDown () then 
+          app.warning "Cannot place seed .."
+          app.alert "Try humuse .."
+           local humuse = turtle.digDown()
+            if humuse then turtle.select (app.selectThis(seed_)) turtle.placeDown() end
+             if not humuse then 
+                app.warning ("Failed humuse  "..tostring( app.SortString( {app.inspectSide( "bottom" )} ) ) )
+                app.alert "Prepare replace with dirt !"
+                if where_dirt then 
+                  app.success "Dirt found, moving !"
+                  down() sleep (.1)
+
+
+
+                     if app.inspectThis("bottom", water ) then 
+                      app.alert "Water was ignored" up()  return true end
+                      turtle.select (where_dirt)
+                       if turtle.placeDown() then 
+                          app.success "Successfuly place dirt"
+                            up()
+                             app.alert "Also humuse and place seed .."
+                            turtle.digDown(); turtle.select(where_seed) turtle.placeDown() 
+                           return true
+                        else app.danger "Unaible to place dirt !"; up() return false
+                        end 
+                else app.danger "Cannot find dirt !" return false
+                end  
+             end 
+          end  
+       end 
+     return true
+end
+
+
+local function dropItems(  )
+  local available_seed = (seed_inLen*seed_inWid)
+  local available_dirt = available_seed
+   local available_fuel = (seed_inLen*seed_inWid)
+   
+   local x = 0 
+   app.warning "Droping seed overflow"
+   
+   for slt =1,16 do
+       if app.isListedRequestSlot(slt , seed_ ) then 
+        x = x + turtle.getItemCount(slt)
+         if x > available_seed and turtle.getItemCount(slt)>0 then turtle.select (slt) turtle.drop((x-available_seed) <= 64 
+            and x-available_seed or 64 ) end
+       end 
+   end
+   app.success "Successfuly droped seed ..." sleep (.5)
+   
+    local x = 0 
+   app.warning "Droping dirt overflow"
+    for slt =1,16 do
+       if app.isListedRequestSlot(slt , dirt ) then 
+        x = x + turtle.getItemCount(slt)
+         if x > available_dirt and turtle.getItemCount(slt)>0 then turtle.select (slt) turtle.drop((x-available_dirt) <= 64 
+            and x-available_dirt or 64 ) end
+       end 
+   end
+   -- app.success "Successfuly droped dirt"; sleep (.56)
+
+   --       if app.fuelTotal(  ) > available_fuel then  
+   --         app.warning "Droping fuel/wood overflow"
+   --        app.valueDropLess((app.fuelTotal(  )-available_fuel) ,"Front" ) 
+   --        app.success "Successfuly droped fuel/wood .."
+   --       end
+
+   --   app.alert "Droping last items"    
+        for slt = 1,16 do 
+            local isSeed = app.isListedRequestSlot(slt , seed_ )
+            local isFuel = app.isListedRequestSlot(slt , fuel )
+            local isDirt = app.isListedRequestSlot(slt , dirt )
+            -- print ("slot: ",slt," == ",not (isSapling or isLog)) sleep(2)
+            if turtle.getItemCount (slt) > 0 and not (isSeed or isFuel or isDirt) then turtle.select (slt); turtle.drop() end
+
+        end 
+     app.success "Complete droping odd items .."  
+     sleep (2)
+     turtle.select (1) 
+end
+
+local function str(  )
+   local x,z = term.getCursorPos()
+   local xSize,zSize = term.getSize()
+   return string.rep ("-",xSize-x)
+end
+
+function assert_ ()
+  assert (inportChest (),str()) 
+  assert (proceed_wheatfarm (seed_inWid+seed_inLen+( (seed_inWid+seed_inLen)*2 )),str()) --up and down
+end
+
+
+ 
+
+          
+
+app.clear()
+app.special ("Wheat farm is running .. \nand wating redstone inputs ")
+while true do 
+           if  not home(  ) then 
+             app.goto (0,0,0)
+             app.look("SOUTH")
+          end  
+-- returtn 
+ 
+ 
+
+while not rs.getInput("left") and not rs.getInput("right") do sleep(0) end
+
+ size_treefarm(  )
+ assert_ ()
+  
+app.alert "Wating 10s, please select order .."
+sleep (10) 
+  
+  if rs.getInput ("right") and rs.getInput("left")  then 
+    app.alert "Sleep timer running ..." sleep(sleep_time)
+   elseif rs.getInput ("right") then 
+     reset ()
+  end 
+  
+  
+  if rs.getInput ("left") then 
+    right() right () dropItems(  ) right () right()
+    app.alert "Farming >.."
+    forward () -- pusht one block forward
+    for seed_wid=1,seed_inWid do 
+         seed(  )
+        forward ()
+         seed(  )
+      for seed_len=1,seed_inLen-2 do 
+        forward ()
+        seed(  )
+      end
+     if seed_wid % 2 == 0 then left() forward() left ()
+                          else  right() forward() right()
+     end 
+    end
+   app.success ("Complete cycle !")
+   -- turtle.select (app.selectThis (dirt)) turtle.placeDown()
+  end
+
+end 

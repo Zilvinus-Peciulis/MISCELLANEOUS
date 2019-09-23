@@ -1,0 +1,10 @@
+rednet.open("back")
+
+while true do 
+
+a, b = rednet.receive();
+term.clear()
+term.setCursorPos(1,1)
+print (b)
+
+end

@@ -1,0 +1,669 @@
+local x=999; 
+local z=999;
+local y=999
+loadCoord = true 
+
+--READ Only
+--++Globals
+Global = {}
+
+Global.isBreaker  = false;
+
+function Global:setCondition (boolean)
+   if type(boolean)=="boolean" then 
+         Global.isBreaker  = boolean
+    else
+         error "Condition shoud be boolean"
+   end
+end
+
+
+
+local Ref_time = 0;
+
+--READ?/Only
+
+local myPath ="moreFile/GPS" .."/" 
+
+local folder = "moreFile/GPS".."/" 
+
+--{[Assert Data fs]}--
+
+assert(  fs.exists(myPath.."refuelLib"),"gps:Requare refuelLib. " )
+os.loadAPI(myPath.."refuelLib")
+
+
+
+local xTo = {0 , -0.5 , 0 , 0.5};
+local zTo = {0.5 , 0 , -0.5 , 0} ;
+local orientations = {'SOUTH' , 'WEST' , 'NORTH' , 'EAST' };
+
+
+
+function sethomeCoord(x,z,y,f)
+
+if tonumber (x) and tonumber(z) and tonumber(y) and tonumber (f) then
+local xsave = fs.open (folder.."x" ,"w") ;
+  local zsave = fs.open (folder..'z' , 'w');
+  local ysave = fs.open (folder..'y' , 'w');
+  local fsave = fs.open (folder..'f' , 'w');
+  
+ xsave.write (x);
+ zsave.write(z);
+ ysave.write(y);
+ fsave.write(f);
+ 
+ xsave.close();
+ zsave.close();
+ ysave.close();
+ fsave.close();
+ end
+end
+
+
+
+local function isNumber( inpt  )
+   if tonumber(inpt) ~= nil then 
+    return true
+      else 
+        return false
+   end
+end
+
+local  function isCorrect( text )
+   print (text)
+   local inpt =false;
+    while not isNumber ( inpt ) do     
+        inpt = read()   
+    end
+   return inpt
+ end
+
+
+local function getCoord () --load ination
+ local X = fs.exists(myPath.."x")
+ local Z = fs.exists(myPath.."z")
+ local Y = fs.exists(myPath.."y")
+ local F = fs.exists(myPath.."f")
+
+
+       if  X and Z and  Y and F then
+         
+                    local xget = fs.open (folder.."x" ,"r") ;
+              local zget = fs.open (folder..'z' , 'r');
+              local yget = fs.open (folder..'y' , 'r');
+              local fget = fs.open (folder..'f' , 'r');
+              
+             x = tonumber (xget.readAll() ) ;
+             z = tonumber (zget.readAll()) ;
+             y = tonumber ( yget.readAll() ) ;
+             f = tonumber ( fget.readAll() )  ;
+             
+             xget.close();
+             zget.close();
+             yget.close();
+             loadCoord = x and z and y and f and  true or true
+         else
+          
+          
+            -- If no files then redo Coords
+               x = isCorrect( "New X please" )
+               y = isCorrect( "New Y please" )  
+               z = isCorrect( "New Z please" )
+               f = isCorrect( "New F please" )          
+               f= f+1
+           saveCoord ()
+           --display()
+           error "Some file was missing! Thank you :)"
+      end
+
+end
+ 
+
+
+
+  function saveCoord () -- save ination
+  local xsave = fs.open (folder.."x" ,"w") ;
+  local zsave = fs.open (folder..'z' , 'w');
+  local ysave = fs.open (folder..'y' , 'w');
+  local fsave = fs.open (folder..'f' , 'w');
+  
+ xsave.write (x);
+ zsave.write(z);
+ ysave.write(y);
+ fsave.write(f);
+ 
+ xsave.close();
+ zsave.close();
+ ysave.close();
+ fsave.close();
+  
+ end
+ 
+
+
+ local function isChangingOrientation(  )
+   
+   --getCoord()
+
+
+   
+   if orientations[f] == "EAST" then -- Make goo desision what to do convertion COORDINATION when turninng around 
+             x = math.floor(x)-- print"EAST ass"
+  elseif orientations[f] == "WEST"then
+             x = math.ceil(x) --print"WEST shit"
+  end
+
+
+
+  if orientations[f] == "SOUTH" then -- Make goo desision what to do when  turning  in eny side
+             z = math.floor(z)-- print"SOUTH aaaaaaaaa"
+  elseif orientations[f] == "NORTH"then
+             z = math.ceil(z) --print"NORTH aaaaaaaaaa"
+  end
+ 
+   
+
+    --print"NEW NUMBERS"
+
+--print(x)
+--print(z)
+--print(y)
+
+    saveCoord ()
+    --sleep(10)
+    
+   -- getCoord()
+end
+
+ function display()
+ term.setCursorPos(1,1);
+ term.clear();
+ 
+ print ("X:D. "..tostring(x));
+ print ("Z. "..tostring(z));
+ print ("Y. "..tostring(y));
+ print("F. "..tostring( f)..' = '..orientations[f])
+ print("Working = "..tostring(Global.isBreaker ))
+ end
+ 
+ local function REFUEL(  ) 
+   local fuelLevel = 100
+   local refuelvalue = 1
+   if turtle.getFuelLevel() <=fuelLevel then 
+     print ("Fuel is below "..fuelLevel..".")
+     refuelLib.RefuelByValue( 1 ) -- Refuel items from inventory
+  end 
+ end
+ 
+local  function forward ()
+
+ if loadCoord  then 
+    REFUEL(  )
+    --print "??"
+    --Compare min max value to say i shoud move but if i have between 0.5 that mean not moved completle
+    --MAGIC HAPPEND
+    local Xf = math.floor(x)
+    local Xs = math.ceil(x)
+    local Zf = math.floor(z)
+    local Zs = math.ceil(z)
+
+    if Xs == Xf  then -- Okey  , you know i done but i cannot do that again if you not move forward man/turtle
+        x = x + xTo[f];
+     --print "MOVE X"
+    end
+    
+    if Zs == Zf then  
+     --print "MOVE Z"
+        z = z + zTo[f];
+    end
+      
+           if turtle.forward ()==true  then
+            
+              x = x + xTo[f];
+              z = z + zTo[f]; 
+              -- print"IEMFROWAR??????"
+                   saveCoord ()
+                return true 
+             end
+     
+     -- sleep(Ref_time+3)
+     end
+--display()
+return false
+end
+ 
+local function left ()
+      
+if loadCoord  then 
+REFUEL(  )
+if turtle.turnLeft() ==true  then 
+      isChangingOrientation(  )
+ f = f - 1 
+  if f < 1 then 
+    f = 4;  
+   
+     
+   end
+ saveCoord ()
+
+ end
+ end
+--display() ; 
+end
+
+local function right ()
+if loadCoord then 
+REFUEL(  )
+if turtle.turnRight() == true then 
+      isChangingOrientation(  )
+  f = f + 1 
+  if f > 4 then 
+   f = 1 ;
+  end
+  saveCoord()
+ 
+end 
+ end
+  --display() ; 
+  end  
+local function up()
+          if loadCoord  then
+              REFUEL(  )
+
+                local Yf = math.floor(y)
+                local Yc = math.ceil(y)
+                              if Yf == Yc then  
+                               --print "MOVE Y Up"
+                                  y = y + 0.5
+                              end          
+
+                   -- print("Yf "..Yf.." == "..Yc.." Yc")
+
+                       if turtle.up ()  then 
+                         isChangingOrientation(  )
+                         y = y + 0.5
+                             y = math.floor(y)
+                              saveCoord () 
+                              return true  
+                       end
+               y = math.floor(y)
+               saveCoord ()
+                return true 
+           end
+end
+
+local function down  ()
+      if loadCoord  then
+             REFUEL(  )
+
+            local Yf = math.floor(y)
+            local Yc = math.ceil(y)
+                          if Yf == Yc then  
+                           --print "MOVE Y Down"
+                              y = y - 0.5
+                          end
+
+                  -- print("Yf "..Yf.." == "..Yc.." Yc")
+
+                          if turtle.down () then 
+                             isChangingOrientation(  )
+                             y = y - 0.5  
+                          end
+                 y = math.ceil(y)
+                 saveCoord () 
+        end
+end
+ 
+  function look (direction)
+    assert(direction=="NORTH" or direction =="SOUTH" or direction == "EAST" or direction=="WEST", "Requare Orientatiom: NORTH,SOUTH,EAST,WEST")
+   local ORNT_val = {SOUTH=1 , WEST=2 , NORTH=3 , EAST=4 };--orientations values
+  local countTurns = 0
+  local function w_lelft ()
+                   while direction ~= orientations[f] and Global.isBreaker  == true do  left(); end ;
+  end-- while orientations not math go left
+  
+  local function w_right ()
+                  while direction ~= orientations[f] and Global.isBreaker  == true do  right(); end ;
+ end--while orientations not math go right
+   
+  
+
+   if ORNT_val [ direction ] == f then 
+ --   print'Same ornt'
+  
+  elseif ORNT_val [ direction ] > f and f == 1 and ORNT_val [ direction ] ~= 2 and ORNT_val [ direction ] ~= 3 then --Go left if are looking SOUTH  and not in WEST , NORTH  , Jump command
+    w_lelft()
+   -- print"Jump! EAST"
+    elseif ORNT_val [direction] < f and f ==4 and ORNT_val [ direction ] ~= 2 and ORNT_val [ direction ] ~= 3 then -- Go right if are looking EAST  and not in WEST , NORTH ,Jump command
+    w_right ()
+--  print "Jump! SOUTH"
+  elseif ORNT_val [ direction ] < f then --"Go left if no Jump"    
+   w_lelft()
+  --  print "Ornt Is  smaller" 
+   elseif ORNT_val [direction] > f then -- 'Go right if no Jump'       
+   w_right()
+  --  print 'Ornt is bigger'  
+   end
+  
+   
+
+   
+ 
+  --  while direction ~= orientations[f] do 
+  --  right()
+  --,asda
+  -- end
+  end
+
+local function calculateLooking ( xT,zT )
+
+ if  xT < x  then 
+  look("WEST") -- WEST
+  print "WEST ========="
+ 
+ 
+ elseif  xT > x  then 
+  look("EAST") --EAST 
+    print "EAST ========="
+
+
+ elseif  zT < z  then 
+  look("NORTH") --NORTH 
+    print "NORTH ========="
+
+ 
+ elseif  zT > z  then 
+  look("SOUTH") -- SOUTH
+    print "SOUTH ========="
+ end
+
+end
+ 
+
+ local function isWalkableOject( where )
+local wlist = {"minecraft:tallgrass",} ; 
+     
+     local fn = function (where)      
+        for vec = 1, #wlist do 
+         local success, data =  turtle[where]()
+           if data.name == wlist[vec] then 
+           return true ; 
+           end
+        end;
+        return false ;
+     end
+
+    
+    if where == "top" then
+         return fn("inspectUp") 
+    elseif where == "bottom" then 
+         return fn("inspectDown")
+    elseif where == "front" then  
+        return fn("inspect")
+    else 
+       assert (where =="top" or where == "bottom" or where=="front" , "Inspect top, bottom , front")
+    end
+ end
+
+
+
+
+
+local function  isAliesObject(where)  
+   local wlist = {"ComputerCraft:CC-Turtle",
+   "ComputerCraft:CC-TurtleAdvanced",
+   "ComputerCraft:CC-TurtleExpanded",
+   "ComputerCraft:CC-Computer",
+   "minecraft:trapped_chest",
+   "minecraft:chest",
+      } ; 
+     
+     local fn = function (where)      
+       local success, data =  turtle[where]() 
+        for vec = 1, #wlist do 
+           if data.name == wlist[vec] then 
+           return true ; 
+           end
+        end;
+        return false ;
+     end
+
+    
+    if where == "top" then
+         return fn("inspectUp") 
+    elseif where == "bottom" then 
+         return fn("inspectDown")
+    elseif where == "front" then  
+        return fn("inspect")
+    else 
+       assert (where =="top" or where == "bottom" or where=="front" , "Inspect top, bottom , front")
+    end
+end
+
+
+ --local success, data =  turtle["inspect"]()
+ --print(data.name)
+
+local function dig(where)
+  assert (where =="top" or where == "bottom" or where=="front" , "Dig top, bottom , front")
+ 
+    --if not isAliesObject(where) then 
+           if where == "top" then
+                  turtle.digUp()
+           elseif where == "bottom" then 
+                  turtle.digDown()
+           elseif where == "front" then  
+                  turtle.dig()
+      end
+    --end
+end
+
+function dig_notAllias( where )
+  if not isAliesObject(where) then  
+      --sleep(3)
+      dig(where)
+   end   
+end
+
+
+
+
+local function rezolveFront( LOOK )
+  
+ local function movUpDn(  )
+      if not turtle.detectDown() and turtle.detectUp()  then  dig_notAllias("bottom") down()  
+      elseif not turtle.detectUp() and turtle.detectDown() then dig_notAllias("top") up() 
+     end 
+ end
+
+ local function frw(  )
+   dig_notAllias( 'front' ) forward()
+ end 
+local function lookHere( LOOK ) 
+ -- print ("LOKING "..tostring(LOOK))
+   if LOOK then 
+    look (LOOK) 
+   end  
+end
+           
+            if  isAliesObject("front")  then -- not 
+                
+                 right() frw(  )   left()
+              if isAliesObject("front") then -- + 
+              left()
+              frw(  )
+               
+               
+
+               if isAliesObject("front")  then -- + 
+                 left() frw(  ) left() frw(  )                    
+                   
+                  movUpDn(  )
+               
+                  lookHere( LOOK )
+                    
+
+                                   
+ 
+                  
+              end 
+                
+                 if not isAliesObject("top")  then dig_notAllias( "top" ) up() 
+                      elseif not isAliesObject("bottom")  then dig_notAllias( "bottom" ) down()
+                       end 
+            end
+           end 
+                           lookHere( LOOK )           
+end
+
+--dig("front")
+  local function getSmarterPath(o , side, LOOK,xT,zT)
+--    print(side)
+     
+    if not turtle.detect() or isWalkableOject(  side ) then              
+     
+                  forward()
+      elseif not  isAliesObject("front")   then 
+                turtle.dig()
+      elseif not isAliesObject("top")  then    
+                 turtle.digUp() up() rezolveFront( LOOK,xT,zT )  
+      elseif not isAliesObject("bottom")  then 
+                turtle.digDown()   down() rezolveFront( LOOK,xT,zT )  
+      else
+           rezolveFront( LOOK,xT,zT )  
+           
+      end    
+  end
+
+
+
+
+ function Global:goto (xT , yT , zT)
+ --print"PLEASE WORKD" 
+ 
+  
+      getCoord ()  -- more stable when inprocess
+  
+ --display()
+ --sleep(10)
+print ("GPS:yT "..yT.."> y "..y.. " ="..tostring(yT>y))
+while yT > y and Global.isBreaker  == true do  --UP
+               
+      if not isAliesObject("top")   then              
+                dig_notAllias( "top" )  up()               
+      
+      elseif not turtle.detect()  or turtle.detectUp() or turtle.detectDown() then 
+                  getSmarterPath("_" , "front") 
+      
+       elseif not turtle.detectUp() then    
+                 dig_notAllias( "bottom" ) down() 
+      end
+ end
+
+ 
+
+ 
+  while (xT ~= x or yT ~= y or zT  ~= z) and  Global.isBreaker  == true  do
+  -- print"HAHA"
+  
+  
+  
+ 
+ if  xT < x  then 
+  look("WEST") -- WEST
+  --print"WEST" 
+   while xT < x and Global.isBreaker  == true   do 
+    getSmarterPath("WEST" , "front","WEST",xT,zT) 
+   end
+ end
+ 
+ if  xT > x  then 
+  look("EAST") --EAST
+  --print"EAST" 
+   while xT > x and Global.isBreaker  == true do 
+            getSmarterPath("EAST" , "front","EAST") 
+   end
+ end
+
+ if  zT < z  then 
+  look("NORTH") --NORTH 
+  --print"NORTH" 
+   while zT < z and Global.isBreaker  == true do
+           getSmarterPath("NORTH" , "front","NORTH",xT,zT) 
+   end
+ end
+ 
+ if  zT > z  then 
+  look("SOUTH") -- SOUTH
+  --print"SOUTH" 
+   while zT > z and Global.isBreaker  == true do 
+      --    print"SOUTH" 
+           getSmarterPath("SOUTH" , "front","SOUTH",xT,zT) 
+   end
+ end
+
+
+while yT < y and Global.isBreaker  == true do -- DOWN       
+                     
+         if not isAliesObject("bottom")   then 
+                    dig_notAllias( "bottom" )  down()               
+         elseif turtle.detect() or turtle.detectUp or turtle.detectDown() then 
+                  getSmarterPath("_" , "front") 
+         elseif not turtle.detectUp() then    
+                 dig_notAllias( "top" ) up()                             
+        end
+   end 
+
+    --display()
+   
+end
+
+
+
+
+end 
+function Global:setX(this)
+ x = this 
+ saveCoord()
+end
+
+
+function Global:setY(this)
+ y = this 
+ saveCoord()
+end
+
+function Global:setZ(this)
+ z= this 
+ saveCoord()
+end
+
+function Global:setF(this)
+ f = this + 1
+ saveCoord()
+end
+
+-- GET CORD
+function Global:getX()
+ return x
+end
+
+
+function Global:getY()
+ return y
+end
+
+function Global:getZ()
+return z
+end
+
+function Global:getF()
+ return f
+end
+--** Load data
+--getCoord ()
+ 
+os.unloadAPI(myPath.."refuelLib")
+
+

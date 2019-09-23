@@ -1,0 +1,184 @@
+local path = "/playFiles/" 
+
+local lastplay = path.."LastPlay"
+
+os.loadAPI ("/playFiles/FileLibAPI/file")
+
+local  select = {}
+       select.isSelected = 1
+       select.Disks = {}
+
+
+       --ignore me i just working here       
+local  bug = {}
+       bug.isStaySelected = 0
+                                   
+local  swith = {}
+
+function select:isRecord(slot)
+   if type(slot) == "number" then  
+      if turtle.getItemCount(slot) > 0 then 
+          local data = turtle.getItemDetail(slot)
+          local record = string.sub( data.name , 11,16)  
+            if record == "record" then 
+               --print ("Music record in "..slot..".")
+               return true
+            end
+      end
+     else error "Not record slot selected"
+   end
+return false
+end    
+
+
+
+function select:AllDisks() --Remember all recors where they live's in slot's
+ table.remove( self.Disks ) -- remove nasty table here
+ local c = 1 
+  for x = 1 , 16 do 
+    if turtle.getItemCount(x) == 1 and self:isRecord(x) then 
+                self.Disks[c] = x     
+         c=c+1
+    end 
+  end
+end
+
+function select:count ()
+ local c = 0 
+  for x = 1 , 16 do
+    if self:isRecord(x) then
+        c=c+1
+    end 
+  end
+return c
+end
+
+function   bug:staySelected () -- works like event, if something happend  then return false
+ select:AllDisks() -- 1 remember all records from invetory :)
+   
+       --print (self.isStaySelected .. " ==? " ..#select.Disks)
+   if self.isStaySelected ==  #select.Disks then  
+       --print "Its normal "
+       return true
+   else
+       self.isStaySelected = #select.Disks    
+      -- print "That is wrong"
+       return false
+   end
+end
+
+--bug:staySelected ()
+--sleep(4)
+--bug:staySelected()
+--sleep(4)
+--bug:staySelected()
+
+
+function select:next()
+    --  local stuckCountingCorrectly =  bug:staySelected () -- remeber all disk record's and debug flag return  
+  --if stuckCountingCorrectly and #self.Disks > self.isSelected then 
+    self:AllDisks()
+    if #self.Disks > self.isSelected then
+      --print "Adding to next recrod"
+      self.isSelected = self.isSelected +1
+  else
+      --print "To muscch spae bro"
+      self.isSelected = 1 -- reset row meaning all cycle is complete
+  end  
+--print ("tabe "..#self.Disks .."  seleted " .. self.isSelected)
+turtle.select( self.Disks[ self.isSelected ] or 1)
+end
+--select:next() -- just for debuging
+--IGNORE sleep(0.5)
+
+function swith:emptySlot ()
+   for x = 1,16 do
+     if turtle.getItemCount(x) == 0 then 
+       return x
+     end
+   end
+return 1
+end
+
+
+
+
+
+function swith:setLastPlayed ()   
+  local t = { select.isSelected  } 
+   file.writeFromTable(lastplay , t )       
+end
+
+
+function swith:getLastPlayed()
+local getFile = file.getTable (lastplay)
+      select.isSelected = tonumber( getFile[1] )
+end
+
+
+
+
+function swith:disks()
+   
+ 
+   --1. prepate take a baby
+           select:AllDisks() -- scout all disk from turtle invetory
+           turtle.select(self:emptySlot()) -- select disk where they live
+           turtle.suckDown()
+   --2. placing new baby :(-)
+           sleep(0.5)
+           select:next()
+local smartSlot = select.Disks[ select.isSelected ] or 1
+           turtle.select( smartSlot )
+           turtle.dropDown() 
+          
+        
+end
+
+function swith:isCorrect(  )
+  if nil == select.Disks[ select.isSelected ]  then 
+      select:AllDisks()
+      select.isSelected = 1
+      swith:setLastPlayed()     
+     --error ("Something goes wrong: "..tostring(select.isSelected))
+
+  end
+end
+--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=
+--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=
+--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+local function import ()
+    if not fs.exists( lastplay) then 
+	     swith.setLastPlayed()
+            
+             error "Creating new file "
+
+    else
+
+             swith.getLastPlayed() -- get data from file 
+	           select:AllDisks() --all in sinck
+              swith:isCorrect(  ) 
+    end
+end
+import ()
+
+
+
+
+--Widely useblae
+function nextDisk ()
+   swith:disks()
+   swith:setLastPlayed()
+end 
+
+function getSlot ()
+import ()
+--print("Is selected "..select.isSelected)
+ return select.Disks[ select.isSelected ] or 1
+end
+
+--print (getSlot())
+
+function hello(  )
+  print "Hello world"
+end

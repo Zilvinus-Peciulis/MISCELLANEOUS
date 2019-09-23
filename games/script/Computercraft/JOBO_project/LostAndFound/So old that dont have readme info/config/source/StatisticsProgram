@@ -1,0 +1,296 @@
+os.loadAPI("config".."/source/FileLibrary/fLib")
+os.loadAPI("/config/DATA/GenerateJobCoord/JobCoordProgram")
+os.loadAPI ("programs/turtleLib")
+os.loadAPI("/config/source/ConfigProgram")
+os.loadAPI("/config/DATA/GenerateHomeCoord/HomeCoordProgram")
+local pathDATA = "config/statistics"
+local myID = os.getComputerID()
+--local config = fLib.getTable( "config/statistics" )
+
+
+
+local ManagerX = ConfigProgram.GET.xPos()
+local ManagerY = ConfigProgram.GET.yPos()
+local ManagerZ = ConfigProgram.GET.zPos()
+local ManagerF = ConfigProgram.GET.fPos()
+
+
+
+
+
+
+--// Local Library'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+local function set_Status( id, set )-- Set value by id
+	assert(type(id)=="number","set_Status:Requare compare id.")
+	assert(type(set)=="boolean", "set_Status:Requare boolean.")
+	 return fLib.PointIndexToValue( pathDATA, "ID" ,id,"STATUS", set ) --return success
+end
+
+---------------------
+
+local function set_isAvailable( id, set )-- Set value by id
+	assert(type(id)=="number","set_isAvailable:Requare compare id.")
+	assert(type(set)=="boolean", "set_isAvailable:Requare boolean.")
+	 return fLib.PointIndexToValue( pathDATA, "ID" ,id,"isAvailable", set ) --return success
+end
+
+-- 
+
+-- Get informatyion by condition 
+
+ 
+local function inspect_ID( id ) -- Check by condition if found return line else false
+	assert(type(id)=="number", "Requare ID.")
+	return fLib.Inspect(pathDATA, "ID",id )
+end
+
+local function inspect_isAvailable( condition ) -- Check by condition if found return line else false
+	assert(type(condition)=="boolean", "Requare condition")
+	return fLib.Inspect(pathDATA, "isAvailable",condition )
+end
+
+local function inspect_Status( condition )-- Check by condition if found return line else false  then	assert(type(condition)=="boolean","inspect_Status:inspect_isAvailable condition boolean.")
+	 assert(type(condition)=="boolean", "Requare condition")
+	 return fLib.Inspect(pathDATA, "STATUS",condition )
+end
+
+local function get_ExistingIDs( )
+	return fLib.GetIndexValue( pathDATA, "ID" )
+end
+
+-----------------Comunications----------------------------------------------------------------------
+ function sendEveryOne( message )
+	assert(type (message) == "table","sendEveryone:Requare table for message.")
+	local TurtlesIDs = fLib.GetIndexValue( pathDATA, "ID" )
+     for k,ID in pairs(TurtlesIDs) do
+     	turtleLib.Send(ID,message)
+     end
+end
+
+function sendDataEveryone(  )
+    local  data = fLib.GetAllLongLines( pathDATA )
+     for k,tables in pairs(data) do
+     	tables.Manager = myID
+     	if tables.JobAvailable ==true  then 
+     		--sleep(0.1)
+     		--print ("Sending to "..tables.ID.."")
+     	  turtleLib.Send(tables.ID,tables)
+       end 
+     end
+end
+
+
+
+
+
+function sendOne( id, message )
+		assert(type (id) == "number","sendOne:Requare send to id.")
+			assert(type (message) == "table","sendOne:Requare table for message.")
+			turtleLib.Send(id,message)
+end
+
+
+local function receiveOne( time )
+	local sender,data =  turtleLib.Receive( time )
+	return sender,data
+end
+
+-- [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[P]R]O]T]O]C]O]L]s]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
+
+
+function ProtocolGoHome(  ) -- Broadcast protocols about Go home 
+	turtleLib.Broadcast( {GoHome=true, Manager = myID} ) -- send information to shutdown
+end
+
+ 
+ function SendDisassembleProtocol( success ) -- succes triger to remove from registry
+	assert (type(success)=="boolean", "Disassemble Protocol requare success.")
+	local getFirstID = fLib.GetFirstLongLine( pathDATA )
+	if type(getFirstID)=="table" then 
+      print ("Send disassemble to "..tostring(getFirstID.ID))
+       turtleLib.Send(getFirstID.ID, {
+       	 Disassemble = true, 
+       	 x = ManagerX,
+       	 y = ManagerY,
+       	 z = ManagerZ,
+       	 Manager = myID,
+       	})
+	end 	
+	if success then 
+     print ("Complete "..tostring(getFirstID.ID.."."))
+     fLib.TakeFirstLongLine( pathDATA )
+	end 	
+end
+
+
+--###############JobCoordProgram#Lib############################################################
+ function isJob(  )
+ 	return JobCoordProgram['getJobAvailable']()
+ end
+
+ function DeleteJobData(  )
+	JobCoordProgram["DeleteContentData"](  )
+end
+
+ function getGeneratorPath(  )
+	return JobCoordProgram["getJobGenerators"](  )
+end
+
+ function Costructor( GeneratorName ) -- Construck type of Mining Generation
+	return JobCoordProgram["ConstructorGenerators"]( GeneratorName ) --succsecc
+end
+
+function GetJob(  ) -- look , not change enything :) 
+  return JobCoordProgram["GetJobCoordAdvanced"]()
+end
+
+function TakeJob(  ) -- stealing forever
+   return JobCoordProgram["TakeJobCoordAdvanced"](  )
+end
+--Costructor( "GenerateQuarry" )
+
+
+
+--############################################################################
+
+function DeleteStatistic(  )
+	Delete(  )
+end
+
+
+--///////////HomeCoord/////////////////////////////////////////////////////////////
+function GenerateHomeCoord(  )
+	HomeCoordProgram.GenerateHomeCoord(  )
+end
+function DeleteHome(  )
+	fLib.DeleteContent( "/config/DATA/GenerateHomeCoord/HomeCoordDATA" )
+end
+--//////////////////////////////////////////////////////////////////////////////////
+
+
+local function checkID( isID )
+	 assert(type(isID)=="number", "checkID:Requare ID.")
+	return fLib.Inspect(pathDATA, "ID",isID ) -- return true if find same index and value :D
+end 
+
+
+
+local function setContent( id )
+	assert (type(id)=="number","Need id to return :/")
+	local JobAvailable = TakeJob(  ) -- take job from generator memory 
+	 local content
+	if JobAvailable then -- if still job content do else return return somehing else
+				         
+				       return  {
+				  				    ID=id,
+				  					xJ=JobAvailable.x,
+				  					zJ=JobAvailable.z,
+				  					yJ= ConfigProgram.GET.yJob() or ConfigProgram.SET.yJob(ConfigProgram.GET.yPos()) or ConfigProgram.GET.yPos(),
+				  					fJ = JobAvailable.f,
+				  					STATUS=true,
+				  					JobAvailable = true 	 ; --set job is available
+				  				}
+    				    else 
+				    	
+				    	
+				    	return {
+				    	           ID=id,
+				    	           JobAvailable = false 
+				                    }
+						
+    			end 
+end
+
+
+
+
+function setNew( newid ) -- Set newid id in here
+	local newid = tonumber(newid)
+	assert(type(newid)== "number" , "Requare newid id value.")
+
+	if not checkID( newid )  then 
+					 local isJobAvailable = setContent( newid ) -- get Data in here
+				       if isJobAvailable then term.setTextColor(colors.cyan) print("Wrote \""..newid.."\" id in ".."\"statistics\"") term.setTextColor(colors.white)
+	    				         -- Write All in next pocsition if JobAvailable  
+	    				         fLib.AppendLoongLine( pathDATA , isJobAvailable )  
+    				   end       
+    				       
+    else                
+    	print("ID["..newid.."] exists in \"Statistics\" memory.") 
+    
+    end
+
+end
+
+function setJob( id )
+	assert (type(id)=="number", "Man, i Need id to proceed Set the Job.")
+	  local  idPos  = checkID( id )
+	  if idPos then 
+            local JobAvailable = setContent( id )
+	  	            if JobAvailable then print ("Set next Job to "..id.." turtle.")
+	  	             	     fLib['ReplaceLongLineValue']( pathDATA, idPos ,JobAvailable)
+	  	            end 
+	  				return JobAvailable 
+	  else
+	  		       print (id.. " not found.")
+	  end 
+ return false 
+end
+
+
+
+
+
+
+
+--Costructor( "GenerateQuarry" )
+--setNew( 35 )
+
+
+
+
+
+
+
+
+
+
+
+----Utiltity-------------------------------------------------------------------------
+
+function isContent(  )
+	return fLib.isContent( pathDATA )
+end
+
+function DeleteLine( ln )
+	fLib.DeleteLongLines( pathDATA , ln )
+end
+
+function SpamLine( ln ,text)
+	fLib.ReplaceLongLineValue( pathDATA, ln ,{tostring(text)})
+end
+
+function Delete(  )
+	fLib.DeleteContent(pathDATA)
+end
+
+os.unloadAPI("config".."/source/FileLibrary/fLib")
+
+
+function changeCoord( xPos,yPos,zPos,fPos )
+	ConfigProgram.SET.xPos(xPos)
+	ConfigProgram.SET.yPos(yPos)
+	ConfigProgram.SET.zPos(zPos)
+	ConfigProgram.SET.fPos(fPos)
+
+end
+
+function changeJobLocation( xStartJob,zStartJob,xEndJob,zEndJob,yJob )
+	ConfigProgram.SET.xStartJob(xStartJob)
+	ConfigProgram.SET.zStartJob(zStartJob)
+	ConfigProgram.SET.xEndJob(xEndJob)
+	ConfigProgram.SET.zEndJob(zEndJob)
+	ConfigProgram.SET.yJob(yJob)
+
+end

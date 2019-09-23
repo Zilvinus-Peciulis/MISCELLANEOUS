@@ -1,0 +1,6 @@
+fixed ConfigLineAuto that false value return nil , shoud be false
+added input api thant support string input and number input condition
+fixed in doc file is no loaded orientation
+adder in input api NumberElipse , acceptedUser
+fixed objectDropValue from refuelAPI now return success
+fixed coordinated are reseted still exist same values in gps/reload

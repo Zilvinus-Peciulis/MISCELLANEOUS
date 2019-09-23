@@ -1,0 +1,703 @@
+term.setCursorPos(1,1);
+term.clear();
+
+os.loadAPI("cnt/doc")
+  local app = doc.getLibrary(  ) -- get current library 
+app.setCondition (true) --enable gps 
+
+local xSize ,zSize = term.getSize()
+local seed_inLen = 5;
+local seed_inWid = 4;
+local timeoutDelay = 30 --seconds
+local fuel = app.Fuel_MaterialNames(  ) -- return known fuel
+
+local path_progressHandle = "cnt/progressHandler"
+---------------Objests-----------
+if (perip.inspectThisObject("modem")) then
+    rednet.open (perip.connectThisObject( "modem" )); -- auto turn on modem
+  else
+    say.warning("No modem... broadcast message disabled")
+end
+local coordination =  "cnt/library/GPS/"
+local BeadrockReached = false;  --local program NO CHANDGE
+--Testing
+--turtleLib.DropJunkyItem(  )
+--perip.connectPeripheral(obj , theSide)
+--if true then return; end
+
+function getX(  )
+ return app.getContent( coordination.."x")
+end
+
+function getY(  )
+ return app.getContent( coordination.."y")
+end
+function getZ(  )
+ return app.getContent( coordination.."z")
+end
+
+function getF(  )
+ return app.getContent( coordination.."f")
+end
+
+function GET(SELECT)
+  local  function __GET (ln)
+   return app.getLineValue( path_progressHandle , ln or 1 )  
+  end
+-- return condition in config file 
+    if SELECT == "complete" then 
+      return  __GET (1)
+    elseif  SELECT == "xpos" then 
+       return  math.floor(__GET (2))
+    elseif SELECT == "ypos"   then 
+        return  math.floor(__GET (3))
+    elseif SELECT == "zpos" then 
+        return  math.floor(__GET (4))
+    elseif SELECT == "fpos" then 
+        return  math.floor(__GET (5))
+    elseif SELECT == "lenght" then 
+        return  __GET (6)
+     elseif SELECT == "width" then 
+        return  __GET (7)
+      elseif SELECT == "depth" then 
+        return  __GET (8)
+      -- indexing query loop  
+      elseif SELECT == "line" then 
+        return  __GET (9)                  
+      elseif SELECT == "lines" then 
+        return  __GET (10)
+      elseif SELECT == "yline" then 
+        return  __GET (11) 
+      elseif SELECT == "dropjunk" then 
+        return  __GET (12)                    
+    else 
+        print ("Try: yline,line,lines,xpos, ypos, zpos, fpos,lenght, width, depth complete\nerror-[!:"..tostring(SELECT)..':!]')
+    end 
+
+end  
+
+
+function POST( SELECT, post_content )
+  local function __POST ( post_content,ln,index_alert,__type)
+      if __type == type (post_content) then 
+      app.ConfigLineAuto( path_progressHandle , ln or 1 ,index_alert or "-", post_content )
+      else error ("[-"..index_alert.."-] is not "..__type )
+     end
+   end
+     if SELECT == "complete" then 
+        __POST ( post_content,1,"Where are job is complete boolean","boolean")
+    elseif  SELECT == "xpos" then 
+       __POST ( post_content,2,"x position","number")
+    elseif SELECT == "ypos"   then 
+      __POST ( post_content,3,"y position","number")
+    elseif SELECT == "zpos" then 
+      __POST ( post_content,4,"z position","number")
+    elseif SELECT == "fpos" then 
+      __POST ( post_content,5,"f position","number")
+    elseif SELECT == "lenght" then 
+      __POST ( post_content,6,"Query lenght","number")
+     elseif SELECT == "width" then 
+      __POST ( post_content,7,"Query width","number")  
+      elseif SELECT == "depth" then 
+      __POST ( post_content,8,"Query depth","number")
+      -- indexing query loop  
+      elseif SELECT == "line" then 
+      __POST ( post_content,9,"line","number")
+      elseif SELECT == "lines" then 
+      __POST ( post_content,10,"in lines","number")
+      elseif SELECT == "yline" then 
+      __POST ( post_content,11,"yline","number")
+       elseif SELECT == "dropjunk" then 
+      __POST ( post_content,12,"drop junk boolean ","boolean")  
+    else 
+        print ("Try: yline,line,lines,xpos, ypos, zpos, fpos,lenght, width, depth complete\nerror-[!:"..tostring(SELECT)..':!]')
+    end 
+    if post_content== nil then print "No content to post" end 
+end
+
+
+local fall_time = .4;
+-- post progres where are made it in query 
+
+
+function DropJUNK(  )
+  if (GET ("dropjunk") == true) then -- if user want drop junk then do this
+      turtleLib.DropJunkyItem(  ); -- auto junk / sorter
+  end    
+end
+
+--DropJUNK(  );
+--if true then return end
+
+local function up ()
+while not  app.up()  do turtle.digUp() end 
+  POST("ypos",app.get_y(  ))
+end
+
+local function down()
+while not  app.down() do turtle.digDown() sleep(.3) end 
+    POST("ypos",app.get_y(  ))
+end
+
+local function forward()
+  local digs = 0
+  while not app.forward() do turtle.dig() digs = digs + 1  end 
+  if digs > 1  or turtle.digUp ()  then  sleep(fall_time) while turtle.digUp () do sleep(fall_time) end    end
+     
+     local orentation = app.get_f()
+
+-- Save current query progress
+    if app.toNameOrientation (orentation) == "SOUTH" or app.toNameOrientation (orentation) == "NORTH" then 
+         POST ("zpos",getZ())  --print ("N & S")
+    -- else POST ("xpos",getX()) -- print ("W & E ")
+    end 
+     POST ("xpos",getX()) -- print ("W & E ")
+     POST ("fpos",getF() )
+
+--print ("My x"..getX().." y "..getY().." z "..getZ().." "..app.toNameOrientation (getF()))
+          
+          turtle.digUp() turtle.digDown() 
+end
+
+local function left(  )
+  app.left() POST("fpos",getF())
+end
+function right(  )
+  app.right() POST("fpos",getF())
+end
+
+-- won't save current  progress 
+local function ignore_forward(  )
+
+  local digs = 0
+  while not app.forward() do turtle.dig() digs = digs + 1  end 
+  if digs > 1  or turtle.digUp ()  then  sleep(fall_time) while turtle.digUp () do sleep(fall_time) end    end
+ 
+  --print ("ignore_forward")
+    turtle.digUp() turtle.digDown()
+end
+
+local function ignore_left(  )
+  app.left() turtle.digDown() turtle.digUp()
+end
+
+local function ignore_right ()
+  app.right() turtle.digUp() turtle.digDown() 
+ end 
+--Checkers 
+local function home(  )
+  if  getX()== 0 and  getY() == 0 and  getZ() == 0 then 
+     return true
+  end  
+end
+
+local function proceed_home(  )
+local x = math.abs (getX())
+local y = math.abs (getY())
+local z = math.abs (getZ())
+   if  ( x+y+z)+1  >= (app.fuelTotal(  ) + turtle.getFuelLevel()) or app.fuelTotal(  )  then 
+      -- app.danger ("Not enauth fuel" )
+         return 
+   end 
+   return true
+end
+ --calculate fuel return to home 
+function proceed_travel( silence )
+ local x = math.abs(GET("xpos")) 
+ local y = math.abs(GET("ypos")) 
+ local z = math.abs(GET("zpos")) 
+ local average = 8
+ if ((x+y+z+1)*average) >= app.fuelTotal() + turtle.getFuelLevel () or app.fuelTotal() + turtle.getFuelLevel () <= average then 
+      if silence ~= "silence" then 
+          app.danger ("Not enauth fuel ..." )
+          rednet.broadcast("["..os.getComputerID().."] Not enauth fuel") 
+      end
+    return 
+ end
+ return true
+end
+
+function queryisStarted(  )
+ local x = math.abs(GET("xpos")) 
+ local y = math.abs(GET("ypos")) 
+ local z = math.abs(GET("zpos")) 
+   return (x+y+z) > 0 
+end
+
+function turtleisHome(  )
+ local x = math.abs(getX()) 
+ local y = math.abs(getY() ) 
+ local z = math.abs(getZ()) 
+   return (x+y+z) == 0 
+end 
+
+function bedrock( side )
+  local side  = side or ""
+   if app.inspectThis(side, {"minecraft:bedrock"} )  then
+    app.danger ("Bedrock level rech in "..side.."!")
+	  BeadrockReached = true; -- say reacehd bedrock
+      return true
+   end   
+end
+
+local function saveCurrentProgress(  )
+  POST ("xpos",getX());
+  POST ("ypos",getY());
+  POST ("zpos",getZ());
+  POST ("fpos",getF());
+  app.success ("Saving querry progress: x "..getX().." y "..getY().." z "..getZ().." f "..getF());
+end
+
+local function reset(  )
+  app.set_x (0)
+  app.set_y (0)
+  app.set_z (0)
+  app.set_f (1)
+  app.success ("Reset applied x "..getX().." y "..getY().." z "..getZ().." f "..getF())
+end
+
+function resetProgress(  )
+   POST ("complete",true)
+ POST ("xpos",0)
+ POST ("ypos",0)
+ POST ("zpos",0)
+ POST ("fpos",1)
+ --loops
+ POST ("yline",1)
+ POST ("lines",1)
+ POST ("line",1)
+  app.success ("Reset progress applied")
+end
+
+function resetProgressNot_Y(  )
+ --  POST ("complete",false)
+ POST ("xpos",0)
+ --POST ("ypos",0)
+ POST ("zpos",0)
+ POST ("fpos",1)
+ --loops
+ POST ("yline",1)
+ POST ("lines",1)
+ POST ("line",1)
+  app.success ("Reset progress applied")
+end
+
+local function findOutAboutJunk (  )
+  for i=1,16 do
+    if turtle.getItemCount (i) > 0  then  -- and not app.find_fuel_nameSlot(  i  )
+         return true end
+  end
+end
+
+local function findoutAboutEmptySlot(  )
+    for i=1,16 do
+       if turtle.getItemCount(i) == 0 then 
+        return true  end 
+    end
+ end 
+ 
+local function findOutAboutFuelRequareCompleteQuerry()  
+      local available_job= (GET("width")*GET("lenght")) * math.ceil (GET("depth"))  
+      local completed_job  = (GET("line")*GET("lines")) * math.ceil (GET("yline")) 
+      local fuelHave =   (available_job - completed_job) 
+      local fuelRequare = fuelHave  -   (turtle.getFuelLevel() ) > 0 and fuelHave  -   (turtle.getFuelLevel() ) or 0 -- deside return in positive way 
+      --term.setCursorPos(12,1)
+      
+
+     -- print ("Available  "..tostring(available_job).." Complete "..tostring(completed_job));
+     -- print ("Progress "..math.ceil(completed_job/available_job*100).."%");
+     -- print ("Fuel saturate "..math.floor(completed_job/available_job).."%");
+     -- print ("FUEL TOTAL "..app.fuelTotal(  ).."  refueled>"..turtle.getFuelLevel())
+     -- print ("Fuel Have "..( fuelHave     ) .. " Need "..fuelRequare )
+     -- print (fuelHave)
+     return fuelRequare;
+
+end
+
+
+
+
+
+local function dropItems(  )
+   local available_fuel = findOutAboutFuelRequareCompleteQuerry();
+   print ("Requare fuel complete query "..available_fuel..".")
+   
+    if  findOutAboutJunk() or available_fuel ~=0 then 
+       app.look('NORTH');
+          
+
+       -- waiting chest be deployd
+         if ( not turtle.detect() or not turtle.detectUp() ) then 
+                        print ("Cannot find chest in front or top...");
+                        while not turtle.detect() and not turtle.detectUp() do sleep (1) end;
+        end;
+
+         if available_fuel ~=0 then 
+            sleep(4);
+           if not  turtle.suck() then 
+            turtle.suckUp()
+           end
+        end 
+
+            
+                 print ("Refueling ...");
+                 app.values( available_fuel );
+
+                 -- if app.fuelTotal(  ) > available_fuel then  
+                 --         app.warning "Droping fuel overflow"
+                 --      --       while not app.valueDropLess((app.fuelTotal(  )-available_fuel) ,"Front" )  do sleep (5) end 
+                 --      app.success "Successfuly droped fuel .."
+                 -- end
+             app.alert "Droping last  items"    
+                for slt = 1,16 do 
+                             if turtle.getItemCount (slt) > 0   then turtle.select (slt);
+                                turtle.select(slt);
+                                if turtle.detect() then turtle.drop() end
+                                if turtle.detectUp() then turtle.dropUp() end
+                              
+                             end
+                    end 
+                    if ( findOutAboutJunk()) then 
+                        print ("Cannot drop items in front or top chest");
+                        while  findOutAboutJunk() and not turtle.detect() or not turtle.detectUp() do sleep (1) end;
+                          -- try again drop junk
+                             for slt = 1,16 do 
+                                 if turtle.getItemCount (slt) > 0   then turtle.select (slt);
+                                    turtle.select(slt);
+                                    if turtle.detect() then turtle.drop() end
+                                    if turtle.detectUp() then turtle.dropUp() end
+                                  
+                                 end
+                             end 
+                    end;
+                app.success "Complete droping odd junky items .."  
+              sleep (2)
+          turtle.select (1) 
+       app.look ("SOUTH")
+   end   
+end
+--dropItems(  )
+--if true then return end
+-- app.clear()
+-- dropItems(  )
+-- findOutAboutJunk (  )
+
+local function returnItems(  )
+   --if turtle.getItemCount(16) > 0 then app.sortSlotsFromThis  ( 16, {app.getDataName  (16)} ) end 
+   if not findoutAboutEmptySlot(  ) then -- if no free slots available then do this
+    app.goto(getX(),0,getZ()); 
+    app.goto (0,0,0)
+    dropItems(  )
+    app.goto(GET("xpos"),0,GET("zpos"))
+    --app.goto(0,GET("ypos"),GET("zpos")) --always go forward then where it needet
+    app.goto(GET("xpos"),GET("ypos"),GET("zpos"))
+    app.look (app.toNameOrientation ( GET("fpos")) ) 
+   end  
+   
+end
+
+
+
+
+-- condition responsible to control execution of query mining
+local executeQuery = false
+
+
+-- if querry still in progress keep asking about what to do next
+if not GET ("complete") then 
+  if not proceed_travel( "silence") then turtle.suckDown(); turtle.suckUp();  end-- for fuel 
+-- check to continue current job  
+   -- app.alert "Return home"
+   -- app.goto (0,0,0)
+   -- app.look("SOUTH")
+   app.warning ("Available:".." x:"..GET("xpos").." y:"..GET("ypos").." z:"..GET("zpos").." do "..tostring( math.abs(GET("xpos")+GET("xpos")+GET("xpos"))>0 ))
+   app.warning ("Query: lenght:"..GET("lenght").." width:"..GET("width").." depth:"..GET("depth") )
+   app.special ("My: fuel:"..app.fuelTotal()+turtle.getFuelLevel().." x:"..getX().." y:"..getY().." z:"..getZ().." f:"..app.toNameOrientation(getF()) )
+     
+      user , timeout  = app.acceptedUserDelay(timeoutDelay,"Continue");
+      if (timeout) then print "Timeout continue ..." end
+   
+   if user  or timeout then 
+
+        if proceed_travel(  ) then 
+                                                                                   -- return nill  and continue
+         if  queryisStarted(  ) and not turtleisHome(  ) and app.acceptedUserDelay(timeoutDelay,"Reset turtle")   then reset ();resetProgressNot_Y(  ); end
+             
+              user , timeout = app.acceptedUserDelay(timeoutDelay,"Continue mining")
+              if timeout then print "Timeout continue ..." end
+          
+         -- print ("user "..tostring (user) .. " timeout "..tostring (timeout))
+          if not user then 
+           app.warning ("User Refused...") 
+              if  not timeout then 
+                 app.warning ("Timer Refused...");  
+                return 
+              else
+                app.warning ("Timer Success...");  
+              end;
+          end
+          app.alert ("Progress is continue")
+          print ("Goto x "..GET("xpos").." y "..GET("ypos").." z "..GET("zpos")) 
+          app.goto (GET("xpos"),GET("ypos"),GET("zpos"))
+          app.look (app.toNameOrientation( GET("fpos") ) )
+          executeQuery = true 
+       else -- not enout fuel to travel in job location 
+          return 
+       end 
+    else  
+       if app.acceptedUser( "Are you shure delete progress" ) then
+           
+           -- if app.acceptedUser( "Return home" ) and not proceed_home(  ) and false then 
+           --    if not proceed_home(  ) then app.danger ("Cannot return home,fuel is out")  return end
+           --    app.success ("Ok")
+           --    app.goto(0,0,0)
+           --   app.look("SOUTH")
+           -- end  
+           app.alert ("Progress is breaked") 
+           POST( "complete", true )
+           POST( "xpos", 0 )
+           POST( "ypos", 0 )
+           POST( "zpos", 0 )
+           POST( "fpos", 1 )
+           --query
+           POST( "line", 1 )
+           POST( "lines", 1 )
+           POST( "yline", 1 )
+           reset(  )
+               else 
+            return     
+       end
+   end  
+end  
+
+-- if querry is complete then fill new form
+if GET ("complete") then 
+-- contine set new job 
+    if app.acceptedUser( "Start new Query" ) then 
+       --set width lenght
+       app.alert ("Dimensions ")
+-- local width = app.getNInput( "width", app.NumberElipse( 30, 1  ) )
+-- local  lenght = app.getNInput( "lenght", app.NumberElipse( 30, 1  ) )
+local  diameter = app.getNInput( "diameter", app.NumberElipse( 120, 1  ) )
+local  depth = app.getNInput( "depth", app.NumberElipse( 120, 1  ) )
+local  dropjunk;      
+       
+       if app.acceptedUser( "Drop Junky itmes like cobble" ) then 
+          dropjunk = true;
+          
+          else 
+          dropjunk = false;
+          
+       end
+
+local width,lenght = diameter,diameter
+       app.alert (string.rep("-",xSize))
+       app.alert (">width: "..width.." lenght: "..lenght.." depth: "..depth.."/l:"..math.ceil(depth/3))
+       app.alert ("My fuel: "..app.fuelTotal() + turtle.getFuelLevel())
+                reset ()
+       if app.acceptedUser(  ) then 
+         --new values
+         POST( "width", width )
+         POST( "lenght", lenght )
+         POST( "depth", depth )
+         POST( "complete", false )
+         --default values
+         POST( "xpos", 0 )
+         POST( "ypos", 0 )
+         POST( "zpos", 0 )
+         POST( "fpos", 1 )
+         -- query loop values 
+         POST( "line", 1 )
+         POST( "lines", 1 )
+         POST( "yline", 1 )
+         POST( "dropjunk", dropjunk );  
+         
+       executeQuery = true
+      else app.warning ("Dimensions not saved") return 
+      end
+    
+    else
+      app.danger "Query not started" return
+    end  
+end  
+
+-- return values here
+local max_lenght = GET("lenght")
+local max_width= GET ("width")
+local max_depth= math.ceil( GET ("depth")/3 )
+
+
+  
+
+if app.fuelTotal() + turtle.getFuelLevel() == 0 then app.danger ("Not enouth fuel dude")  return end
+
+print (max_depth)
+
+
+
+--call annomyous function 
+
+
+function Query ()
+
+  if executeQuery   then 
+          
+          for inDepth=GET("yline"),max_depth  do
+              
+             -- if cannot continue to execute job then break
+              if not proceed_travel( ) or  bedrock( "front" )  then return end 
+                 -- say.writeAlert ("inDepth "..inDepth.."~"..max_depth)
+                 
+                    POST ("yline",inDepth)
+                    -- Clear One Layer
+                        for inWidth=GET("lines"),max_width do
+                          -- say.writeAlert(",inWidth "..inWidth.."~"..max_width)
+                    --------- Save loop progress of Lines/Width ----
+                            POST ("lines",inWidth)  
+                            POST ("fpos",getF())
+                            
+                                  --Reapet single line 
+                                    for inLenght=GET("line"),max_lenght do
+
+                                      
+                                      --say.alert(",inLenght "..inLenght.."~"..(max_lenght))
+                               --------- Save loop progress of Line/Lenght ----
+                                          POST ("line",inLenght)
+
+                                          -- if cannot continue to execute job then break
+                                          if not proceed_travel( ) or  bedrock( "front" )  then return end 
+                                             DropJUNK(); -- auto junk / sorter
+                                             returnItems(  ) -- check if are junk items in inventory 
+                                         if  inLenght < max_lenght then  forward () --[[print "Last line "]]  end -- to prevetn not pusth forward then complete line
+                                    end --inLenght
+
+                                --Deside whlie clearing layer
+                                 if    inWidth ~= max_width then  -- prevent not ot do when  inDept  not equal max_depth
+                                     -- print ("depth.. "..inDepth); 
+                                      if inDepth % 2 == 1 then 
+                                           if inWidth % 2  == 1 then  -- ignore save querry progress position while in corners turning to strait line 
+                                              ignore_right () ignore_forward () ignore_right ()   -- print (" ----Right: " .. inWidth % 2 )
+                                                else 
+                                              ignore_left ()  ignore_forward ()  ignore_left ()   --    print (" ----LEFT: " .. inWidth % 2 )
+                                           end -- inWidth == 1
+                                       else 
+                                          if inWidth % 2  == 0 then 
+                                              ignore_right () ignore_forward () ignore_right ()   -- print (" ----Right: " .. inWidth % 2 )
+                                                 else 
+                                              ignore_left ()  ignore_forward ()  ignore_left ()    --   print (" ----LEFT: " .. inWidth % 2 )
+                                          end      
+                                      end -- inDepth % 2   
+                                 end -- inWidth ~= max_width      
+      -- print ("sleep 10")sleep (10)                             
+                                --------------- RESET loop progress --------
+                                      POST ("line",1)  
+                                      --Display Menu
+                                      term.setCursorPos(1,1);
+                                      term.clear();
+                                      local msg = "["..os.getComputerID().."] Progress "..inDepth.." of "..max_depth..":= "..math.floor(inDepth/max_depth*100).."%"
+                                      print (msg);
+                                      rednet.broadcast(msg);
+                        end  --inWidth
+
+
+    --------------- RESET loop progress --------
+                POST ("lines",1)  
+               -- print ("sleep 5 ") sleep (10)
+               
+
+               -- Keep always facing in query mine 
+               -- if width number is odd then turtle turn to much //fixed : 2016-06-23
+               if (max_width % 2 == 1) then
+                    --in odd heigt three right is ok 
+                  -- say.writeDanger ("Lenova")
+                   if (inDepth %2 == 1) then 
+                        right (); right () right(); 
+                      --print ("..3")
+                      else
+                     -- print ("..1")
+                      right(); --odd current height
+                  end
+                    
+                  else
+                   right (); right ();  -- odd width
+                  -- print("Intel")
+               end     
+              
+               
+               -- print ("sleep 30 ") sleep (30)
+             if inDepth ~= max_depth then   
+                -- check 16 slot 
+                --if (turtle.getItemCount(16) > 0 ) 
+
+                --end
+                 if not proceed_travel( ) or  bedrock( "bottom" )  then  return  end 
+               down ()
+                    if not proceed_travel( ) or  bedrock( "bottom" )  then  return end 
+               down ()
+                       if not proceed_travel( ) or  bedrock( "bottom" )  then  return end 
+               down ()
+             end  
+               -- sleep (20) ;
+               turtle.digDown()
+          end -- inDepth
+          
+
+          
+          
+
+    end  -- executeQuery 
+ -- Comlete and reset query 
+resetProgress(  )
+ app.success "Query was successfully complete !" sleep(2)
+  return true 
+end; 
+
+
+
+
+while not BeadrockReached do 
+
+if Query () then break end  -- when complete query  break 
+  -- save every querry proggress while not move any more forward
+  saveCurrentProgress(  ) --//fixed : 2016-06-23
+
+  --- return for more fuel from user 
+   app.alert "Return home,fuel problems :("
+   app.goto(getX(),0,getZ());
+   app.goto (0,0,0)
+   app.look("NORTH")
+    if (BeadrockReached) then 
+		print "Hit in bedrock ! ,, Stop ,, "
+		resetProgress(  );
+		break;
+	end
+  app.warning "Waiting for fuel"
+  rednet.broadcast("["..os.getComputerID().."] Waiting for fuel");
+  while not  proceed_travel ("silence") do sleep (5) 
+      if not proceed_travel( "silence") then turtle.suckDown(); turtle.suckUp();turtle.suck()  end-- for fuel  end  -- Wait from user some fuel 
+  end
+   rednet.broadcast("["..os.getComputerID().."] Fuel Was Received");
+  -- try put out items  
+  dropItems(  )
+  local x =  GET("xpos") 
+  local y =  GET("ypos") 
+  local z =  GET("zpos") 
+  local orentation = math.floor( GET("fpos") )
+  app.goto (x,y,z)
+  app.look (app.toNameOrientation (orentation))
+  turtle.suckDown();
+end 
+
+
+
+if proceed_home() then  app.danger ("Not enauth fuel :(") end 
+
+   app.alert "Return home :D"
+   app.goto (0,0,0)
+   app.look("SOUTH")
+   dropItems(  )
+if (BeadrockReached) then 
+print "Hit in The BADROCK !!!"
+print "Progress was terminated"
+end
+   --]]

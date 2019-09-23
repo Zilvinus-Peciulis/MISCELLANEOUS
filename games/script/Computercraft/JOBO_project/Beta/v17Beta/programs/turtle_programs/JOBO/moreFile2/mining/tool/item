@@ -1,0 +1,40 @@
+os.loadAPI("OS")
+local FileName = "item"
+OS.loadAPI("/moreFile/programs/requestAPI",FileName)
+OS.loadAPI("/moreFile2/programs/material",FileName)
+OS.loadAPI("/moreFile2/programs/junkItem",FileName)
+OS.loadAPI("/moreFile/programs/config/source/defaultProgramT",FileName)
+
+local GeneratorName = configProgramT.GET['JobType']()
+
+function voidBlockMine(  )
+	for item=1,#material.junk do
+		if material.junk[item].name == requestAPI.inspectSide( "front" )  then return true end 
+	end
+ return false 
+end
+function voidGenerator(  )
+	return GeneratorName=="ClearQuarry"
+end
+
+function voidDig(  )
+		if not voidGenerator(  ) then 
+	if turtle.detect() and  not voidBlockMine(  )   then turtle.dig() end 
+	end 
+end
+
+function LeaveTrash(  )
+	if defaultProgramT.GET["DropJunkItem"] () 	then 
+			say.writeAlert ("Drop junk")
+			junkItem.dropVoidJunk( "Down" )
+			say.success " complete!"
+			turtle.select(1)
+	end 	
+end
+
+function SortLastItem(  )
+	 if turtle.getItemCount(16) > 0 then 
+			 requestAPI.sortSlotsFromThis  ( 16,{requestAPI.getDataName  (16)} )
+			 turtle.select(1)
+	 end 
+end

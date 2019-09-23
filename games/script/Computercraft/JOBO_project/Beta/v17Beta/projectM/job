@@ -1,0 +1,118 @@
+
+
+
+os.loadAPI("/programs/comunicate")
+os.loadAPI("config/source/StatisticsProgram")
+os.loadAPI("/config/source/ConfigProgram")
+
+
+function JobGeneratorExist( GeneratorName )
+	return JobCoordProgram.existsGenerator( GeneratorName )
+end
+function JobGeneratorNames(  )
+	return JobCoordProgram.getGeneratorNames(  )
+end
+
+function JobGenerator(  )
+local getGeneratorType = ConfigProgram.GET.GenerateJob()
+      StatisticsProgram.Costructor( getGeneratorType )
+end
+
+function wipeMemory( ... )
+		 -- JobGenerator(  )
+         StatisticsProgram.DeleteStatistic(  )
+         -- StatisticsProgram.GenerateHomeCoord(  )
+end
+
+function countleftJob(  )
+	local xJLeft = 	StatisticsProgram.isLeftJobAvailabel(  )
+	return xJLeft > 0 and xJLeft 
+end
+
+function completeJobs(  )
+return StatisticsProgram.completeJobs(  )
+end
+
+function isEmpty(  )
+	return StatisticsProgram.isEmpty(  )
+end
+
+function leftJob(  )
+	return StatisticsProgram.isLeftJobAvailabel(  )
+end
+function MarkToResetTurtleJobs(  )
+	-- mark to  overwrite slave turtle joblocations then asking for the job 
+	StatisticsProgram.setAllfTime( true ) -- true then  reset 
+end
+function AllJobsisComplete(  )
+    if  completeJobs(  ) and not countleftJob(  )  then  return true else return false end 
+end
+
+-- Alway send next job for available turtles
+function sendNewJob( command )
+	comunicate.sendConnected(  ) --1.Connect
+	comunicate.checkJob(  ) -- 2. Mark jobs
+	comunicate.nextJob(  ) -- 3.Set jobs to statistic
+	comunicate.storeJob(  ) -- 4.Send new jobs
+	--overwrite if needed status in statistic
+	comunicate.sendManagerGetStatus(  ) -- 5. Check fuelLevel with given new job
+	comunicate.sendExecuteJob()--6. -- execute  or continue old job or when job s complte do nothing
+	-- return false if job not coplete 
+    if  completeJobs(  ) and not countleftJob(  )  then  
+    	return true 
+    else 
+    	return false 
+    end 
+end
+function disassemble(  )
+	 comunicate.sendConnected ("silence")
+	 comunicate.sendDisassemble(  )
+     comunicate.sendSupportConnected("silence")
+	 comunicate.sendSupportDisassemble(  )
+end
+
+
+
+function sendSupport(  )
+local wasRequests = comunicate.supportRequests(  )
+    comunicate.sendSupportConnected(  )	
+	comunicate.sendSupport_Multiple_Item_Request (  )
+local Requests = comunicate.supportRequests(  )
+say.alert ( "Requests left  "..Requests.." , was: "..wasRequests..".")
+-- return about job is comple
+if Requests > 0 then return false else return true end 
+end
+
+
+function sendSupportTakeLastJunk(  )
+        LogProgram.DeleteLog(  )
+		say.writeAlert "Wait feed back "
+		comunicate.sendConnected ("silence")
+		comunicate.sendSupportConnected( "silence" )
+		say.success "complete!"
+		comunicate.MarkDisassembleSlave( "silence" )
+local supportinProgress, suppotAccepted = comunicate.sendSupport_Multiple_Item_Request ( "silence" )
+if suppotAccepted then 
+	if supportinProgress then 
+	say.warning ("Clear slaves, please wait!")
+	sleep(2)
+     while  true do 
+		comunicate.sendSupportConnected( "silence" )
+     	if not comunicate.sendSupport_Multiple_Item_Request ( "silence" ) then break end 
+     	sleep (1) 
+ 	end 
+	if comunicate.isSupportRequests(  ) > 0 then say.danger ("Support fuel not enough!") return false end 
+	say.success ("Complete :)")
+	elseif comunicate.isSupportRequests(  ) == 0 then 
+		say.special "All slaves are empty :)"  return true 
+	else
+		say.danger "Support fuel not enough!" return false 
+	end 
+elseif  not SupportProgram.isEmpty(  ) then say.success ("No support requare..!") return true 
+elseif not suppotAccepted then say.warning ("No Support Connected!") return false 
+else
+	say.danger ("Eny support not connected!") return false 
+end 	
+return true
+end
+

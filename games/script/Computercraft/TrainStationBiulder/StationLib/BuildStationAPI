@@ -1,0 +1,281 @@
+os.loadAPI("StationLib/requestAPI")
+os.loadAPI("StationLib/autoFuelAPI")
+xGet , yGet = term.getSize()
+term.clear()
+
+
+
+function rsOutput( side , second )
+	
+	redstone.setOutput(side or "fron", true)
+	sleep(second or 1)
+	redstone.setOutput(side or "fron", false)	
+end
+
+
+note = function (txt)
+local string = txt or " "
+
+if turtle.getFuelLevel() == 0 then txt ="out of fuel" end
+
+requestAPI.effect1  (xGet/2- #string/2 ,yGet/2 , txt   ,colors.green,5901)
+autoFuelAPI.refuelTo (16 ,1, 0)
+end
+
+fd = function ()
+while not turtle.forward() do 
+note("FrontBlock")
+end
+note()
+end
+
+bk = function ()
+while not turtle.back() do 
+note("BackBlock")	
+end
+note()
+end
+
+lt = function ()
+turtle.turnLeft()
+end
+
+rt = function ()
+turtle.turnRight()
+end
+
+
+up = function (x)
+while not turtle.up()  do
+note("UpBlock")	
+end
+note()
+end
+
+dn = function ()
+while not turtle.down() do 
+note("DownBlock")	
+end
+note()
+end
+
+pu = function ()
+ turtle.placeUp()
+end
+
+pl = function ()
+turtle.place()
+end
+pd = function ()
+turtle.placeDown()
+end
+
+sel = function (slot)
+ turtle.select(slot)
+ end
+
+
+
+
+
+
+simpleTrainStation = function (x_reapet , PlatfomLeft , PlatfomRight)
+
+
+local buildItem = 1
+local visualItem = 2
+local RedTorh = 3
+local reapt = 4
+local rail  = 5
+local stikyPiston = 6
+local RedstoneDust = 7 
+local GoldenRail = 8
+local Button = 9
+
+local extraBuildItem = 10 
+
+
+
+--1. 16 building block's+
+--2. 6 visualBlock's+
+--3. 4 redstone torh's+
+--4. 4 reapetor's+
+--5. 3 simple rail's+
+--6. 1 sticky piston's+
+--7. 5 redstonedust
+--8. 1 golder rail
+--9. 1 button
+
+
+ 	if PlatfomRight == true then 
+ 	 -- 1. placing 9 blocks
+ 	 --print "Right"
+ 	 rt() fd() fd()  rt() dn() bk() sel(extraBuildItem) pl() bk()  pl() bk()  pl() bk()  pl() bk()  pl() bk()  pl() bk()  pl() lt() bk() pl() up() pd() up()
+ 	---- 2. Placing rails
+ 	sel(rail) pd() fd() pd() rt() fd() pd()    fd() pd() fd() pd() fd() pd() fd() pd() fd() pd() fd() pd()
+	-- 3. Back where is started
+	 rt() fd() fd() rt() dn()
+ 	end
+
+
+		for x = 1, x_reapet do
+--1.-- don building 1/2 pannel
+sel(buildItem)   dn() fd() sel(buildItem)  pd() sel(visualItem) pu()  bk() sel(RedstoneDust) pl() up() sel(visualItem) pd()  up() pl()
+
+--2.-- finising plasing button and torth
+ lt() fd() rt() pl() lt() bk() sel(RedTorh) pl() rt()  bk()  dn() sel(Button) pl()
+
+--3.-- finis all platform fish buttons and reset line
+rt() bk() rt() bk() bk()  sel(buildItem) dn() sel(visualItem)  pu() pl() sel(buildItem)  pd() bk() sel(RedstoneDust) pl() 
+
+--4. do place  two first cercuit lines  
+rt() bk() dn()  sel(buildItem) pd() rt() pl() up() sel(reapt) pd() sel(buildItem) pl() up() --[[sel(reapt) pl()]] rt() rt() bk()  sel(RedTorh) pl() rt() rt() up() sel(reapt) pd() sel(visualItem)  
+
+--5. done placing stiky pistons . Staying in bottom
+fd()  dn() dn()   sel(buildItem) pl() up() sel(reapt) pl() dn() sel(buildItem) pu() dn() rt() rt() sel(stikyPiston) bk() pl()
+
+--6. starting build rail platform
+bk() bk() rt() fd() sel(buildItem) pd() up() sel(RedTorh) pd() up() sel(buildItem) pd() bk() pd() lt() pl() bk() pd() --bk() pd()
+
+--7. Placing rails
+up() sel(rail) pd()  fd() pd() rt() sel(GoldenRail) fd() pd()
+
+--8. Back in starting postiontio
+lt() fd() sel(RedTorh) pd() fd() sel(buildItem) dn()  pd() pl() up() sel(RedstoneDust) pd() up() fd() pd() fd() dn() dn() sel(buildItem) pl() up() pd() sel(RedstoneDust) up() pd() fd() sel(reapt) pd() rt() fd() dn() dn() lt() fd() fd() lt()lt()
+end 	  
+
+
+	if PlatfomLeft== true and x_reapet ~= 0 then --x_reapet Left platform  left are build becucle turtle not come back to original point! . That means we can only exsecute when at least one platform are builded!	
+	--print"Left"
+	-- 1. placing 9 blocks
+	rt()  bk() rt() dn() bk() sel(extraBuildItem) pl() bk()  pl() bk()  pl() bk()  pl() bk()  pl() bk()  pl() bk()  pl()  rt()  bk() pl()  up() pd() up()
+	-- 2. Placing rails
+	sel(rail) pd() fd() pd() lt() fd() pd()    fd() pd() fd() pd() fd() pd() fd() pd() fd() pd() fd() pd()
+	-- 3. Back where is started
+	 lt() fd() lt() dn()
+	end
+
+
+end
+
+
+
+
+
+
+
+advancedTrainStation = function (x_reapet , PlatfomLeft , PlatfomRight)
+
+--1.  1 lamp
+--2.  1 button
+--3.  1 golden rail
+--4.  1 detect rail
+--5.  3 simple rails=
+--6.  4 redstone torth
+--7.  8 reapetors+
+--8,9.  21 redstone dust  (25 - 16 = 9 )
+--9    5	redstone dust
+--10. 16 visual blocks
+--11. 16 'red' pulse_limiter block's
+--12. 10 'yellow' RS-latch 
+--13. 9  'green' reset line
+
+local lamp = 1;
+local button = 2;
+local golden_rail = 3;
+local detect_rail = 4;
+local simple_rail = 5;
+local redstone_torh = 6;
+local reapetor = 7;
+local redstonedust_1 = 8;
+local redstonedust_2 = 9;
+-- building frame blocks
+local block_VISUAL = 10;
+local block_RED = 11;
+local block_YELLOW = 12;
+local block_GREEN= 13;
+
+local block_platform = 14
+
+
+--print"advanced train station "
+
+
+ 	if PlatfomRight == true then 
+ 	-- print "PlatfomRight"
+ 	--1.Moving from panel
+ 	     rt() fd() fd() fd() rt()   
+ 	--2.Building Rails 
+ 	        sel(block_platform) pd() bk() sel(simple_rail) pl() --[[1]] sel(block_platform) pd() bk() sel(simple_rail) pl() --[[1]] sel(block_platform) pd() bk() sel(simple_rail) pl() --[[1]] sel(block_platform) pd() bk() sel(simple_rail) pl()
+    --2.1
+    	dn()  sel(block_platform) pd() bk() sel(simple_rail) pl() --[[1]] sel(block_platform) pd() bk() sel(simple_rail) pl() --[[1]] sel(block_platform) pd() bk() sel(simple_rail) pl() --[[1]] sel(block_platform) pd() bk() sel(simple_rail) pl() --[[1]] sel(block_platform) pd() bk() sel(simple_rail) pl() --[[1]] sel(block_platform) pd() bk() sel(simple_rail) pl() 
+ 	--2.2  finished railing !
+ 	          sel(block_platform) pd() bk() sel(simple_rail) pl() --[[1]] sel(block_platform) pd() bk() sel(simple_rail) pl()  --[[1]] sel(block_platform) pd() bk() sel(simple_rail) pl()  --[[1]] sel(block_platform) pd() bk() sel(simple_rail) pl() lt() --[[1 connecting new rails]] sel(block_platform) pd() bk() sel(simple_rail) pl() --[[1]] sel(block_platform) pd() bk() sel(simple_rail) pl() --[[1 connecting]] sel(block_platform) pd() up() sel(simple_rail) pd() lt() fd() dn()  dn() dn() fd() lt()
+ 	--3. Coneting rail detectors singnal to treminal'stationCircuit'
+ 			sel(block_GREEN) pd() rt() bk() pd() sel(redstonedust_2) pl() bk () pl() sel(block_GREEN) pd() bk() pd() sel(redstonedust_2) pl()
+ 	--3.1
+ 			lt() lt()  sel(block_GREEN) pl() sel(reapetor) up() pd()  sel(redstone_torh) pl() up() sel(block_GREEN) pl() up() sel(redstone_torh) pl()  up() up() --[[sel(block_GREEN) pd()]] rt() rt() bk() sel(block_GREEN) pd() sel(redstonedust_2) pl() bk() pl()
+ 	--4. back to starting point
+ 	 bk()bk()bk()bk()bk()bk()bk()bk()bk()bk() bk() dn() dn()  rt() bk()lt()
+ 	end
+
+
+-- 1  1 1  1 1 1 1
+
+for x = 1, x_reapet do
+		--1. Build visual platform
+		     dn() sel(block_VISUAL) pl() rt() bk() pl() rt() bk() pl() bk() pl() up() up() pd() up() pd() pu() rt() bk() pl() pu() pd() rt() bk() sel(lamp) pl() bk() dn() sel(button) pl() rt() dn() rt() bk() bk() bk() sel(block_VISUAL) pl()		
+		--2. Bulding left side 
+		    dn() sel(block_RED) pd() sel(block_YELLOW) pu() sel(redstonedust_2) bk() pl() --[[placed redstne]] sel(block_RED) pd()--[[placed redstne]] rt() rt() sel(block_YELLOW) pl() up() sel(redstonedust_2) pd() sel(reapetor) pl() rt() up() sel(redstone_torh) pd() rt()  sel(redstonedust_2) pl() rt() rt() sel(block_YELLOW) pl() up() sel(redstone_torh) pd()
+		--3. Finising RS-Latch and finised redstone_2 dusts 4
+		   rt() rt() bk() bk() sel(redstonedust_2) pl() sel(block_YELLOW) dn() pd()  sel(redstonedust_2) bk() pl() 
+		
+		--4. placing reset line('green')
+		    sel(block_GREEN)  up() pd()  bk() sel(redstonedust_2)pl() --[[6}1]] sel(block_GREEN)pd()sel(redstonedust_2)bk()pl() --[[7}2]] sel(block_GREEN)pd()sel(redstonedust_2)bk()pl() --[[8}3]] sel(block_GREEN)pd()sel(redstonedust_2)bk()pl() --[[9}4]]sel(block_GREEN)pd()sel(reapetor)bk()pl()--[[5]]lt() sel(block_GREEN)pd()sel(redstonedust_2)bk()pl() --[[[10}6 left]] rt()sel(block_GREEN)pd()sel(redstonedust_1)bk()pl() --rsOutput("front" , 1)
+		--5. fininising reset line('green') rs_1
+   		  dn() dn() dn() sel(block_GREEN) pl() sel(redstone_torh) up() pl() dn() --[[Modified]] dn() dn() sel(block_GREEN) pl()  up() pd() sel(redstonedust_1) pl() sel(reapetor) rt() rt() up() pd() fd() lt() --[[Modified]] --	leaved bk() rt()
+   		--6. Building tracks
+   		    sel(block_VISUAL) pd() bk()   sel(block_VISUAL) pd() lt()  sel(simple_rail)  bk() pl() sel(block_VISUAL) pd() bk() sel(simple_rail) pl()dn() dn()rt() fd() sel(block_GREEN) pd() bk() pd() sel(redstonedust_1) pl() up() pd() rt() sel(block_VISUAL) pl() sel(simple_rail) up() pl()  sel(block_VISUAL) pd() sel(detect_rail) up() pd() bk() bk()  lt() fd() sel(golden_rail) pd() bk() rt() bk() --[[Modified]]  bk()--[[Modified]]
+   		 --7+. Finishing RS-lath control output
+   		    	  dn() dn() sel(block_YELLOW) --[[Modified]] dn() pl() up() sel(redstonedust_1) pl() bk() sel(block_YELLOW) pl() --[[Modified]]   pd()  bk() sel(block_YELLOW) pd() sel(reapetor) pl()  --[[1]] bk() sel(redstonedust_1) pl() sel(block_YELLOW) pd() --[[2]] bk() sel(redstonedust_1) pl() sel(block_YELLOW) pd() --[[3]] bk() sel(redstonedust_1) pl() sel(block_YELLOW) pd() --[[4]]-- bk() sel(redstonedust_1) pl() sel(block_YELLOW) pd()
+   		 --7.2+ Finisinh
+   		 	  rt() rt() sel(block_YELLOW) pl() up() sel(redstonedust_1) pl() pd() bk() bk() bk() bk() lt() bk() lt() 
+   		  --8 1/3+ Starting	Pulse-limiter("red")
+			 sel(block_GREEN) pd() bk() sel(redstonedust_1) pl() dn() sel(block_RED) pd() bk()  pd() sel(reapetor) pl() bk() sel(block_RED) pd() sel(reapetor) pl() sel(block_RED) pd() bk() sel(reapetor) pl() sel(block_RED) pd() bk() sel(reapetor) pl() --[[!]] sel(block_RED) pd() bk() sel(reapetor) pl()
+		  --8.2/3
+		   	up() sel(block_RED) pd() sel(redstone_torh) up() pd() sel(block_RED) fd() pd() fd() pd() fd() pd() fd() pd() fd() pd()
+		 --8.2
+		        sel(redstonedust_1) bk() pl() bk() pl() bk() pl() bk() pl() bk() sel(reapetor) pl()
+		 --8.3 Finishing pulse-limiter("red")
+		       sel(block_RED) up() pd() bk() dn() dn() dn() pu() pd() bk()  sel(redstonedust_1) pl() up()  sel(redstone_torh) pd() bk()
+		 -- Back to start position
+		 	rt()bk() lt() bk() bk()up()
+
+end
+
+
+
+
+
+	if PlatfomLeft== true  and x_reapet ~= 0 then  	--x_reapet Left platform  left are build becucle turtle not come back to original point! . That means we can only exsecute when at least one platform are builded!
+	 --[[1. Movibng to  rails  position]]
+	   rt() bk() bk() rt()   --lt
+	 --2.Building Rails 
+ 	        sel(block_platform) pd() bk() sel(simple_rail) pl() --[[1]] sel(block_platform) pd() bk() sel(simple_rail) pl() --[[1]] sel(block_platform) pd() bk() sel(simple_rail) pl() --[[1]] sel(block_platform) pd() bk() sel(simple_rail) pl()
+    --2.1
+    	   dn()  sel(block_platform) pd() bk() sel(simple_rail) pl() --[[1]] sel(block_platform) pd() bk() sel(simple_rail) pl() --[[1]] sel(block_platform) pd() bk() sel(simple_rail) pl() --[[1]] sel(block_platform) pd() bk() sel(simple_rail) pl() --[[1]] sel(block_platform) pd() bk() sel(simple_rail) pl() --[[1]] sel(block_platform) pd() bk() sel(simple_rail) pl()  --[[1]] sel(block_platform) pd() bk() sel(simple_rail) pl() 
+ 	--2.2  finished railing !
+ 	            sel(block_platform) pd() bk() sel(simple_rail) pl() --[[1]] sel(block_platform) pd() bk() sel(simple_rail) pl()  --[[1]] sel(block_platform) pd() bk() sel(simple_rail) pl() rt() --[[1 connecting new rails]] sel(block_platform) pd() bk() sel(simple_rail) pl() --[[1]] sel(block_platform) pd() bk() sel(simple_rail) pl() --[[1 connecting]] sel(block_platform) pd() up() sel(simple_rail) pd() 
+	 --2.3 finished build rails 
+	       rt() fd() fd() dn() dn() dn()
+	 --3 Reset Line
+	    sel(block_GREEN) pd() bk() pd() sel(redstonedust_2) pl() bk() pl() --[[Modified]]  sel(block_GREEN) pd() sel(redstonedust_2)  bk() pl()  sel(block_GREEN) pd() sel(redstonedust_2)  bk() pl()  up() sel(block_GREEN) pd() up() sel(redstone_torh) pd() up() sel(block_GREEN) pd()  up() sel(redstone_torh) pd() up() sel( block_GREEN) pd() bk() sel(redstonedust_2) pl()  --[[Modified]] 
+	 
+	 --4 
+	  bk()bk()bk()bk()bk()bk()bk()bk()bk()bk()bk() --[[ge down]] dn() dn() 
+	end
+ 
+
+
+end
+

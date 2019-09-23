@@ -1,0 +1,40 @@
+print "Run extra script "
+os.loadAPI("/moreFile/programs/config/source/defaultProgramT")
+
+local Name = defaultProgramT.GET.TurtlesName()   or defaultProgramT.SET.TurtlesName("\"JOBO\"") or "JOBO"
+-- set label 
+ local id = os.getComputerID();
+ local getLb = os.getComputerLabel() or ""
+ local label;
+
+-- print ("My name is: ",Name)
+-- print ("Curname: ",getLb)
+-- sleep(20)
+
+-- Sub computer id to raw name 
+ -- check name it math , if not then triger
+ -- if  getLb ==nil or Name ~= subName  then 
+     label = Name.."-"..id.."" 
+     print ("Creating new label '"..label.."'")
+     os.setComputerLabel(label)
+ -- end 
+
+-- open modem
+local modemSides = {"top","bottom","right","left","front","back"}
+local condition = false;
+for x = 1 ,#modemSides do
+local type = peripheral.getType( modemSides[x] )
+  
+  if type == "modem" then 
+      --local type =peripheral.getType("back")
+       rednet.open(modemSides[x])
+       --print("Modem in:"..modemSides[x]..".")
+       --condition = true
+       break
+  end
+end
+  
+ --if not condition then error"Eny modem not found" end
+ 
+
+os.unloadAPI("/config/defaultProgramT")

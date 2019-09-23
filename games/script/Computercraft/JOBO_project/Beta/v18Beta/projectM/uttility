@@ -1,0 +1,411 @@
+
+local xSize,zSize = term.getSize()
+local minHeight = 5
+local maxHeight = 220
+
+function resetScreen(  )
+  local xPos,zPos = term.getCursorPos()
+  if  zPos>=zSize then term.clear(); term.setCursorPos(1,1) end 
+end
+
+local function getNInput(  txt,history,command )
+  	      resetScreen(  )
+          say.writeAlert (""..txt.." # ")
+           local tb -- select table is not created 
+          local xPos,zPos = term.getCursorPos()
+           if type(history)~="table" then  tb = {history} else tb = history end 
+              local  n = tonumber(read(nil,tb))
+                while n == nil do
+                     term.setCursorPos (1,zPos)
+                     term.clearLine()
+                     say.writeAlert (""..txt.." # ")
+                n = tonumber(read(nil,tb))
+
+  		end
+                  if command == "clearInput" then 
+                          term.setCursorPos (1,zPos)
+                          term.clearLine()
+                          say.alert (""..txt.." # ")
+                    end     
+               return n,xPos,zPos
+  end
+
+  local function getSInput(  txt,history,command )
+          resetScreen(  )
+          say.writeAlert (""..txt.." % ")
+           local tb -- select table is not created 
+          local xPos,zPos = term.getCursorPos()
+           if type(history)~="table" then  tb = {history} else tb = history end 
+              local  n = tostring(read(nil,tb))
+                while #n==0 do
+                    term.setCursorPos (1,zPos)
+                     term.clearLine()
+                    say.writeAlert (""..txt.." % ")
+                    n = tostring(read(nil,tb))
+
+      end               if command == "clearInput" then 
+                          term.setCursorPos (1,zPos)
+                          term.clearLine()
+                          say.alert (""..txt.." % ")
+                        end  
+               return n,xPos,zPos
+  end
+
+function clear(  )
+	term.setCursorPos(1,1) ; term.clear()
+end
+
+function acceptedUser( text )
+  resetScreen(  )
+  local xPos,zPos = term.getCursorPos()
+    local text = type(text)=="string" and (text.." y/n # ") or "Are you shure y/n # "
+    say.writeQuestion (text)
+    local input  = read (nil,{"y","n"})
+  
+  if input == "y" or input == "Y" then   
+        term.setCursorPos (1,zPos)
+        term.clearLine()
+        say.writeQuestion (text)
+        term.setCursorPos (#text,zPos)
+        term.write (string.rep(" ",(xSize-#text)>0 and (xSize-#text) or  0) )
+        term.setCursorPos (#text,zPos)
+        say.success (" y")
+
+    return true 
+    else 
+        term.setCursorPos (1,zPos)
+        term.clearLine()
+        say.writeQuestion (text)
+        term.setCursorPos (#text,zPos)
+        term.write (string.rep(" ",(xSize-#text)>0 and (xSize-#text) or  0) ) -- java lan error
+        term.setCursorPos (#text,zPos)
+        say.danger (" n")
+      return false 
+  end     
+end
+
+function NumberElipse( start, ends  )
+  assert (type(start)=="number" and type(ends)=="number","NumberElipse expected number")
+  local cnt = 1
+  local tb = {}
+  if ends >= start then 
+      for i=start,ends do
+        tb[cnt]=tostring(i)
+        cnt=cnt+1
+      end
+  else 
+    for i=start,ends,-1 do
+        tb[cnt]=tostring(i)
+        cnt=cnt+1
+      end
+  end 
+  return tb 
+end
+
+--Corrds
+function changeCoord ( command )  
+	clear(  )
+   local x,y,z,f = StatisticsProgram.getCoord(  )
+	say.special ("Changing where are stating Coord ...")
+  local xPos = getNInput(  "xPos old: "..x,x )
+  local yPos = getNInput(  "yPos old: "..y,y )
+  local zPos = getNInput(  "zPos old: "..z,z )
+  local fPos = getNInput(  "fPos old: "..f.." ("..orientation.toNameOrientation( f +1 )..")",f )
+  if (fPos < 4 and fPos >= 0)  and acceptedUser(  )   then
+    if command == "clearCamp" and  acceptedUser( "Dissasembled'requare pickaxe'" )  then 
+          clearCampAuto(  )
+    end
+  StatisticsProgram.changeCoord(  xPos, yPos,zPos,fPos )
+  ConfigProgram.SET['isDisk'] (false) -- force to reset coord
+  BOOT_TURTLE.UpdateCoordToTurtle(  )
+  BOOT_TURTLE.UpdateDisk () 
+      say.success ("Changed coordinates!")
+   return true 
+  elseif fPos >= 4 or  fPos < 0  then 
+      say.danger ("fPos "..fPos.." out of range")
+  else 
+    say.warning "Coordinates not changed!" 
+    return false 
+  end 
+    return false 
+end
+
+
+
+function changeJobLocation(  )
+clear(  )
+  local minHeight = minHeight;
+  local maxHeight = 250
+  local   xStart,zStart,xEnd,zEnd,yJob = StatisticsProgram.getJobLocation(  )
+	say.special ("Changing Job Location...")
+  local xStart = getNInput(  "xStartJob old: "..xStart,xStart )
+  local zStart = getNInput(  "zStartJob old: "..zStart,zStart )
+  local xEnd = getNInput(  "xEndJob old: "..xEnd,xEnd )
+  local zEnd = getNInput(  "zEndJob old: "..zEnd,zEnd )
+  local yJob = getNInput(  "yJob: "..yJob,yJob )
+ if yJob < maxHeight and yJob>minHeight and acceptedUser(  ) then 
+    StatisticsProgram.changeJobLocation(xStart ,zStart,xEnd,zEnd,yJob )
+    if acceptedUser ("More options") then 
+          CHANGE_GenratorName(  )
+          CHANGE_TurtlesNames(  )
+          CHANGE_yJobEnd(  )
+          CHANGE_DungeonChest(  )
+          CHANGE_DropJunkItem(  )
+    end   
+          --  To work old and new turtle job where they have , need invent something like id when quarry is started,give uneque one and that works like quarry progress algoritm!
+          -- if   acceptedUser( "Leave turtle that stil work" ) then say.warning "Sum of turtles can continue unit finish job!" else  say.alert "Turtle now work from begining!" job.MarkToResetTurtleJobs(  )   end -- point to reset turtle memoryend
+          -- Leave in simple
+          job.MarkToResetTurtleJobs(  ) 
+          sleep(.5)
+          job.JobGenerator(  )
+  say.success ("Changed Job location!")
+  elseif yJob > maxHeight then   say.danger ("yJob to hight out of range")
+  elseif  yJob<minHeight then     say.danger ("yJob to small out of range")
+  else
+    say.warning "Job Location not changed!"
+end
+end
+
+function getCoord(  )
+   local x,y,z,f = StatisticsProgram.getCoord(  )
+   local xStart,zStart,xEnd,zEnd,yJob = StatisticsProgram.getJobLocation(  )
+   clear(  )
+   say.special "There will see all coordinates."
+   say.super ("Job")
+   if job.isEmpty(  ) then say.super ("xStart:"..xStart..", zStart:"..zStart..",\nxEnd:"..xEnd..", zEnd:"..zEnd..", yJob:"..yJob) else jobAlert(  )  end 
+   say.super ("My\nx: "..x..", y:"..y..", z:"..z..", f:"..f.." "..orientation["toNameOrientation"]( f+1 ))
+   say.alert ("Reset My location, newCorrdinates!")
+   say.alert ("Reset Job Location, newJob!")
+   say.warning("Mark job: from right bottom to top left")
+   say.danger ([[b^-
+        a<_]])
+end
+
+function getMoreOption(  )
+clear(  )
+  say.special"There will see more options."
+  say.alert ("Drop junk Item:"..tostring(ConfigProgram.GET['DropJunkItem'] ()))
+  say.alert ("Generator:"..tostring(ConfigProgram.GET['GenerateJob'] ()))
+  say.alert ("Turtles name:"..tostring(ConfigProgram.GET['TurtlesName'] ()))
+  say.alert ("Maximum turtles home:"..tostring(ConfigProgram.GET['MaxTurtlesHome'] ()))
+  say.alert ("Start height:"..tostring(ConfigProgram.GET['yJob'] ()))
+  say.alert ("End height:"..tostring(ConfigProgram.GET['yJobEnd'] ()))
+  say.alert ("Dungeon chest:"..tostring( ConfigProgram.GET['DungeonChest']() ))
+
+end
+
+function getNotConnectedSlaves(  )
+  say.writeAlert "Wait feed back"
+  comunicate.sendConnected( "silence" )
+  say.success " complete!"
+  local failed = comunicate.NotConnectedMissing(  )
+  -- lo
+  for loc,target in pairs(failed) do
+       local xLn,zLn = term.getCursorPos ()
+        say.warning ("No responde: #"..target.ID.." job in x:"..tostring(target.x or "N").." z:"..tostring(target.z or "N") )
+        if zLn >= zSize-1 then WaitEnter() clear() end 
+        -- WaitEnter ()
+  end
+end
+
+--Events
+function WaitEnter ()
+term.write "Press enter to continue."
+local _ = read()
+  end
+
+
+  
+function TurtlesKickStart( )  -- lounth all turtles
+  -- if in sucking slot is something else then turtle dtop up
+  if not inventory.getInvSpace(  )  and not turtleLib.isTurtle() and not turtleLib.TurtleIn( turtle.getSelectedSlot() )and  chestLib.chestSide("bottom") then turtle.dropUp() end  
+-- Place all turtles.
+  while  turtleLib.Count()>0 or turtle.suckDown() do  
+       local status,wait =  BOOT_TURTLE.RUNSupport() 
+      
+        if not wait then 
+            if  not BOOT_TURTLE.RUN( )  then sleep(0);
+                return false;   
+            end 
+        end  
+        sleep(0.5)
+        while turtle.detect () do sleep(1) end             
+    end
+  return  true  -- Return status was secesfuly
+end
+
+function TurtlesUpdateDisk( boolean )
+  return BOOT_TURTLE.UpdateDisk (boolean) 
+end
+
+
+function dropTurtleChest(  )
+ if  chestLib.chestSide ("bottom") and turtleLib.isTurtle(  ) then 
+      if turtleLib.dropTurles( "Down" ) and inventory.getSpace( turtle.getSelectedSlot() ) then 
+      local slot = turtle.getSelectedSlot()
+      if turtle.getItemCount(slot) >= 64 and slot < 16 then slot = slot + 1;turtle.select(slot) end 
+      -- trasfer wood/ matterial
+      -- while one slot is in inventory , take the items
+     while inventory.getSpace( turtle.getSelectedSlot() ) and turtle.suck() do requestAPI.sortSlotsFromThis  ( slot,{ requestAPI.getDataName  (slot) } ) end -- suck materials that gerttered from dissasembled turtle 
+      
+      end
+ end 
+end
+
+
+function dissasembledAuto(  )
+   comunicate.suckFuelInChest(  ) 
+           if job.sendSupportTakeLastJunk(  ) then 
+                if uttility.acceptedUser( "Are you shure disassemble" ) then 
+                    comunicate.suckFuelInChest(  ) sleep(1)
+                    job.disassemble(  )
+                end 
+            else
+                say.danger "Failed disassemble!"
+           end    
+end
+
+function clearCampAuto(  )
+  say.alert "Plase wait !"
+     comunicate.suckFuelInChest(  ) sleep(0)
+      if job.sendSupportTakeLastJunk(  ) then 
+                if uttility.acceptedUser( "Are you shure clearCamp" ) then 
+                    comunicate.suckFuelInChest(  ) sleep(1.3)
+                    comunicate.destroyHomeChest(  )sleep(3)
+                    job.disassemble(  ) sleep(.5)
+                    BOOT_TURTLE.defaultSettings(  )
+                end 
+            else
+                say.danger "Failed clearCamp!"
+           end    
+end
+
+  function moveOut(  )
+     comunicate.suckFuelInChest(  ) sleep(0)
+      if job.sendSupportTakeLastJunk(  ) then 
+                if uttility.acceptedUser( "Are you want continue" ) then 
+                   sleep(0) comunicate.suckFuelInChest(  ) 
+                   sleep(5)
+                    comunicate.destroyHomeChest(  ) sleep(2)
+                    job.disassemble(  ) sleep(.5)
+                    BOOT_TURTLE.defaultSettings(  )
+                    ConfigProgram.SET['isDisk'] (false) -- force to reset coord
+                   return true 
+                end 
+            else
+                say.danger "Failed clearCamp!"
+           end 
+      return false 
+  end 
+
+
+  function ManagerReady(  )
+    
+ local SuperID = ConfigProgram.GET.SuperComputerID()
+ local Booted = ConfigProgram.GET['isDisk'] ()
+ local isSame = SuperID == os.getComputerID()
+
+   if not isSame or not Booted then 
+     return  uttility.changeCoord (  )
+   end
+   return true 
+  end
+
+
+  function jobAlert( silence )
+      local jobs = job.countleftJob(  )
+      local jobStill = job.isEmpty(  )
+      local complete = job.AllJobsisComplete(  )
+      local jobT = job.jobTotal(  )
+      local procent = job.Procent(  )
+
+       if jobs then 
+        say.writeSuccess ("Job left: "..jobs,silence) say.alert (" complete "..procent.."%",silence) return true 
+        elseif not jobStill then say.alert ("No job generated at all!",silence)
+        elseif complete then  say.warning ("All jobs is complete!"    ,silence)
+        elseif not complete then  say.danger ("Job is not complete, in progress! ",silence) return true 
+        end 
+        return false 
+  end
+
+
+
+-- quiiz
+  function CHANGE_MaxTurtlesHome(  )
+   local i =  ConfigProgram.GET["MaxTurtlesHome"] ()
+   local MaxTurles = 25
+   local MinTurles = 5
+   local input,xPos,zPos = getNInput ("Changed Maximum turtles",NumberElipse( MinTurles, MaxTurles  ),"clearInput")  
+         term.setCursorPos(xPos,zPos)
+         if input<=MaxTurles and input >= MinTurles then 
+            say.success (input)
+              ConfigProgram.SET["MaxTurtlesHome"] (input)
+            else say.danger  (i)
+         end    
+  end
+
+function CHANGE_yJobStart(  )
+   local i =  ConfigProgram.GET["yJob"] ()
+   local yJobMax = maxHeight
+   local yJobMin = 8
+   local input,xPos,zPos = getNInput ("Change Starting Mining Height",NumberElipse( yJobMin, yJobMax  ),"clearInput")  
+         term.setCursorPos(xPos,zPos)
+         if input<=yJobMax and input >= yJobMin then 
+            say.success (input)
+              ConfigProgram.SET["yJob"] (input)
+            else say.danger  (i)
+         end    
+  end
+
+  function CHANGE_DropJunkItem(  )
+     local DropJunkItem = ConfigProgram.GET['DropJunkItem'] ()
+       if acceptedUser ("In Quarry drop junk items") then ConfigProgram.SET['DropJunkItem'] (true) else ConfigProgram.SET['DropJunkItem'] (false) end 
+  end
+
+   function CHANGE_GenratorName(  )
+    local i = ConfigProgram.GET['GenerateJob']()
+    local input,xPos,zPos = getSInput(  "Change Genrator Name",job.JobGeneratorNames(  ),"clearInput" )
+         term.setCursorPos(xPos,zPos)
+    if job.JobGeneratorExist( input ) then 
+    say.success (input)
+      ConfigProgram.SET['GenerateJob'](input)
+            else say.danger  (i)
+    end  
+  end
+
+  function CHANGE_TurtlesNames(  )
+    local i = ConfigProgram.GET['TurtlesName'](input)
+    local input,xPos,zPos = getSInput(  "Turtles names",i,"clearInput")
+      if type ( tonumber(input) ) =="number" then print "HAHA"  ;input = "\""..input.."\"" end 
+      ConfigProgram.SET['TurtlesName'](tostring(input))
+           term.setCursorPos(xPos,zPos)
+           say.success (input)
+
+  end
+
+ function CHANGE_yJobEnd(  )
+    local minHeight = minHeight
+    local maxHeight = ConfigProgram.GET["yJob"] () - 3
+    local i = ConfigProgram.GET['yJobEnd'](input)
+    local input,xPos,zPos = getNInput(  "Change End Mining Height",NumberElipse( maxHeight,minHeight  ),"clearInput")
+         term.setCursorPos(xPos,zPos)
+      if maxHeight >= input and minHeight <= input  then 
+          say.success (input)
+          ConfigProgram.SET['yJobEnd'](input)
+            else 
+          -- ConfigProgram.SET['yJobEnd'](minHeight)
+              say.danger  (i)
+    end  
+  end
+
+
+  function CHANGE_DungeonChest(  )
+    local i = ConfigProgram.GET['DungeonChest']()
+     if acceptedUser ("Dungeon Chest[slower]") then  
+      ConfigProgram.SET['DungeonChest'](true)
+       else 
+      ConfigProgram.SET['DungeonChest'](false)
+    end       
+  end
+
+

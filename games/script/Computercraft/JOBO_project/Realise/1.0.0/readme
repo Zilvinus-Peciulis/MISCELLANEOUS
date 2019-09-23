@@ -1,0 +1,9 @@
+Realese 
+Added Dungeon chest method tha alowed take content from that chest.
+Added Dungeoun chest look until reash height 12 / everything below 12 make faster mining bicucle cheking chest takes time
+Added Command line selector like CHANGE_,TurtleNames,yJobStart,yEndJob, DropJunkItem,GenratorName,DungeonChest
+Added event method handker that loop until event is  trigered or funtion return false
+Added option to deisde dissasemble when support not connected 
+Fixed force slave always chesk junk where are in junk chest just sucking one.
+Fixed now dissasemble also can player
+Fixed typo on when are in job location NORT not return true 

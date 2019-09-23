@@ -1,0 +1,71 @@
+--print (shell.dir())
+os.loadAPI("/moreFile/programs/config/source/FileLibrary/fLib")
+pathDATA = "/moreFile/GPS"
+local defLn = 1
+SET = {
+	
+   xLocation = function (this)
+      assert (type(this)=="number" , "Requare initial number xLocation.")
+	  fLib.setContent( pathDATA.."/x",this) 
+	  
+   end;
+
+   yLocation = function (this)
+      assert (type(this)=="number" , "Requare initial number yLocation.")
+	  fLib.setContent( pathDATA.."/y",this) 
+	  SET.POST(this)
+   end;
+
+   zLocation = function (this)
+      assert (type(this)=="number" , "Requare initial number zLocation.")
+	  fLib.setContent( pathDATA.."/z",this) 
+	  
+   end;
+
+
+   fLocation = function (this)
+      assert (type(this)=="number" , "Requare initial number fLocation.")
+	  fLib.setContent( pathDATA.."/f",this) 
+	  
+   end;
+}
+
+
+GET ={
+
+		xLocation = function ()
+		  return  fLib.getContent( pathDATA.."/x")
+	    end;
+
+	    yLocation = function ()
+		  return  fLib.getContent( pathDATA.."/y")
+
+	    end;
+	     
+	     zLocation = function ()
+		  return  fLib.getContent( pathDATA.."/z")
+	     end;
+	    
+	     fLocation = function ()
+		  return  fLib.getContent( pathDATA.."/f")
+	  	end;
+	  
+
+}
+
+os.unloadAPI("/moreFile/programs/config/source/FileLibrary/fLib")
+
+--[[
+SET.isDisk(false)
+SET.xPos(55)
+print(GET.xPos())
+
+	print(GET.isDisk())
+	print(GET.xPos())
+	print(GET.yPos())
+	print(GET.zPos())
+	print(GET.fPos())
+print ( type(GET.isDisk()))
+
+--os.unloadAPI(shell.dir().."/source/FileLibrary/fLib")
+]]

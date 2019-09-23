@@ -1,0 +1,53 @@
+--print (shell.dir())
+os.loadAPI("/moreFile/programs/config/source/FileLibrary/fLib")
+--Turtle
+
+SET = {
+	POST  = function ( line , text )
+		assert(line, "Requare initial line")
+		assert(text~=nil, "Requare initial text")
+	    fLib.replaceLineValue( "/moreFile/programs/config/default" , line ,text , ":" )
+	end;
+     
+
+   TurtlesName = function (this)
+      assert (type(this)=="string" , "Requare initial string TurtlesName got:"..tostring(this))
+	  SET.POST(1, this)
+   end;
+
+    ManagerID = function (this)
+      assert (type(this)=="number" , "Requare initial number ManagerID got:"..tostring(this))
+	  SET.POST(2, this)
+   end;
+
+     yProgressEnd = function (this)
+      assert (type(this)=="number" , "Requare initial number yProgressEnd got:"..tostring(this))
+	  SET.POST(3, this)
+   end;
+}
+
+
+GET ={
+	 GETPOST = function( line )
+	 	assert(type(line)=="number", "Requare initial line")	 	 
+	 	return fLib.getLineValue( "/moreFile/programs/config/default" , line ,":")
+	 end; 
+
+     
+     TurtlesName = function ()
+	  return  GET.GETPOST(1)
+    end;
+
+     ManagerID = function ()
+	  return  GET.GETPOST(2)
+    end;
+
+      yProgressEnd = function ()
+	  return  GET.GETPOST(3)
+    end;
+  -------JOB-----------------------------------   
+   
+}
+
+os.unloadAPI("/moreFile/programs/config/source/FileLibrary/fLib")
+

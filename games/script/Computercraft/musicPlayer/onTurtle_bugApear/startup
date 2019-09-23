@@ -1,0 +1,4 @@
+
+print "Automatic music player was disable for game  crashing!"
+sleep(os.getComputerID() )
+shell.run "play"

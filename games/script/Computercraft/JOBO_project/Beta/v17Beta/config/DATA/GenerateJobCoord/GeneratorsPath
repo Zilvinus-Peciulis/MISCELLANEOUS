@@ -1,0 +1,4 @@
+JobGenerators = {
+ ["ClearQuarry"] = "config/DATA/GenerateJobCoord/GenerateABSQuarry/Locations";
+ ["Quarry"] = "config/DATA/GenerateJobCoord/GenerateQuarry/Locations";
+}

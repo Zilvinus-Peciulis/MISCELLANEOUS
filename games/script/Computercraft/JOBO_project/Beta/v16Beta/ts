@@ -1,0 +1,248 @@
+os.loadAPI("/config/source/ConfigProgram")
+os.loadAPI("/programs/Require_Items/source/requestAPI")
+os.loadAPI("/programs/turtle_programs/JOBO/moreFile/GPS/refuelLib")
+os.loadAPI("/programs/turtle_programs/JOBO/moreFile/programs/refuel")
+os.loadAPI("/programs/perip")
+os.loadAPI("config/DATA/GenerateHomeCoord/HomeCoordProgram")
+os.loadAPI ("/programs/GUI/Background/Animations/MatrixAnimation/MatrixProgram")
+os.loadAPI("programs/turtleLib")
+os.loadAPI("config".."/source/FileLibrary/fLib")
+os.loadAPI("config".."/source/StatisticsProgram")
+os.loadAPI("programs/tbLib")
+os.loadAPI("projectM/uttility")
+os.loadAPI("programs/orientation")
+os.loadAPI("/config/DATA/GenerateJobCoord/JobCoordProgram")
+os.loadAPI("programs/BOOT/BOOT_TURTLE")
+os.loadAPI("programs/inventory")
+os.loadAPI("programs/say")
+os.loadAPI("programs/protocol")
+os.loadAPI("programs/comunicate")
+-- Porblematic
+-- os.loadAPI("/programs/turtle_programs/JOBO/moreFile/programs/calculate")
+
+local pathDATA = "config/statistics"
+local xPath = "/programs/turtle_programs/JOBO/moreFile/GPS/x"
+local yPath = "/programs/turtle_programs/JOBO/moreFile/GPS/y"
+local zPath = "/programs/turtle_programs/JOBO/moreFile/GPS/z"
+local fPath = "/programs/turtle_programs/JOBO/moreFile/GPS/f"
+
+lol = "FUCK"
+local orientations = {'SOUTH' , 'WEST' , 'NORTH' , 'EAST' };
+local fuelArray = {"minecraft:coal","minecraft:planks","minecraft:chest", value = 100}
+local chestArray =  {"minecraft:chest", "minecraft:trapped_chest"}
+print (requestAPI.inspectThis("front", {"minecraft:bedrock"} )) 
+-- refuel.value(1)
+-- refuel.valueSuck( 120 , "Front")
+-- refuel.valueObject( 6800  , "Front")
+ -- comunicate.sendConnected(  )
+-- StatisticsProgram.sendManagerGetStatus(  )
+
+-- fLib.replaceLineValue( "/programs/turtle_programs/JOBO/moreFile/programs/config/default" , 1 ,(ConfigProgram.GET.TurtlesName() and "\""..ConfigProgram.GET.TurtlesName().."\"" ) or ConfigProgram.SET.TurtlesName("\"JOBO\"") or "\"JOBO\"" , ":" ) -- set turtleStatus in config file false . enather way that woud be sematic error
+-- x ,z  = orientation.Left("WEST",forwValue  )
+-- print ("X: ",x)
+-- print ("Z: ",z)
+-- print ("label name: ",ConfigProgram.GET.TurtlesName())
+-- x,z= orientation.Right("EAST",2  )
+-- print ("xMove: ",x," zMove: ",z)
+-- orientation.turn( "NORTH", -3 )
+-- print (inventory.getSpace( 1 ))
+-- print (turtleLib.TurtleIn( turtle.getSelectedSlot() ) )
+
+
+-- print (calculate.orientations["WEST"])
+-- x ,z = orientation.byValue( 2,4 )
+-- x ,z = orientation.byName( "NORTH",3 )
+-- print ("X: ",x)
+-- print("Z: ",z)
+-- uttility.dropTurtleChest(  )
+-- uttility. dropTurtleChest(  )
+-- sleep(StatisticsProgram.cashTime())
+-- StatisticsProgram.checkJob(  )
+
+-- print (JobCoordProgram.getLeftJobAvailabel(  ))
+
+--[[
+lolo = tbLib.merge({bobbs = "shit"}, {ass = "balls","amabo"}) 
+
+shit = {"HELLO"}
+ yes = StatisticsProgram.ProtocolExecuteJob( {x=55,z=45,y=97} )	
+
+
+if type(yes)=="table" then 
+	for k,v in pairs(yes) do
+		print(k.."=:"..v)
+	end
+else
+	print(type(yes))
+end
+]]
+-- for k,v in pairs(lolo) do
+	-- print(k.."= "..tostring(v))
+-- end
+
+--print (false==nil and false or nil~=nil and true   )
+--StatisticsProgram.sendExecuteJobProtocol(  )
+--print(ConfigProgram.GET.yJob(5))
+--print (StatisticsProgram.set_Progress( 268, true ))
+--StatisticsProgram.SendDisassembleProtocol( false )
+
+--StatisticsProgram.sendDataEveryone(  )
+
+--print (ConfigProgram.GET.GenerateJob("GenerateQuarrys"))
+
+--local a,b =  JobCoordProgram.isCorrectName( "GenerateQuarr" )
+
+
+--print (ConfigProgram.SET.GenerateJob(112))
+ --BOOT_TURTLE.UpdateDisk () 
+
+--ConfigProgram.SET.xStartJob(1124)
+
+--print (JobCoordProgram['getJobAvailable']() and true )
+
+--print (ConfigProgram.GET.yJob() or ConfigProgram.SET.yJob(ConfigProgram.GET.yPos()) or ConfigProgram.GET.yPos())
+
+--print (orientations[ConfigProgram.GET.fPos()+1])
+--print (os.getComputerID())
+
+--print (JobCoordProgram.AlgoritmExists( "" ))
+--print (JobCoordProgram.ConstructorGenerators( "GenerateQuarry" ))
+ --JobCoordProgram.getJobCoordAdvanced( )
+
+--JobCoordProgram.GetComplete( false )
+
+--fLib.AppendLoongLine( "config/DATA/GenerateJobCoord/JobCoordDATA" , {"Assole"} )  
+--local s = fLib.GetLongLineValue("config/DATA/GenerateJobCoord/JobCoordDATA",1)
+--local line = fLib.GetLongLineValue( "/config/DATA/GenerateHomeCoord/HomeCoordDATA", 1)
+--for k,v in pairs(s) do
+--	print(k,v)
+--end
+--print (JobCoordProgram.getAPIName( "/lolo/LOLOL"  ))
+--StatisticsProgram.sendEveryOne( {isAvailable=false} )
+--print (JobCoordProgram.getJobCoordAdvanced( ) )
+
+
+--print (StatisticsProgram.inspect_isAvailable( true ))
+--if StatisticsProgram.inspect_ID( 274 ) then 
+--	print "WHOHO"
+--end 
+
+--StatisticsProgram.set_isAvailable( 259, true )
+--print (StatisticsProgram.inspect_isAvailable( true ))
+--print (fLib.Inspect(pathDATA, "Status",true ))
+--print(StatisticsProgram.get_Content( 258 ).isAvailable)
+--print(StatisticsProgram.tst( 2,258 ))
+
+--print (fLib.PointIndexToValue( pathDATA, "ID" ,259,"Status", "112" ))
+
+--print(StatisticsProgram.isIndex( 258,"HAHA" ))
+
+-- print (StatisticsProgram.inspect_Status( true))
+-- StatisticsProgram.inspect_isAvailable( false ) )
+--print (StatisticsProgram.inspect_Status(false))
+--StatisticsProgram.DeleteLine( StatisticsProgram.inspect_Status(false) )
+--StatisticsProgram.SpamLine( 1 ,"You like Bananas? So you like babanas Like A boss dot you")
+-- print (StatisticsProgram.set_Status( 274, false ))
+--print (StatisticsProgram.set_isAvailable( 274, false ))
+
+
+--print (requestAPI.inspectThis("top", chestArray ))
+
+--print (configProgram.SET.TurtlesName("\"COCK\""))
+--print (configProgram.GET.TurtlesName())
+
+--MatrixProgram.Matrix()
+--os.loadAPI("config".."/source/FileLibrary/fLib")
+
+
+--print(requestAPI.inspectThis("front", fuelArray ))
+--print(requestAPI.inspectSide( 'front' ))
+--print (requestAPI.selectThis( {"minecraft:coal","minecraft:planks"} ))
+
+--print (HomeCoordProgram.getStatus( 4542 ) )
+
+--print(HomeCoordProgram.getHomeCoordAdvanced( 4 ).STATUS )
+
+--print (configProgram.GET.FloppyName())
+--print (type(configProgram.GET.FloppyName()))
+
+--perip.setPointObjet ("turtle")
+ --	perip.forceConnectPeripheral()
+--print( perip.getID())
+
+--print(textutils.unserialize("HELLOWORLD") )
+--for i,v in pairs(index) do
+--	print(i.." "..tostring(v))
+--end
+ 
+--print (HomeCoordProgram.isAvailable(  ))
+  --print (HomeCoordProgram.isHomeCoord() and "No content in HomeCoordProgram " or "Content is in HomeCoordProgram")
+--requestAPI.sortSlotsFromThis  ( 15, {"minecraft:coal","minecraft:planks"} )
+--requestAPI.giveItemsFrom("a", 10,  {"minecraft:coal","minecraft:planks"}  ) 
+
+--requestAPI.requestByCountFrom( 3,"NAME", {"minecraft:coal",value=5} )
+
+--print (requestAPI.SortString( {"minecraft:coal","minecraft:planks"}) )
+
+ --requestAPI.loopItem (1 , 1 ,1, "1. 1-ComputerCraft:disk" ,{"ComputerCraft:diskExpanded","ComputerCraft:disk"},colors.brown ,10000,true)
+
+--print (requestAPI.isListedRequestSlot(2, {"minecraft:coal"} ))
+
+--refuelLib.RefuelByValue( 1 )
+--print (refuelLib.getFuelCount(  ))
+--[[
+local ResetItems = {
+{"ComputerCraft:disk","ComputerCraft:diskExpanded", value = 1};
+{"ComputerCraft:CC-Peripheral", value = 1}
+}
+
+print (requestAPI.checkAll( ResetItems ))
+--]]
+
+--local success, data =  turtle["inspect"]()
+-- print(data.name)
+-- print(data.name == "minecraft:coal_block")
+--print(turtle.getFuelLevel())
+
+--[[
+ fLib.ReplaceLongLineValue("config/ctest",5,{"mambo",lamda=false,hera="WOWOW",lol=55,haha="YES"} )
+ tb = fLib.GetLongLineValue( "config/ctest", 5)
+
+
+ for i,v in pairs (tb) do 
+		print(i.." "..tostring(v))
+	end
+
+
+	print(tb.hera.." -??")
+
+]]
+
+--for i,v in pairs (fLib.GetLastLongLine( "config/ctest" )) do 
+	--print(i.." = "..tostring(v))
+--end
+--perip. inspectObject()
+--print (perip.inspectThisObject("modem"))
+
+
+--local sucsess , data = turtle.inspect()
+
+--print (data.name)
+--string =textutils.serialize({x=1,z=2,y=3})
+--print(string )
+--tb = textutils.unserialize(string)
+--print(tb.x)
+
+
+
+
+--[[
+haha=fLib["getAllValuesByType"]( "/config/configID" )
+for _, ID in pairs (haha) do
+	print(ID..",:"..type(ID))
+end
+]]
+
+
+
+

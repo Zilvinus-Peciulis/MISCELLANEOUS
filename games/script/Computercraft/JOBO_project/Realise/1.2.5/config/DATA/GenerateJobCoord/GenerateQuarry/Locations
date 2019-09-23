@@ -1,0 +1,157 @@
+os.loadAPI("config".."/source/FileLibrary/fLib")
+os.loadAPI("config".."/source/ConfigProgram")
+
+
+
+local orientations = {'SOUTH' , 'WEST' , 'NORTH' , 'EAST' };
+local orientation = ConfigProgram.GET.fPos() 
+local qSize = 10 --quare size 	
+  --print(orientations[orientation]) sleep(8)
+
+
+function CoordCorrect( X_start,Z_start,X_end,Z_end )
+  assert (type (X_start)=="number","To see Error need x Start..")
+assert (type (Z_start)=="number","To see Error need z Start..")
+assert (type (X_end)=="number","To see Error need x End..")
+assert (type (Z_end)=="number","To see Error need z End..")
+ 
+
+local xStart = X_start -- -83
+local zStart = Z_start -- -175
+
+local xEnd = X_end -- -75
+local zEnd = Z_end -- -183
+
+local xNextJob = xStart
+local zNextJob = zStart
+
+if orientations[orientation+1] == "SOUTH" then
+  return zEnd > zNextJob
+elseif orientations[orientation+1] == "WEST" then
+  return xEnd < xNextJob
+elseif orientations[orientation+1] == "NORTH" then
+  return xNextJob < xEnd
+elseif orientations[orientation+1] == "EAST" then
+  return zNextJob < zEnd
+end 
+end
+
+
+function Generate(  )
+local generateStatus = false -- flag about generation was in
+local yProgress = ConfigProgram.GET.yJob() 
+
+--print ("yProgress:",yProgress)
+local ErrorCount = 0
+local ErrorLevel = 150
+local xStart = ConfigProgram.GET.xStartJob()-- -83
+local zStart = ConfigProgram.GET.zStartJob() -- -175
+
+local xEnd = ConfigProgram.GET.xEndJob() -- -75
+local zEnd = ConfigProgram.GET.zEndJob() -- -183
+
+local xNextJob = xStart
+local zNextJob = zStart
+local err= true 
+
+if  type (xStart) == "nil" then print ("xStart  value requare in config/config 15) xStartJob:") sleep(20) err= false 
+end   
+if  type (zStart) == "nil" then print ("zStart  value requare in config/config 16) zStartJob:") sleep(20) err= false 
+end 
+if  type (xEnd) == "nil" then print ("xEnd  value requare in config/config 17) xEndJob:") sleep(20) err= false 
+end 
+if  type (zEnd) == "nil" then print ("zEnd  value requare in config/config 18) zEndJob:") sleep(20) err= false 
+end  
+
+assert(err, "Failed louch Not Exsisting Values from config/config file.")
+
+-- Deleting old file leaving black space 
+ fLib.DeleteContent( "config/DATA/GenerateJobCoord/JobCoordDATA" )
+
+local MapArray = {x=xNextJob ,z=zNextJob ,f=orientation , Complete = false}
+
+if orientations[orientation+1] == "SOUTH" then
+            print "Generating in SOUTH."
+  while  zEnd > zNextJob and ErrorLevel > ErrorCount do --SOUTH
+       generateStatus = true  
+       ErrorCount = ErrorCount + 1 
+            --print ('xJob '..xNextJob.." zJob "..zNextJob) -- Endpoint
+    if xNextJob > xEnd then -- West 
+            xNextJob = xStart
+            zNextJob =  zNextJob + qSize 
+    end 
+       if zEnd > zNextJob then 
+          fLib.AppendLoongLine( "config/DATA/GenerateJobCoord/JobCoordDATA" , {y = yProgress ,x=xNextJob ,z=zNextJob ,f=orientations[orientation+1] , Complete = false} )  
+          xNextJob = xNextJob + qSize 
+       end   
+ end
+
+elseif orientations[orientation+1] == "WEST"  then
+          print "Generating in WEST."
+   while  xEnd < xNextJob and ErrorLevel > ErrorCount  do --WEST
+       generateStatus = true   
+       ErrorCount = ErrorCount + 1
+          --print ('xJob '..xNextJob.." zJob "..zNextJob) -- Endpoint
+    if zNextJob > zEnd then -- West 
+         zNextJob = zStart
+         xNextJob =  xNextJob - qSize
+         --print "Carry"
+    end 
+    if xEnd < xNextJob then 
+     fLib.AppendLoongLine( "config/DATA/GenerateJobCoord/JobCoordDATA" , {y=yProgress, x=xNextJob ,z=zNextJob ,f=orientations[orientation+1] , Complete = false} )  
+     zNextJob = zNextJob + qSize
+    --sleep(2)  
+   end 
+ end 
+
+
+elseif orientations[orientation+1] == "NORTH"  then
+         print "Generating in NORTH."
+   while  zEnd < zNextJob  and ErrorLevel > ErrorCount do --NORTH
+       generateStatus = true   
+         ErrorCount = ErrorCount + 1
+          --print ('xJob '..xNextJob.." zJob "..zNextJob) -- Endpoint
+    if xNextJob < xEnd then -- West 
+          xNextJob = xStart
+          zNextJob =  zNextJob - qSize
+          --print "Carry"
+    end 
+        if zEnd < zNextJob then 
+         fLib.AppendLoongLine( "config/DATA/GenerateJobCoord/JobCoordDATA" , {y= yProgress, x=xNextJob ,z=zNextJob ,f=orientations[orientation+1] , Complete = false} )  
+         xNextJob = xNextJob - qSize 
+        end  
+  --sleep(2)
+ end
+
+
+elseif orientations[orientation+1] == "EAST"  then
+          print "Generating in EAST."
+   while  xEnd > xNextJob and ErrorLevel > ErrorCount  do --EAST
+       generateStatus = true   
+         ErrorCount = ErrorCount + 1
+          --print ('xJob '..xNextJob.." zJob "..zNextJob) -- Endpoint
+        if zNextJob < zEnd then -- West 
+              zNextJob = zStart
+              xNextJob =  xNextJob + qSize
+              --print "Carry"
+
+        end
+         if  xEnd > xNextJob  then -- fix problem when one coord out of bounds
+          fLib.AppendLoongLine( "config/DATA/GenerateJobCoord/JobCoordDATA" , {y = yProgress, x=xNextJob ,z=zNextJob ,f=orientations[orientation+1] , Complete = false} )  
+          zNextJob = zNextJob - qSize  
+         end   
+  --sleep(2)
+    end 
+end 
+return generateStatus,ErrorCount>=ErrorLevel
+end 
+   
+
+
+os.unloadAPI("config".."/source/FileLibrary/fLib")
+os.unloadAPI("config".."/source/ConfigProgram")
+
+
+
+
+

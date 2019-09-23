@@ -1,0 +1,1 @@
+Added function 'turtleLib.DropJunkyItem( slot )' automaticly drop selectet items from 'material.junk' list or sort  if item not from material.junk list.

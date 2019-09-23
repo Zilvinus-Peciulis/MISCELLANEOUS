@@ -1,0 +1,23 @@
+ 1) isDisk Drive : true
+ 2) My Coord xpos: -562
+ 3) My Coord ypos: 70
+ 4) My Coord zpos: 283
+ 5) My Coord fpos: 0
+ 6) SuperComputer ID: 1
+ 7) GiveFuelLevel: 3
+ 8) Floppy label: "JOBO"
+ 9) XAsk turtle Type: false
+10) XAsk user Coords: false
+11) Turtles Name: "Jobla"
+12) TurtlesHomeRow: 4
+13) MaxTurtlesHome: 32
+14) TurtlesGapsSize: 2
+15) xStartJob: -595
+16) zStartJob: 293
+17) xEndJob: -513
+18) zEndJob: 331
+19) yJob: 20
+20) yJobEnd: 10
+21) GenerateJob: "ClearQuarry"
+22) DropJunkItem: true
+

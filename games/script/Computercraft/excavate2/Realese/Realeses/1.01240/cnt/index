@@ -1,0 +1,73 @@
+os.loadAPI("cnt/doc")
+app = doc.getLibrary(  ) -- get current library 
+app.setCondition (true) --enable gps 
+--return -- Stop here
+
+--To load for other files  
+--1. os.loadAPI("cnt/index") -- Load to app
+--2. index.app.HelloWord( ); -- use methods
+
+  local USER , timeout  = app.acceptedUserDelay(11);
+
+ print ("User "..tostring(USER))
+ print ("timeout "..tostring(timeout))
+
+
+ local USER2 , timeout2  = app.acceptedUserDelay(11);
+
+ print ("User2 "..tostring(USER2))
+ print ("timeout2 "..tostring(timeout2))
+---------------------- , Methods ' ---------------------
+---[FILES]----------------------------------------------
+
+-- [input]
+-- getNInput(  txt,history,command ); ("txt") or ("txt", {"yes","no"}) or ("txt", "yes") or ("txt", {"yes","no"},"clearInput") return true or false 
+-- getSInput(  txt,history,command ); ("txt") or ("txt", {"yes","no"}) or ("txt", "yes") or ("txt", {"yes","no"},"clearInput") return true or false
+-- acceptedUser( text ); return true or false
+-- NumberElipse( start, ends  ); (55,1) or (55,1) return  55-1 or 1-55 
+-- acceptedUserDelay(delay,text) --(13,"continue") or (13) return 1. bool user, 2. bool timeout(whet counter rached zero retutn true)
+-- readTimeDelays(delay,historyArr) --Basic read() with woking time out > (13, {"y","n"}) return read() or nil
+
+
+--[say]
+ -- alert( text,silence ) ("text","silence") return " " ,("text") return colored "text"
+ -- warning( text,silence )
+ -- danger( text,silence )
+ -- success( text,silence )
+ -- special( text,silence )
+ -- super( text,silence )
+ -- question( text,silence )
+ -- writeAlert( text,silence )
+ -- writeWarning( text,silence )
+ -- writeDanger( text,silence )
+ -- writeSuccess( text,silence )
+ -- writeSpecial( text,silence )
+ -- writeSuper( text,silence )
+ -- writeQuestion( text,silence )
+
+--[requestAPI]
+           --  [[SORT ITEMS IN INVENTORY]]
+           --  sortSlotsFromThis  ( slotfrm,Array )-- Sort item by type in iventory  > ( 15, {"minecraft:coal","minecraft:planks"} ) 
+
+           --  [[CUT NAMES]]
+             --SortNames( Array ) -- sort names to readable in table > ( {"minecraft:coal","minecraft:planks"})
+             --SortString( Array ) -- Sort tbName in string > ( {"minecraft:coal","minecraft:planks"})
+
+           --  [[REQUEST ITEMS FROM USERT]]    
+           --  loopItem  (value, slot,y, txt ,minecraftData,color,blink,flag)  -- (1 , 1 ,1, "1. 1-ComputerCraft:disk" ,{"ComputerCraft:diskExpanded","ComputerCraft:disk"},colors.brown ,10000,true)
+           --  requestByCountFrom( slot,text, Array )-- reqest items by multyple type for , Advanced request multyple types - NAME == say what name need  > ( 3,"NAME", {"minecraft:coal",value=5} ) -- "NAME" then return by name
+           --  requestInSlot( slot,text, Array  ) -- force ask user for item in one slot
+           
+           --  [[CHECK VALUES FROM INVETORY]]    
+		   --  getDataName  (slot)  return data
+		   --  isListedRequest(compare , arg ) -- check name if true in all invetory	 return boolean or Item
+		   --  isListedRequestSlot(slot , arg ) -- check name if true in all invetory    return boolean or Item
+		   --  isListedRequestSlotValue(slot , arg, value ) -- check name if true in all invetory return  return false or Item
+		   --  Count( slot , Array )  -- count items in inventory specified in array return 0 or items count
+		   --  CountThis(Array) -- count in all invetory -- count items in inventory specified in array  return  count
+		   --  checkAll( arg ) -- if chain is to short break return  false else return true   >  ({{"minecraft:coal","minecraft:planks","minecraft:charcoal",value=99}})
+		   --  giveItemsFrom(side,value, arg  ) -- Give in turtle items by current value automaticly like fuel  > ("front", 10,  {"minecraft:coal","minecraft:planks"}  )  "front,up,down" or "front"
+
+		   --  [[Inspect block,blocks]]
+		   --  inspectSide( side ) -- > return(name or false) 
+		   --  inspectThis(side, arg ) -- ("fron",{"minecraft:planks","minecraft:stone"}) --> return true or false

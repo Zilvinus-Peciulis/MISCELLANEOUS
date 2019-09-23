@@ -1,0 +1,60 @@
+os.loadAPI("/config/source/ConfigProgram")
+
+
+
+  function getNInput(  txt )
+  	      print ("Requare:"..txt..".")
+   local  n = tonumber(read())
+        while n == nil do
+                n = tonumber(read())
+  		end
+               return n
+  end
+
+
+x = ConfigProgram.GET.xPos()
+y = ConfigProgram.GET.yPos()
+z = ConfigProgram.GET.zPos()
+f = ConfigProgram.GET.fPos()
+
+
+
+  
+
+ local SuperID = ConfigProgram.GET.SuperComputerID()
+ local isSame = SuperID == os.getComputerID()
+
+
+  -- if not x or not y or not z or not f or not isSame then 
+  --   	if not x or  not isSame then 
+  --   			ConfigProgram.SET.xPos( getNInput("X") ) 
+  --       end
+
+  --       if not y or not isSame then 
+  --   			ConfigProgram.SET.yPos( getNInput("Y") ) 
+  --       end
+
+  --       if not z or not isSame then 
+  --       		ConfigProgram.SET.zPos( getNInput("Z") ) 
+  --       end
+
+  --        if not z or not isSame then 
+  --       		ConfigProgram.SET.fPos( getNInput("F") ) 
+  --     end
+  
+
+  --             ConfigProgram.SET.xStartJob( getNInput("xStartJob") ) 
+  --             ConfigProgram.SET.zStartJob( getNInput("zStart") )
+  --             ConfigProgram.SET.xEndJob( getNInput("xEnd") )
+  --             ConfigProgram.SET.zEndJob( getNInput("zEnd") )
+  --             ConfigProgram.SET.yJob( getNInput("yJob") )
+
+  --      end
+
+   
+x = ConfigProgram.GET.xPos()
+y = ConfigProgram.GET.yPos()
+z = ConfigProgram.GET.zPos()
+f = ConfigProgram.GET.fPos()
+
+os.unloadAPI("/config/ConfigProgram")

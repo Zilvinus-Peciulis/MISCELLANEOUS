@@ -1,0 +1,12 @@
+
+function placeFuelinFront( fuelValue )
+	   refuel.valueSuck(fuelValue ,"Front" )
+end
+
+function placeFuelinFrontLess( fuelValue )
+	   refuel.valueDropLess( fuelValue  , "Front")
+end
+
+function suckFuelinFront( fuelValue )
+	   refuel.valueSuck(fuelValue ,"Front" )
+end

@@ -1,0 +1,299 @@
+local  termWidht , termHeight = term.getSize()
+
+local input = {...}
+
+local place_W = tonumber (input[1])  --widght  by plat
+local place_L = tonumber (input[2])  --lenght by plat
+local add_remove = tostring (input[3]) -- select what to do with floor
+
+term.setCursorPos(1,1)
+term.clear()
+--place_W = 3
+--place_L = 3
+local justMove = true	
+local moveTotal  = 0 
+local blockTotal = 0	
+local xDis = 10;
+
+-- Read/Write/Execute only
+local fuelLevel = 10
+
+--Read only
+local jkCount = 0;
+
+
+
+function fd()
+local  EngryTurleAlwaysSay = randomTextGenerator(DontEngryTurtle)
+local fuelSlot =16;
+local returnData = true
+local foundFuel ;
+local text ;
+local usedFuel= false;
+local getFuelandSlot = findUniqueItemFromInventoryReturnSlot(refuelItems)
+
+--while not turtle.forward() and refuel do
+ turtle.dig()
+
+   
+
+
+
+ if turtle.getFuelLevel() < fuelLevel then
+    if getFuelandSlot == nil then 
+        print("No fuel in inventory")
+        turtle.select(1)
+        returnData  = false;
+        else
+          print("I manage to ge fuel from '"..getFuelandSlot.."' slot")
+          turtle.select(getFuelandSlot)
+          usedFuel = turtle.refuel(1)
+          print( usedFuel )         
+    end  
+        else
+          turtleWhile("forward",EngryTurleAlwaysSay)
+ end
+  
+ 
+    
+
+-- return data is just for kmow
+return returnData , usedFuel
+end
+
+
+function turtleWhile(moves,txt)
+  local toggle = true
+ while not turtle[moves]() do
+    sleep(1)
+      if txt and toggle then
+       print(txt)
+       toggle = false
+      end
+  end  
+end
+
+function randomTextGenerator(tableText)
+   
+ if tableText then 
+   local newJke =  math.random(1 , #tableText);
+    jkCount = jkCount + 1
+                 if jkCount > #tableText then 
+                    jkCount = 0
+                    return tableText[newJke]
+                 end  
+              
+                   return tableText[jkCount]
+ else
+       jkCount = 0
+       return "";
+ end
+
+end
+
+
+function DataName (slot)
+ 
+     if 0<turtle.getItemCount(slot)then 
+           local data = turtle.getItemDetail(slot)
+        return data.name
+    end
+return nil
+end
+
+function findUniqueItemFromInventoryReturnSlot  (itemtable)
+    --Searth in inventory
+      for itm = 1, #itemtable do
+        for slot=1 ,16 do
+          local name = DataName (slot)
+         -- Searth unique item          
+                if name == itemtable[itm] then 
+                    return slot; 
+            end
+        end 
+      end    
+ return nil;
+end
+
+
+
+
+
+--print ("Data is "..)
+
+-- void place raw items in inventory
+voidPlace = {
+	'minecraft:coal';
+	'minecraft:torch';
+	'minecraft:sapling';
+}
+
+--point to avoid count fuel type object
+voidCounting ={
+	'minecraft:coal';	
+}
+
+refuelItems = {
+  'minecraft:coal',
+  'minecraft:planks'
+}
+
+DontEngryTurtle = {
+  "Just go away";
+  "Camon dude let me work";
+  "Why you are so annoying";
+  "I do all work for you and you act like .this";
+  "Okey , I gona punch you little ";
+  "Ahhhh";
+  "OSOAKLNVAVJKLJASDIKHG";
+  "Do something usefuel";
+  "MOVING !!!!";
+}
+
+
+
+
+--print("Item is slot: "..findUniqueItemFromInventoryReturnSlot(voidPlace))
+
+--print ()
+
+
+function voidControl (slot, voidtb)
+for x = 1, #voidtb do 
+  local data = turtle.getItemDetail(slot)
+
+  if data then 
+    if data.name == voidtb[x] then 
+       -- print ( 'void :'..x )
+    return false
+    end	
+  end	
+end
+return true 
+end
+
+
+--print ( voidControl (1, voidSlot) )
+
+function fItem ()
+
+  for x = 1, 16 do 
+  	local data = turtle.getItemDetail(x)
+   if turtle.getItemCount(x)> 0 and voidControl (x, voidPlace) then
+     return x , true
+   end
+  end
+return 1 , false
+end
+
+function selectObject(  )
+ itemSlot , justMove = fItem () 
+ turtle.select(itemSlot)
+end
+
+function proceedBlock(  )
+ 
+    
+    if add_remove=='remove'then 
+      if turtle.digDown() then
+       blockTotal =blockTotal +1;
+      end
+    end
+	
+	if add_remove =='add' then
+	 if turtle.placeDown() then
+     selectObject(  ) 
+       blockTotal =blockTotal +1;
+	 end
+    end
+end
+
+function move()
+moveTotal = moveTotal +1
+local x1;
+local x2;
+local xprogress = math.floor ( (moveTotal/(place_W*(place_L+1) ))*100 ) 
+   
+   items ,x1	= fItem ()
+   turtle.select(items)
+   x2,usedFuel = fd() 
+   if usedFuel then turtle.select(items)  end
+   proceedBlock(  )
+ 
+ if x1 and x2  then  justMove = true; else justMove = false;  end
+ if math.floor (xprogress)>=xDis  then print ( "done :"..xprogress..'%' ) xDis = xDis +10 end 
+--print ( 'items:x1>'..tostring (x1) )
+--print ( 'forward:x2>'..tostring (x2) )
+--print ( 'result>'..tostring (justMove ))
+end
+
+
+function floor_lenght(  )	
+ for x = 1 , place_L do --place_L
+      
+      move()           
+      if not justMove and add_remove ~='remove' then print ( 'Error no items' ) break end 
+	end	
+end
+
+
+function floor ()
+selectObject(  )
+proceedBlock(  )
+for x = 1,place_W  do 
+ if not justMove and add_remove ~='remove' then print ( 'Error no items' )  break end  
+   floor_lenght(  ) 
+ 
+    if x%2==1  then 
+      turtle.turnLeft()
+      move() 
+      turtle.turnLeft()
+      elseif x%2==0  then   
+	   turtle.turnRight()
+        move() 
+      turtle.turnRight()
+	  
+      end 
+end
+end
+
+
+
+function invCount() 
+local num = 0
+  for x = 1, 16 do
+    if 0 < turtle.getItemCount(x) and voidControl (x, voidCounting) then 
+       num = num + turtle.getItemCount(x)
+    end
+  end
+ return num
+end
+
+
+
+
+function  mainJob( ... )
+	if type (place_W)== "number" and type (place_L) == 'number' and add_remove =='add' or add_remove=='remove' then 
+  local m2 = place_L*place_W 
+  
+  if add_remove =='remove' then m2 = 0; print ( 'Remove mode' ) else print ("Items: "..m2) end      
+    
+   if m2 <= invCount()  then
+   	  if 1<place_L then place_L = place_L -1; end  
+      floor()
+       print('Moved '..moveTotal..", proceed "..blockTotal.." block's") 
+    else print ('Missing items \n'..m2-invCount())
+  end		   
+   
+
+elseif input[1]==nil then print ( 'usage:[widght][lenght][action]' )
+elseif  type (place_W)~= "number" then print'Widght of floor'  
+elseif type (place_L) ~= 'number' then print'Lenght of floor' 
+elseif    add_remove == 'nil' or add_remove ~='add' or add_remove~='remove'  then print ( 'Try use actions:\nadd\nremove' )  
+end
+end
+mainJob()
+
+
+
+

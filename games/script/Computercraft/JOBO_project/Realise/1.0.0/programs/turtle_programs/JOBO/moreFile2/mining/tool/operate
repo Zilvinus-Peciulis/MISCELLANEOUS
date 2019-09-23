@@ -1,0 +1,29 @@
+local DungeonChestFound = 0
+local minHeightAbadonedShaft = 12
+function displayChest(  )
+	 		if defaultProgramT.GET.DungeonChest() then
+	 		say.warning ("I found dungeon "..DungeonChestFound.. " chest total!!")
+	 		end 
+end
+
+ function DungeonChest(  )
+ if defaultProgramT.GET.DungeonChest() then 
+	 	if configProgramT.GET["yProgress"]() > minHeightAbadonedShaft then 
+				local chest = {"minecraft:chest", "minecraft:trapped_chest"}
+			if  requestAPI.inspectThis("front", chest) or requestAPI.inspectThis("bottom", chest) then 
+				 		item.LeaveTrash( "Up","silence" )
+						refuel.organizeFuel(  )
+				 		item.SortLastItem(  )
+
+				 		DungeonChestFound=DungeonChestFound+1
+				 		displayChest(  )
+						screen.ShowProgressBar()
+				 		item.LeaveTrash( "Up" )
+						screen.ShowProgressBar()
+				 		
+				 		while turtle.suck() or turtle.suckDown() do end 
+				 		item.SortLastItem(  ) -- just in case
+			end  		
+ 		end 
+ 	end
+end 

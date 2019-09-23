@@ -1,0 +1,289 @@
+--WRYTE/READ ONLY
+pointObject = "computer";-- turtle,computer,Disk Drive , Printer
+pointSide    = "bottom";
+--READ ONLY
+local peripheralObject; --= peripheral.wrap("bottom")
+local side;
+
+--booleans
+local toggle = true;
+local toggle2 = true;
+
+--shell.run"clear"
+-------------------------------
+
+--"Peripheral inerface API
+
+-------------------------------
+local function getUniqueObject( obj , side )
+ if peripheral.getType (side) == obj then
+--   print ("I found new obejct '"..obj.."'");
+  return side;
+  else
+--  print ("Cannot find an '"..obj.."' at "..side)
+  return nil;
+ end
+end
+
+function connectPeripheral(obj , theSide)
+local getSide = getUniqueObject( obj , theSide);
+  if getSide~= nil then 
+   print("I connected "..obj.." at the "..theSide);
+   peripheralObject = peripheral.wrap(theSide);
+   side = theSide   
+   else
+   print ("Fail to find ,'"..obj..",' at "..theSide)  
+   peripheralObject = nil;
+  end
+end 
+
+
+
+function getMethod (object)
+local t = 0;
+ if object~= nil then
+       print"Geting object methods"
+   for v , i in pairs(object) do
+      t=t+1;
+      print (t..". "..v)
+ end 
+ else
+       print"No object/computer/turtle to inspect"  
+   end
+end
+--part of inspect
+local  function inspectDisk(side)
+  if disk.hasData(side) then
+  print"Floppy disk in drive "
+  return true
+  end
+end
+--part of inspect
+local  function inspectComputer(side)
+ local per = peripheral.wrap(side)
+ local type = peripheral.getType(side)
+     
+     if type == "computer" then  
+       print("Computer have ID: "..per.getID() )
+     return true
+     end
+     
+     if type == "turtle" then
+       print("Turle have ID: "..per.getID())
+     return true
+     end 
+end
+
+local function inspectModem( side )
+  local per = peripheral.wrap(side)
+  local type = peripheral.getType(side)
+        if type == "modem" then 
+            return true
+        end    
+end
+
+-- Great for testing what object is.
+function inspectObject()
+local tb = {"front","top","bottom","right","left","back"}
+   for x= 1,#tb do
+local inspType =  peripheral.getType(tb[x]) 
+       if inspType then
+       print("Inspected "..inspType.." in "..tb[x])
+       --Extra content to inspect 
+       inspectDisk( tb[x] )
+       inspectComputer( tb[x] )
+       end
+   end
+end
+
+function inspectThisObject(THIS)
+local tb = {"front","top","bottom","right","left","back"}
+   for x= 1,#tb do
+local inspType =  peripheral.getType(tb[x]) 
+       if inspType == THIS then
+      -- print("Found/inspect this "..inspType.." in "..tb[x])
+       --Extra content to inspect 
+             return inspectDisk( tb[x] ) or  inspectComputer( tb[x] ) or inspectModem( tb[x] )
+       end
+   end
+  return false
+end
+
+function connectThisObject( THIS )
+  local tb = {"front","top","bottom","right","left","back"}
+   for x= 1,#tb do
+local inspType =  peripheral.getType(tb[x]) 
+       if inspType == THIS then
+       print("Connected "..inspType.." in "..tb[x])
+       --Extra content to inspect 
+             return tb[x]
+       end
+   end
+  return false
+end
+
+--connetc to turtle or computer or Printer. omething like that 
+function forceConnectPeripheral()
+local tb = {"front","top","bottom","right","left","back"} 
+        for x = 1 , #tb do
+local  type = peripheral.getType(tb[x])          
+           if type == pointObject  then
+            print("Force to connect peripherals in "..tb[x])
+            connectPeripheral( pointObject , tb[x] )     
+           return true
+           end
+        end
+   
+    
+    if peripheralObject == nil then  
+    print ("Fail to find, '"..pointObject.."' in all possible sides.")
+    end
+   return false 
+end
+
+--if everything okey return true else false
+local function checkConnectionToPeripheral()
+  local l =false  
+ 
+    if peripheralObject ~= nil then 
+	if toggle then         
+	  -- print"Peripheral are connected propietly"
+           toggle = false
+	end
+      return true
+      else
+      print"Peripherals not connected!"
+      return false
+    end
+end
+
+function inMethods()
+local check = checkConnectionToPeripheral()
+     if check then
+       getMethod(peripheralObject)
+     end
+end
+
+function turnOn()
+local check = checkConnectionToPeripheral() 
+      if check then
+      return peripheralObject.turnOn() 
+      end
+end
+
+function reboot()
+local check = checkConnectionToPeripheral() 
+      if check then
+      return peripheralObject.reboot()
+      end
+end
+
+
+
+function shutdown()
+local check = checkConnectionToPeripheral()
+      if check then
+      return peripheralObject.shutdown()
+      end
+end
+
+function getID()
+local check = checkConnectionToPeripheral()
+      if check then
+      return peripheralObject.getID()
+      end
+end
+
+
+
+---SETS
+
+
+function setPointObjet (pbject)
+      pointObject =pbject ;
+   if pbject == "turtle" or pbject =="computer" or pbject =="drive" then
+   
+   else 
+       print("That object man "..pbject.." not correct!")
+   end 
+end
+
+function setPointSide (side)
+            pointSide    = side; 
+    if side == "top" or side=="bottom" or side=="right" or side=="left" or side =="back" then    
+      else 
+       print("That side man "..side.." not correct!")
+   end
+end
+
+function setLabel( label ) -- only disk awailable :(
+local check = checkConnectionToPeripheral()    
+local lb ="" or  os.getComputerLabel() 
+     if check then  
+          if pointObject =="drive" then 
+          disk.setLabel(pointSide, label and "DRIVE"..lb..":"..label or "DRIVE"..lb..":Unknown["..os.getComputerID().."]")
+          --elseif pointObject =="computer" then 
+          -- os.setComputerLabel(pointSide ,label and "COMPUTER:"..label or "COMPUTER:Unknown" )
+          -- elseif pointObject =="turtle" then 
+          -- pointObject.setComputerLabel(pointSide ,label and "TURTLE:"..label or "TURTLE:Unknown" )
+          end        
+    end
+end
+
+-- COMPUTERCRAFT SUCKS WITH SHELL>RUN :((
+--[[ 
+function isWritingNwFile( file )
+   --assert (file, "Requare file to write in "..pointObject)
+   if fs.exists(file)  then 
+      if pointObject =="drive"  then  
+       --shell.run ("cp" , "..", "drive",file)
+          --local q = fs.copy(file, "disk/"..file) and ("File was writed ".."disk/"..file..".") or ("File "..file.." not found.")           
+       --shell.run"clear"
+     end  
+  else    print("Cannot coppy \""..file.."\" becucle this file not exists in current drectory.")
+  end
+end
+
+]] 
+-----Connection is't needed for set correct object side , get or set data or reboot and restart turtle/computer 
+-----Manual connet peripheral Method for using   
+--connectPeripheral(pointObject ,pointSide) 
+
+----More automatic way to connect to periheral is forceConnectPeripheral it only use dwo default variable 
+--forceConnectPeripheral()
+
+
+----You can reboot object
+--reboot()
+----or
+--shutdown()
+----or even get ID from another turtle!
+--getID()
+
+---- Alow display  all object around top , bottom ,left ,rigt,back to print all tests  
+--inspectObject()
+
+--Show all   reboot , isOn , shutdown, - methods
+--inMethods()
+
+-- local funcrtion by the rule is not usable for user , read only
+
+
+--print(peripheralObject)
+--in Defalt 
+--EVERYTHING GO BELOW forceConnectPeriheral() becule he load ton uf stuff
+--setPointObjet ("turtle")
+--forceConnectPeripheral()
+
+
+
+--inMethods()
+--shutdown()
+--inMethods()
+
+--print(getID())
+--inspectObject()
+
+--print(peripheralObject.shutdown())
+
+

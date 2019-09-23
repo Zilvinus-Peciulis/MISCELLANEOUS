@@ -1,0 +1,29 @@
+os.loadAPI ("/programs/GETCoord")
+os.loadAPI("config/source/FileLibrary/fLib")
+
+-- Set Spawn Coordination
+-- Set in Floppy This Content While Loading Data from SuperComputer.
+--Basicly move one block in all posible side by one 
+--Depend where is looking 
+
+local xDir = {0 ,-1 ,0 , 1}	;local zDir = {1 , 0 , -1 ,0} -- recype where to 
+	
+	local x=GETCoord.x
+	local y=GETCoord.y
+	local z=GETCoord.z
+	local f=GETCoord.f
+
+	f = f + 1 -- becucle table in lua sucks 
+	x = x + xDir[f]
+	y = y
+	z = z + zDir[f]
+	os.loadAPI("config/source/FileLibrary/fLib") --load file Library
+    fLib.fwrite( "/programs/turtle_programs/JOBO/moreFile/GPS/x" , x )
+    fLib.fwrite( "/programs/turtle_programs/JOBO/moreFile/GPS/y" , y )
+    fLib.fwrite( "/programs/turtle_programs/JOBO/moreFile/GPS/z" , z )
+    fLib.fwrite( "/programs/turtle_programs/JOBO/moreFile/GPS/f" , f )
+   -- fLib.fwrite("MAMA","TETEA")
+
+
+os.unloadAPI ("/programs/GETCoord")
+os.unloadAPI("config/source/FileLibrary/fLib")

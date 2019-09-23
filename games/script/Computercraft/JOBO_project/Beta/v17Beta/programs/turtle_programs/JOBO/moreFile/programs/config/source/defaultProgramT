@@ -1,0 +1,110 @@
+--print (shell.dir())
+os.loadAPI("OS")
+local FileName = "defaultProgramT"
+OS.loadAPI("/moreFile/programs/config/source/FileLibrary/fLib",FileName)
+--Turtle
+
+SET = {
+	POST  = function ( line , text )
+		assert(line, "Requare initial line")
+		assert(text~=nil, "Requare initial text")
+	    fLib.replaceLineValue( "/moreFile/programs/config/default" , line ,text , ":" )
+	end;
+     
+
+   TurtlesName = function (this)
+      assert (type(this)=="string" , "Requare initial string TurtlesName got:"..tostring(this))
+	  SET.POST(1, this)
+   end;
+
+    ManagerID = function (this)
+      assert (type(this)=="number" , "Requare initial number ManagerID got:"..tostring(this))
+	  SET.POST(2, this)
+   end;
+
+     yProgressEnd = function (this)
+      assert (type(this)=="number" , "Requare initial number yProgressEnd got:"..tostring(this))
+	  SET.POST(3, this)
+   end;
+
+     DropJunkItem = function (this)
+      assert (type(this)=="boolean" , "Requare initial boolean DropJunkItem got:"..tostring(this))
+    SET.POST(4, this)
+   end;
+
+
+   ROLE = function (this)
+      assert (type(this)=="string" , "Requare initial boolean DropJunkItem got:"..tostring(this))
+    SET.POST(5, this)
+   end;
+
+   xManager = function (this)
+      assert (type(this)=="number" , "Requare initial boolean DropJunkItem got:"..tostring(this))
+    SET.POST(6, this)
+   end;
+
+   yManager = function (this)
+      assert (type(this)=="number" , "Requare initial boolean DropJunkItem got:"..tostring(this))
+    SET.POST(7, this)
+   end;
+
+   zManager = function (this)
+      assert (type(this)=="number" , "Requare initial boolean DropJunkItem got:"..tostring(this))
+    SET.POST(8, this)
+   end;
+
+   fManager = function (this)
+      assert (type(this)=="number" , "Requare initial boolean DropJunkItem got:"..tostring(this))
+    SET.POST(9, this)
+   end;
+}
+
+
+GET ={
+	 GETPOST = function( line )
+	 	assert(type(line)=="number", "Requare initial line")	 	 
+	 	return fLib.getLineValue( "/moreFile/programs/config/default" , line ,":")
+	 end; 
+
+     
+     TurtlesName = function ()
+	  return  GET.GETPOST(1)
+    end;
+
+     ManagerID = function ()
+	  return  GET.GETPOST(2)
+    end;
+
+      yProgressEnd = function ()
+    return  GET.GETPOST(3)
+    end;  
+
+       DropJunkItem = function ()
+    return  GET.GETPOST(4)
+    end;
+
+       ROLE = function ()
+    return  GET.GETPOST(5)
+    end;
+       
+       xManager = function ()
+    return  GET.GETPOST(6)
+    end;
+      
+       yManager = function ()
+    return  GET.GETPOST(7)
+    end;
+      
+       zManager = function ()
+    return  GET.GETPOST(8)
+    end;
+       
+       fManager = function ()
+    return  GET.GETPOST(9)
+    end;
+  -------JOB-----------------------------------   
+   
+}
+
+os.unloadAPI("/moreFile/programs/config/source/FileLibrary/fLib")
+

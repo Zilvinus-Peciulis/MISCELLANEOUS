@@ -1,0 +1,233 @@
+os.loadAPI("cnt/doc")
+  local app = doc.getLibrary(  ) -- get current library 
+
+local path = "cnt/sorting_list.txt";
+
+
+local furnacleCook = turtle.dropDown;
+local pulverizePut = turtle.placeDown;
+local blacklistChest = turtle.drop;
+local whitelistChest = turtle.suckDown;
+
+
+print "Starting after 10 seconds";
+sleep(1);
+
+-- local data = app.GetLongLineValue( path, 1);
+-- print ("index:"..data[1]);
+-- print (item.name == data[1] );
+
+-- local index =  app.getLineValue( path , 1 );
+-- print ("index: "..index);
+
+ -- if true then 
+ --  return  ;
+ --  end ; 
+ -- sleep (10);
+
+-- Turtle go back if was somewhere else
+
+-- fix posistion
+turtle.forward();
+print (" I in position");
+
+function findChest () -- find chest where are plased
+    local success, data = turtle.inspect();
+     
+     print("Block name: ", data.name)
+     print("Block metadata: ", data.metadata)
+     print "Searching Chest"
+     
+     while data.name ~= "minecraft:chest" do 
+        turtle.turnLeft();
+        success, data = turtle.inspect();
+          if success then break end ;
+
+     end 
+ end  
+
+ function moveTurtlePulverize () 
+    while turtle.detectDown() do 
+        turtle.back();
+        sleep(.3);
+    end  
+ end 
+
+ function moveTurtleCook () 
+    while turtle.forward() do 
+        sleep(.3);
+    end  
+ end 
+
+
+function checkWhitelist( ... )
+  
+   
+   for x=1,16 do
+   local isMathing = false; 
+
+
+      if turtle.getItemCount(x) > 0 then 
+        item = turtle.getItemDetail(x) -- in inventory.
+       
+         for list=1, app.Lenght(path)  do
+       
+             local data = app.GetLongLineValue( path, list);
+
+                   
+                  -- print ("line:"..list.."index:"..data[1].." equal:"..tostring (item.name == data[1]) );
+
+                  if item.name == data[1] or data == nil  then -- if item in inventory math with saved data from file
+                --    print "Item  exist in list";
+                    isMathing = true ;
+                     break;
+                  end
+                  
+         end 
+              
+            --  print ("isMathing: "..tostring(isMathing))
+               sleep (2);
+          if  not isMathing then -- if not mached item name from file 
+              -- then ask user to include as valuable item that can be used
+              print "Include to whitelist?"
+                  sleep (3);
+              if app.acceptedUserDelay(30,item.name) then
+             
+                 app.AppendLoongLine( path , {item.name,"whitelist"} )
+              else 
+                 app.AppendLoongLine( path , {item.name,"blacklist"} )
+              end   
+          end         
+      
+      end 
+   end 
+end
+
+
+function whitelistFunction () 
+  print ("White list start");
+  while true do -- wait something with a whitelist to pulverize
+      breakloop = false;   
+          for x=1,16 do
+
+             
+
+                if turtle.getItemCount(x) > 0 then 
+                  item = turtle.getItemDetail(x) -- in inventory.
+                 
+                   for list=1, app.Lenght(path)  do
+                 
+                       local data = app.GetLongLineValue( path, list);
+
+                       print ("is in whitelist: "..data[2] ~= "whitelist");
+                       if data[2] ~= "whitelist" then  -- if nothing left with white list (pulverize)
+                            breakloop =true;
+                            break;
+                       end  
+                       
+                       if data[2] == "whitelist" then -- select only white listed items
+                        turtle.select(x);
+                        pulverizePut();
+                       end   
+                            
+                   end 
+                        
+                       
+                         
+                        
+                
+                end 
+             end
+             sleep(.3)
+             if breakloop then break; end ;
+   end 
+ print ("White list end ");
+
+end
+
+function blacklistFunction( ... )
+  print ("Blacklist list start ");
+  while true do -- wait something with a blacklist to cook
+          local breakloop =false;
+        
+          for x=1,16 do
+
+
+                if turtle.getItemCount(x) > 0 then 
+                  
+                  item = turtle.getItemDetail(x) -- in inventory.
+                  
+                   for list=1, app.Lenght(path)  do
+                 
+                       local data = app.GetLongLineValue( path, list);
+
+                       print ("is in blacklist: "..data[2] ~= "blacklist");
+                       if data[2] ~= "blacklist" then  -- if nothing left with black list (cook)
+                         breakloop =true;
+                         break;
+                       end  
+                       
+                       if data[2] == "whitelist" then 
+                        turtle.select(x);
+                        furnacleCook();
+                       else if data[2] == "blacklist" then -- select only black listed items
+                        print ("slot: "..x.." blacklist chest");
+                        turtle.select(x);
+                        blacklistChest();
+                       end   
+                            
+                   end 
+                        
+                       
+                         
+                        
+                
+                end 
+             end 
+     end 
+    sleep(.3);
+             if breakloop then break; end;
+
+  end
+  print ("Blacklist list end ");
+end 
+
+ while true do 
+
+ checkWhitelist();
+
+-- prepare for fiical execition
+
+-- back to raw materials chest to cook
+
+moveTurtlePulverize ();
+turtle.forward();
+for x=1,16 do 
+  turtle.select(x);
+  whitelistChest();
+end  
+  turtle.select(1);
+  turtle.forward();
+
+for x=1,16 do 
+  turtle.select(x);
+  pulverizePut();
+end
+sleep (30);
+ ---
+whitelistFunction (); 
+checkWhitelist();
+
+
+  
+moveTurtleCook ();
+for x=1,16 do 
+  turtle.select(x);
+  furnacleCook();
+end
+sleep (30);  
+blacklistFunction(); 
+ 
+ 
+sleep(5);
+end 

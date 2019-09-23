@@ -1,0 +1,106 @@
+
+-- Wsith betwen child Location from Manager
+if fs.exists("/programs/Require_Items/source/requestAPI") then 
+  --  print "turtleLib:Loading to Manager...??"
+    os.loadAPI("/programs/turtle_programs/JOBO/OS")
+    OS.loadAPI("/programs/Require_Items/source/requestAPI")
+    OS.loadAPI("/programs/say")
+else 
+	--print "turtleLib:Loading to child..."
+	os.loadAPI("OS")
+	OS.loadAPI("/moreFile/programs/requestAPI")
+	OS.loadAPI("/moreFile/programs/say")
+end 
+
+
+local turtleArray = {"ComputerCraft:CC-Turtle" ,"ComputerCraft:CC-TurtleAdvanced","ComputerCraft:CC-TurtleExpanded"} 
+
+function inspectTurtle(side  )
+	assert(side == "Up" or side == "Down" or side == "Front" , "inspectTurtle expected Up , Down, Front got "..tostring(side))
+	 if side == "Front" then side = "" end 
+	local lol,data = turtle["inspect"..side]() 
+      for _,name in pairs(turtleArray) do
+      		  if  data.name == name then 
+          return true 
+      end 
+      end
+   return false
+end
+
+function isTurtle(  ) -- chesk if Turtle in inventory
+	for slot = 1, 16 do 
+		 if requestAPI.isListedRequest( requestAPI.getDataName (slot) , turtleArray ) then 
+	     return true 
+	     end 
+	end
+return false
+end
+
+
+
+function TurtleIn( slot ) -- chesk if Turtle in inventory
+	assert (type(slot)=="number", "Requare number in isTurtleIn slot.")	 
+		 if requestAPI.isListedRequest( requestAPI.getDataName (slot) , turtleArray ) then 
+	     return true 
+	     end 
+return false
+end
+
+
+function Count(  ) -- countTurtles
+local c = 0
+	for slot = 1, 16 do 
+		 if requestAPI.isListedRequest( requestAPI.getDataName (slot) , turtleArray ) then 
+	      c = c + turtle.getItemCount(slot)
+	     end 
+	end
+return c
+end 
+
+function dropTurles( side )
+	assert (side=="Down" or side=="" or side == "Up","Requare dropTurtle Down Up")
+	for slot=1,16 do
+		if  requestAPI.isListedRequest( requestAPI.getDataName (slot) , turtleArray ) then  
+			turtle.select (slot)
+			if not turtle["drop"..side]() then return false end 
+		end 	
+	end
+ return true
+end
+
+function Send(id ,arg ) -- send Data
+	assert(type(id)=="number","Send:Requare id where to send.")
+	assert (type (arg) == "table","Send:Requre table to serialize")
+	-- print ("Sending")
+	rednet.send(id, textutils.serialize(arg))
+end
+
+function Broadcast( arg )
+	assert (type (arg) == "table","broadcast:Requre table to serialize")
+	rednet.broadcast( textutils.serialize(arg))
+end
+
+function Receive( time )
+	  if time then 
+	  assert(type(time)== "number", "Receive:Requre time value.")
+	  end 
+
+	local sender,message,_ =rednet.receive(time)
+
+	if   message ~= nil and textutils.unserialize(message) then 
+		local tb = textutils.unserialize(message)
+		for k,v in pairs( tb) do
+			 -- say.alert("Rec: "..tostring (k).."="..tostring(v))
+		end
+	return sender , tb
+	-- else print "Message:nil" 
+
+	end 	
+ return false 
+end
+
+
+
+
+
+

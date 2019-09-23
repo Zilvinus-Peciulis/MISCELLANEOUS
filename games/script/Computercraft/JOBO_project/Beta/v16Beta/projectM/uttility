@@ -1,0 +1,95 @@
+os.loadAPI("/programs/Require_Items/source/requestAPI")
+os.loadAPI("config/source/StatisticsProgram")
+os.loadAPI("programs/inventory")
+os.loadAPI("/programs/BOOT/BOOT_TURTLE")
+os.loadAPI("programs/chestLib")
+os.loadAPI("programs/orientation")
+
+local function getNInput(  txt )
+  	      print ("Requare:"..txt..".")
+   local  n = tonumber(read())
+        while n == nil do
+                n = tonumber(read())
+  		end
+               return n
+  end
+
+function clear(  )
+	term.setCursorPos(1,1) ; term.clear()
+end
+
+--Corrds
+function changeCoord (  )  
+	clear(  )
+	print ("Changing Coord ...")
+	StatisticsProgram.changeCoord(  getNInput(  "xPos" ), getNInput(  "yPos" ),getNInput(  "zPos" ),getNInput(  "fPos" ) )
+end
+
+function changeJobLocation(  )
+clear(  )
+	say.special ("Changing Job Location...")
+	StatisticsProgram.changeJobLocation(getNInput(  "xStartJob" ) ,getNInput(  "zStartJob" ),getNInput(  "xEndJob" ),getNInput(  "zEndJob" ),getNInput(  "yJob" ) )
+end
+
+function getCoord(  )
+   local x,y,z,f = StatisticsProgram.getCoord(  )
+   local xStart,zStart,xEnd,zEnd,yJob = StatisticsProgram.getJobLocation(  )
+   clear(  )
+   say.special "There will see all coordinates."
+   say.super ("Job\nxStart:"..xStart..", zStart:"..zStart..",\nxEnd:"..xEnd..", zEnd:"..zEnd..", yJob:"..yJob)
+   say.super ("\nMy\nx: "..x..", y:"..y..", z:"..z..", f:"..f.." "..orientation["toNameOrientation"]( f+1 ))
+   say.alert ("If you want to reset My location, place two floppy and two disk drive!")
+end
+
+function getJobLocation(  )
+  
+end
+--Events
+function WaitEnter ()
+print "Press enter to continue."
+local _ = read()
+  end
+
+
+  
+function TurtlesKickStart( )  -- lounth all turtles
+  BOOT_TURTLE.UpdateDisk ()  --Check if all in place, Update when disk drive and Floppy in inventory
+  -- if in sucking slot is something else then turtle dtop up
+  if not inventory.getInvSpace(  )  and not turtleLib.isTurtle() and not turtleLib.TurtleIn( turtle.getSelectedSlot() )and  chestLib.chestSide("bottom") then turtle.dropUp() end  
+-- Place all turtles.
+  while  turtleLib.Count()>0 or turtle.suckDown() do  
+       local status,wait =  BOOT_TURTLE.RUNSupport() 
+        if wait == true  then say.warning("Waiting while support travel home")  end 
+        say.alert ("Wait: "   ..tostring(wait))
+        -- sleep(10)
+        if not wait then 
+            if  not BOOT_TURTLE.RUN( )  then sleep(0);
+                return false;   
+            end 
+        end  
+        sleep(0.5)
+        while turtle.detect () do sleep(1) end             
+    end
+  return  true -- Return status was secesfuly
+end
+
+function TurtlesUpdateDisk( boolean )
+  return BOOT_TURTLE.UpdateDisk (boolean) 
+end
+
+function dropTurtleChest(  )
+ if  chestLib.chestSide ("bottom") and turtleLib.isTurtle(  ) then 
+      print "Dropping turtles"
+      if turtleLib.dropTurles( "Down" ) and inventory.getSpace( turtle.getSelectedSlot() ) then 
+      local slot = turtle.getSelectedSlot()
+      if turtle.getItemCount(slot) >= 64 and slot < 16 then slot = slot + 1;turtle.select(slot) end 
+      -- print ("Selected slot: ",slot)
+      -- trasfer wood/ matterial
+      -- while one slot is in inventory , take the items
+     while inventory.getSpace( turtle.getSelectedSlot() ) and turtle.suck() do requestAPI.sortSlotsFromThis  ( slot,{ requestAPI.getDataName  (slot) } ) end -- suck materials that gerttered from dissasembled turtle 
+      
+      end
+ end 
+end
+
+
